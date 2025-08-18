@@ -1,0 +1,76 @@
+body{
+    background: lightblue;
+    font-family: Arial, sans-serif;
+}
+h2{
+    text-align: center;
+    font-size: 2.0em;
+    margin-top: 20px;
+    margin-bottom: 40px;
+}
+form{
+    display:flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: 3px solid white;
+    background: white;
+    box-shadow:gray 5px 5px 15px;
+    padding: 20px;
+    border-radius: 10px;
+    height: 350px;
+    width: 350px;
+    margin: 50px auto;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+label, #username, #password{
+    display: block;
+    margin-bottom: 10px;
+    padding: 5px;
+    border-radius: 10px;
+    width: 250px;
+    font-size: 18px;
+}
+input[type="text"], input[type="password"]{
+    border: 2px solid lightgray;
+    padding: 10px;
+    font-size: 16px;
+    width: 100%;
+    box-sizing: border-box;
+}
+#btn{
+    margin-top: 10px;
+    background: rgb(50, 190, 0);
+    color: white;
+    border: none;
+    width: 35%;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 15px;
+   margin-bottom: 20px;
+}
+#btn:hover{
+    background-image: linear-gradient(to right, rgb(50, 190, 0), rgb(0, 150, 0));
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    
+}
+.logo{
+    background: url(../images/logo.png) no-repeat center center;
+    background-size: contain;
+    background-color: white;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    position: fixed;
+    text-align: center;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 1000;
+    height: 40px;
+    padding: 1rem;
+}   
+
