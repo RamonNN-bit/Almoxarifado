@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 15/08/2025 às 21:37
+-- Tempo de geração: 19/08/2025 às 19:51
 -- Versão do servidor: 10.4.32-MariaDB
 -- Versão do PHP: 8.0.30
 
@@ -28,10 +28,11 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `itens` (
-  `id_item` int(11) NOT NULL,
-  `nome` varchar(16) DEFAULT NULL,
-  `quantidade` varchar(16) DEFAULT NULL,
-  `unidade` varchar(16) DEFAULT NULL,
+  `id` int(11) NOT NULL,
+  `nome` varchar(100) DEFAULT NULL,
+  `quantidade` int(11) DEFAULT NULL,
+  `senha` varchar(16) DEFAULT NULL,
+  `unidade` int(11) DEFAULT NULL,
   `marca` varchar(16) DEFAULT NULL,
   `modelo` varchar(16) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -43,12 +44,12 @@ CREATE TABLE `itens` (
 --
 
 CREATE TABLE `movimentacoes` (
-  `id_mov` int(11) NOT NULL,
+  `id` int(11) NOT NULL,
   `id_item` int(11) DEFAULT NULL,
-  `tipo` enum('entrada','saida') DEFAULT NULL,
-  `id_usuario` int(11) DEFAULT NULL,
+  `TIPO` enum('entrada, saida') DEFAULT NULL,
   `quantidade` int(11) DEFAULT NULL,
-  `data` date DEFAULT NULL
+  `data` date DEFAULT NULL,
+  `id_usuario` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -58,11 +59,11 @@ CREATE TABLE `movimentacoes` (
 --
 
 CREATE TABLE `usuario` (
-  `id_usuario` int(11) NOT NULL,
+  `id` int(11) NOT NULL,
   `nome` varchar(100) DEFAULT NULL,
   `email` varchar(16) DEFAULT NULL,
   `senha` varchar(16) DEFAULT NULL,
-  `TIPO` enum('Admin, Usuario') DEFAULT NULL
+  `TIPO` enum('admin,usuario') DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -73,30 +74,43 @@ CREATE TABLE `usuario` (
 -- Índices de tabela `itens`
 --
 ALTER TABLE `itens`
-  ADD PRIMARY KEY (`id_item`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Índices de tabela `movimentacoes`
 --
 ALTER TABLE `movimentacoes`
-  ADD PRIMARY KEY (`id_mov`),
-  ADD KEY `id_item` (`id_item`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `id_item` (`id_item`),
+  ADD KEY `id_usuario` (`id_usuario`);
 
 --
 -- Índices de tabela `usuario`
 --
 ALTER TABLE `usuario`
-  ADD PRIMARY KEY (`id_usuario`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- AUTO_INCREMENT para tabelas despejadas
 --
 
 --
+-- AUTO_INCREMENT de tabela `itens`
+--
+ALTER TABLE `itens`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de tabela `movimentacoes`
 --
 ALTER TABLE `movimentacoes`
-  MODIFY `id_mov` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de tabela `usuario`
+--
+ALTER TABLE `usuario`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- Restrições para tabelas despejadas
@@ -106,7 +120,8 @@ ALTER TABLE `movimentacoes`
 -- Restrições para tabelas `movimentacoes`
 --
 ALTER TABLE `movimentacoes`
-  ADD CONSTRAINT `movimentacoes_ibfk_1` FOREIGN KEY (`id_item`) REFERENCES `itens` (`id_item`);
+  ADD CONSTRAINT `movimentacoes_ibfk_1` FOREIGN KEY (`id_item`) REFERENCES `itens` (`id`),
+  ADD CONSTRAINT `movimentacoes_ibfk_2` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
