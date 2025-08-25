@@ -9,7 +9,7 @@
 
 <body>
     <!-- Login -->
-    <form action="/conexao.php" method="POST">
+    <form action="../model/teste.php" method="POST">
     <h2>Login</h2>
     <div class="container">
         <label for="email">Email:</label>
