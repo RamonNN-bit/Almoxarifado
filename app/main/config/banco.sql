@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 19/08/2025 às 19:51
+-- Tempo de geração: 21/08/2025 às 18:16
 -- Versão do servidor: 10.4.32-MariaDB
 -- Versão do PHP: 8.0.30
 
@@ -31,7 +31,6 @@ CREATE TABLE `itens` (
   `id` int(11) NOT NULL,
   `nome` varchar(100) DEFAULT NULL,
   `quantidade` int(11) DEFAULT NULL,
-  `senha` varchar(16) DEFAULT NULL,
   `unidade` int(11) DEFAULT NULL,
   `marca` varchar(16) DEFAULT NULL,
   `modelo` varchar(16) DEFAULT NULL
@@ -45,8 +44,8 @@ CREATE TABLE `itens` (
 
 CREATE TABLE `movimentacoes` (
   `id` int(11) NOT NULL,
-  `id_item` int(11) DEFAULT NULL,
-  `TIPO` enum('entrada, saida') DEFAULT NULL,
+  `id_item` int(11) NOT NULL,
+  `tipo` enum('entrada','saida') DEFAULT NULL,
   `quantidade` int(11) DEFAULT NULL,
   `data` date DEFAULT NULL,
   `id_usuario` int(11) DEFAULT NULL
@@ -60,10 +59,10 @@ CREATE TABLE `movimentacoes` (
 
 CREATE TABLE `usuario` (
   `id` int(11) NOT NULL,
-  `nome` varchar(100) DEFAULT NULL,
-  `email` varchar(16) DEFAULT NULL,
-  `senha` varchar(16) DEFAULT NULL,
-  `TIPO` enum('admin,usuario') DEFAULT NULL
+  `nome` varchar(100) NOT NULL,
+  `email` varchar(100) DEFAULT NULL,
+  `senha` varchar(255) DEFAULT NULL,
+  `TIPO` enum('admin','usuario') DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -120,8 +119,8 @@ ALTER TABLE `usuario`
 -- Restrições para tabelas `movimentacoes`
 --
 ALTER TABLE `movimentacoes`
-  ADD CONSTRAINT `movimentacoes_ibfk_1` FOREIGN KEY (`id_item`) REFERENCES `itens` (`id`),
-  ADD CONSTRAINT `movimentacoes_ibfk_2` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id`);
+  ADD CONSTRAINT `movimentacoes_ibfk_1` FOREIGN KEY (`id_item`) REFERENCES `itens` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `movimentacoes_ibfk_2` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id`) ON DELETE SET NULL;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
