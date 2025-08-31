@@ -7,7 +7,7 @@
 </head>
 <body>
     <!-- Cadastro -->
-    <form action="../model/cadastro.php" method="POST">
+    <form action="../model/cadastrousuario.php" method="POST">
     <h2>Cadastro</h2>
     <div class="container">
         <label for="nome">Nome:</label>
