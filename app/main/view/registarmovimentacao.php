@@ -1,215 +1,107 @@
+<?php
+require_once '../includes/db.php';
+
+session_start();
+if (!isset($_SESSION ["usuariologado"])) {
+header("Location: index.php");
+}
+?>
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-
-    <title>Login</title>
-    <style>
-    body{
-    background: url(../assets/images/backgroundlogin.png) no-repeat center center fixed;
-    font-family: Arial, sans-serif;
-    background-size: cover;
-    background-attachment: fixed;
-    min-height: 100vh;
-    width: 100vw;
-}
-@media (max-width: 600px) {
-body {
-        background-size: cover;
-        background-attachment: scroll;
-        min-height: 100vh;
-        width: 100vw;
+  <meta charset="UTF-8">
+  <title>Movimentação de Estoque</title>
+  <style>
+    body { font-family: Arial;
+         max-width: 600px; 
+         margin: 20px auto; 
+         padding: 20px; 
+         background: #e0e0e0 }
+    h1 { text-align: center; }
+    .form-container { background: #fff;
+         padding: 15px;
+          border-radius: 8px;
+           box-shadow: 0 0 10px #0001; }
+    .form-group { margin-bottom: 10px; }
+    label { display: block;
+        margin-bottom: 5px;
+         font-weight: bold; }
+    input, select, button {
+      width: 100%;
+       padding: 8px; 
+       border-radius: 4px; 
+       border: 1px solid #bbb;
+        box-sizing: border-box;
     }
-form {
-        max-width: 95vw;
-        padding: 18px ;
-        height: auto;
-    }
-input {
-        width: 100%;
-    }
-#btn {
-        width: 100%;
-    }
-footer {
-        width: 100%;
- }}
-
-/*Nome Login */
-h2{
-    text-align: center;
-    font-size: 2.5em;
-    margin-top: 20px;
-    margin-bottom: 7px;
-
-}
-/* formulario do login */
-form{
-    display:flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    border: 2px solid white;
-    background: rgba(255, 255, 255, 0.94);
-    box-shadow:gray 5px 5px 15px;
-    padding: 60px;
-    border-radius: 15px;
-    height: 410px;
-    width: 350px;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    gap: 20px;
-    transform: translate(-50%, -50%);
-}
-.foco{
-    display: block;
-    margin-bottom: 5px;
-    font-size: 16px; 
-    color: #333;
-    font-weight: bold;
-}
-
-#email, #password{
-    display: block;
-    margin-bottom: 2px;
-    border-radius: 25px;
-    border: 2px solid #e0e0e0;
-    background: #f9f9f9;
-    font-size: 16px;
-    box-sizing: border-box;
-    width: 280px;
-    height: 50px;
-    padding: 0 15px;
-    transition: all 0.3s ease;
-    font-family: Arial, sans-serif;
-}
-
-input:focus{
-    border: 2px solid lightgray;
-    border-color: linear-gradient(255, 119, 0),;
-    outline: none;
-}
-
-
-/* lembrar-me e esqueciasenha */
-.options{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 280px;
-}
-
-#btn{
-    width: 100%;
-    max-width: 200px;
-    margin-top: 10px;
-    background: rgb(50, 190, 0);
-    color: white;           
-    border: none;
-    height: auto;
-    padding: 12px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 17px;
-    transition: transform 0.1s, box-shadow 0.1s, background-image 0.1s;
-}
-#btn:hover{
-    background-image: linear-gradient(to right, rgb(50, 190, 0), rgb(0, 150, 0));
-    
-}
-#btn:active{
-    transform: scale(1.05);
-    background-image: linear-gradient(to right, rgb(50, 170, 0), rgb(0, 140, 0));
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-}
-
-
-/* olho da senha */
-.password-container {
-    position: relative;
-    width: 280px;
-}
-
-#mostrarSenhaBtn {
-    position: absolute;
-    top: 50%;
-    right: 15px;
-    transform: translateY(-50%);
-    cursor: pointer;
-    font-size: 19px;
-    color: #555;
-    border: none;
-    background: none;
-    padding: 0;
-    transition: color 0.3s ease;
-}
-
-#mostrarSenhaBtn:hover {
-    color: #ff7700;
-}
-#password {
-    padding-right: 40px;
-}
-
-
-/* redirecionamento */
-a{
-    color:gray;
-    outline: none;  
-    text-decoration: underline;
-}
-
-
-/* rodapé */
-footer {
-    background-color: rgb(255, 255, 255);
-    padding: 10px;
-    border-top-left-radius: 100%;
-    border-top-right-radius: 100%;
-    text-align: center;
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    z-index: 1000;
-    
-
-}
-
-.logo {
-    display: inline-block;
-    height: 70px;
-    background-size: contain;
-}
-    </style>
+    button { background: #0057d8;
+         color: #fff;
+          border: none; 
+          font-size: 16px;
+           cursor: pointer; }
+    button:hover { background: #003087; }
+     { display: none; 
+        margin-top: 10px;
+         padding: 8px;
+          border-radius: 4px; }
+    .sucesso { background: #d4edda;
+         color: #155724; }
+    .erro { background: #f8d7da;
+         color: #721c24; }
+  </style>
 </head>
-<body style="opacity:0; transition: opacity 1s;" onload="document.body.style.opacity='1'">
-    <!-- Login -->
-    <form id="loginForm" action="../model/rota.php" method="POST">
-    <h2>Login</h2>
-    <div class="container">
-        <label for="email" class="foco">Email:</label>
-        <input type="email" id="email" name="email" placeholder="nome@gmail.com" required autocomplete="off"><br>
-    </div> 
-    <div class="password-container">
-        <label for="password" class="foco">Senha:</label>
-        <input type="password" id="password" name="password" placeholder="senha" required autocomplete="off"><i class="bi-eye-fill" id="mostrarSenhaBtn" onclick="mostrarSenha()"></i></input><br>
-    </div>
-    <div class="options">
-        <label id="remember"><input type="checkbox" name="rememberMe" id="remember"> Lembrar-me</label>
-        <a href="senha.php" id="forgotpassword">Esqueci a Senha</a>
-    </div>
-        <button type="submit" id="btn">Entrar</button>
-        <p>Não tem uma conta? <a href="cadastro.php">Cadastre-se</a></p>
+<body>
+  <h1>Movimentação de Estoque</h1>
+  <div class="form-container">
+    <form id="form-mov">
+      <div class="form-group">
+        <label>Tipo:</label>
+        <select id="tipo" required>
+          <option value="">Selecione</option>
+          <option value="entrada">Entrada</option>
+          <option value="saida">Saída</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Quantidade:</label>
+        <input type="number" id="quantidade" min="1" required>
+      </div>
+      <div class="form-group">
+        <label>Data:</label>
+        <input type="date" id="data" required>
+      </div>
+      <button type="submit">Registrar</button>
     </form>
+    <div id="mensagem"></div>
+  </div>
 
-    <footer>
-    <img src="../assets/images/logo.png" alt="Logo" class="logo">
-    </footer>
-
+  <script>
+    document.getElementById('form-mov').addEventListener('submit', async e => {
+      e.preventDefault();
+      const tipo = tipo.value, qtd = quantidade.value, dataVal = data.value, msg = mensagem;
+      if (!tipo || !qtd || !dataVal || qtd <= 0) {
+        msg.textContent = 'Preencha os campos corretamente.';
+        msg.className = 'erro';
+        msg.style.display = 'block';
+        return;
+      }
+      try {
+        const res = await fetch('/movimentacao/registrar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tipo, quantidade: qtd, data: dataVal })
+        });
+        const txt = await res.text();
+        msg.textContent = txt;
+        msg.className = res.ok ? 'sucesso' : 'erro';
+        msg.style.display = 'block';
+        if (res.ok) form.reset();
+      } catch {
+        msg.textContent = 'Erro ao conectar com o servidor!';
+        msg.className = 'erro';
+        msg.style.display = 'block';
+      }
+    });
+  </script>
 </body>
-<script src="../assets/js/script.js"></script>
-<script src="../assets/js/mostrarSenha.js"></script>
 </html>
+?>
