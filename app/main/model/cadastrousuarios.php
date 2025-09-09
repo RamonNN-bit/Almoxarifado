@@ -22,3 +22,4 @@ if (!empty($_POST['nome']) && !empty($_POST['email']) && !empty($_POST['password
     header("Location: ../view/cadastro.php?erro=1");
     exit;
 }
+?>
