@@ -18,10 +18,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt = $pdo->prepare("SELECT id, nome, email, senha, tipo FROM usuario WHERE email = ?");
     $stmt->execute([$email]);
     $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
-
+    $_SESSION ["usuariologado"] = $usuario;
   
     if ($usuario && password_verify($senhaDigitada, $usuario['senha'])) {
-      
+
         $_SESSION['id'] = $usuario['id'];
         $_SESSION['nome'] = $usuario['nome'];
         $_SESSION['email'] = $usuario['email'];
@@ -39,5 +39,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header('Location: ../view/index.php');
         exit;
     }
-}
-?>
+}?>
