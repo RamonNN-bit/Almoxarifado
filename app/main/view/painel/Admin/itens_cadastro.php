@@ -5,8 +5,8 @@ header("Location: ../../view/index.php");
 }
 
 // Incluir o controller para processar o formulário
-require_once '../../includes/db.php';
-require_once '../../model/ItensModel.php';
+require_once '../../../config/db.php';
+require_once '../../../model/ItensModel.php';
 
 // Buscar todos os itens para exibir na tabela
 try {

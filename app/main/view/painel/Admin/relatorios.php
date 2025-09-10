@@ -1,4 +1,21 @@
 <?php
+require_once '../pdf/fpdf186/fpdf.php';
+require '../config/db.php';
+
+$pdf = new FPDF(P);
+$pdf->addPage(A4);
+
+$pdf->SetFont('arial', 'B', 15);
+
+$pdf->Cell(0, 10, 'Relatorios', 0, 1, 'C');
+$pdf->Ln(10);
+
+$tipo_pdf = 'I';
+
+$pdf->Output($tipo_pdf, 'relatorios.pdf', true);
+$pdf->Close();
+
+
 function getRelatorios() {
     global $conn;
     if ($conn === null) {
@@ -18,9 +35,10 @@ function getRelatorios() {
 }
 
 session_start();
-if (!isset($_SESSION ["usuariologado"])) {
+if (!isset($_SESSION["usuariologado"])) {
 header("Location: ../index.php");
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">

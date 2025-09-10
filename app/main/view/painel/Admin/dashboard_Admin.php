@@ -204,7 +204,7 @@ header("Location: ../../index.php");
                             <i class="fas fa-download mr-2"></i>Exportar Relatório
                         </button>
                         <button class="px-4 py-2 bg-green-primary text-white rounded-lg hover:bg-green-secondary transition-colors duration-200">
-                            <i class="fas fa-plus mr-2"></i>Novo Item
+                            <a href="itens_cadastro.php"><i class="fas fa-plus mr-2"></i>Novo Item</a>
                         </button>
                     </div>
                 </div>
