@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
        
         if ($usuario['tipo'] === 'admin') {
-            header('Location: ../view/painel/admin/dashboard_Admin.php');
+            header('Location: ../view/painel/Admin/dashboard_Admin.php');
         } else {
             header('Location: ../view/painel/Usuario/dashboard_usuario.php');
         }
