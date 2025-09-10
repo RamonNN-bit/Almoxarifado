@@ -41,7 +41,7 @@ class ItensController {
 
             try {
                 if ($this->itensModel->criar($nome, $quantidade, $unidade, $marca, $modelo)) {
-                    header('Location: /itens/listar?sucesso=Item criado com sucesso');
+                    header('Location: ../painel/Admin/itens_cadastro.php?sucesso=Item criado com sucesso');
                     exit;
                 } else {
                     $erro = 'Falha ao criar o item. Tente novamente.';

@@ -187,7 +187,7 @@ footer {
 </head>
 <body style="opacity:0; transition: opacity 1s;" onload="document.body.style.opacity='1'">
     <!-- Login -->
-    <form id="loginForm" action="../model/rota.php" method="POST">
+    <form id="loginForm" action="../config/rota.php" method="POST">
     <h2>Login</h2>
     <div class="container">
         <label for="email" class="foco">Email:</label>

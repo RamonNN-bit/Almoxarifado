@@ -237,7 +237,7 @@
   <script>
     function redirect() {
       setTimeout(() => {
-        window.location = '../painel/Admin/dashboard_Admin.php';
+        window.location = '../painel/Admin/itens_cadastro.php';
       }, 3000);
     }
     redirect();
