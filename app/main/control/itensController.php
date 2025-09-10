@@ -17,11 +17,9 @@ class ItensController {
 
         try {
             $itens = $this->itensModel->buscarTodosItens();
-            require_once '../view/itens_cadastro.php';
         } catch (Exception $e) {
             error_log('Erro ao listar itens: ' . $e->getMessage());
             http_response_code(500);
-            require_once '../view/erro.php'; 
         }
     }
 
@@ -35,7 +33,6 @@ class ItensController {
 
             if (!$nome || !$quantidade || !$unidade || !$marca || !$modelo) {
                 $erro = 'Todos os campos são obrigatórios e devem ser válidos.';
-                require_once '../view/itens_cadastro.php'; 
                 return;
             }
 
@@ -45,16 +42,13 @@ class ItensController {
                     exit;
                 } else {
                     $erro = 'Falha ao criar o item. Tente novamente.';
-                    require_once '../view/itens_cadastro.php'; 
                 }
             } catch (Exception $e) {
                 error_log('Erro ao criar item: ' . $e->getMessage());
                 $erro = 'Erro interno ao criar o item. Contate o administrador.';
-                require_once '../view/itens_cadastro.php'; 
             }
         } else {
             
-            require_once '../view/itens_cadastro.php';
         }
     }
 }
