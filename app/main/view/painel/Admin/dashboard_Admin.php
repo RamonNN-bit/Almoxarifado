@@ -1,449 +1,303 @@
+<?php
+session_start();
+if (!isset($_SESSION ["usuariologado"])) {
+header("Location: ../../index.php");
+}
+?>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Almoxarifado</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome para ícones -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'green-primary': '#059669',
+                        'green-secondary': '#047857',
+                        'green-light': '#10b981',
+                        'green-dark': '#065f46',
+                        'green-accent': '#34d399',
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        :root {
-            --primary-color: #2c3e50;
-            --secondary-color: #34495e;
-            --accent-color: #3498db;
-            --success-color: #27ae60;
-            --warning-color: #f39c12;
-            --danger-color: #e74c3c;
-            --light-color: #ecf0f1;
+        .sidebar-gradient {
+            background: linear-gradient(180deg, #065f46 0%, #047857 100%);
         }
         
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f7f9;
-            color: #333;
+        .stat-card-gradient-1 {
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
         }
         
-        #wrapper {
-            display: flex;
+        .stat-card-gradient-2 {
+            background: linear-gradient(135deg, #047857 0%, #059669 100%);
         }
         
-        #sidebar {
-            width: 250px;
-            background: linear-gradient(180deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            color: white;
-            height: 100vh;
-            position: fixed;
-            transition: all 0.3s;
-            z-index: 1000;
-            box-shadow: 3px 0 10px rgba(0, 0, 0, 0.1);
+        .stat-card-gradient-3 {
+            background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
         }
         
-        #sidebar .sidebar-brand {
-            padding: 1.5rem 1rem;
-            font-size: 1.2rem;
-            font-weight: 700;
-            text-align: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            background-color: rgba(0, 0, 0, 0.1);
+        .stat-card-gradient-4 {
+            background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
         }
         
-        #sidebar .sidebar-brand img {
-            height: 40px;
-            margin-right: 10px;
+        .card-hover {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         
-        #sidebar .sidebar-nav {
-            padding: 0;
-            list-style: none;
-            margin-top: 20px;
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
         
-        #sidebar .sidebar-item {
-            position: relative;
-            margin: 5px 0;
+        .sidebar-link-active {
+            background: rgba(16, 185, 129, 0.1);
+            border-left: 3px solid #10b981;
         }
         
-        #sidebar .sidebar-link {
-            padding: 12px 20px;
-            display: block;
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-            transition: all 0.3s;
-            border-left: 3px solid transparent;
+        .badge-green {
+            background-color: #059669;
         }
         
-        #sidebar .sidebar-link:hover, 
-        #sidebar .sidebar-link.active {
-            color: white;
-            background: rgba(255, 255, 255, 0.1);
-            border-left: 3px solid var(--accent-color);
+        .badge-orange {
+            background-color: #f59e0b;
         }
         
-        #sidebar .sidebar-link i {
-            margin-right: 10px;
-            width: 20px;
-            text-align: center;
+        .badge-red {
+            background-color: #dc2626;
         }
         
-        #content {
-            width: calc(100% - 250px);
-            margin-left: 250px;
-            min-height: 100vh;
-        }
-        
-        .topbar {
-            height: 70px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-            background: white;
-            padding: 0 20px;
-        }
-        
-        .card-almox {
-            border: none;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            margin-bottom: 1.5rem;
-            transition: transform 0.3s;
-        }
-        
-        .card-almox:hover {
-            transform: translateY(-5px);
-        }
-        
-        .card-almox .card-header {
-            background: white;
-            border-bottom: 1px solid #eaeaea;
-            font-weight: 600;
-            color: var(--primary-color);
-            padding: 15px 20px;
-            border-radius: 8px 8px 0 0 !important;
-        }
-        
-        .stat-card {
-            border-radius: 8px;
-            padding: 20px;
-            color: white;
-            height: 100%;
-        }
-        
-        .stat-card .stat-card-icon {
-            font-size: 2.5rem;
-            opacity: 0.9;
-            margin-bottom: 15px;
-        }
-        
-        .stat-card .stat-card-number {
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin: 5px 0;
-        }
-        
-        .stat-card .stat-card-title {
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            opacity: 0.9;
-            letter-spacing: 1px;
-        }
-        
-        .bg-primary-almox {
-            background: linear-gradient(135deg, var(--primary-color) 0%, #3c5575 100%);
-        }
-        
-        .bg-success-almox {
-            background: linear-gradient(135deg, var(--success-color) 0%, #2ecc71 100%);
-        }
-        
-        .bg-warning-almox {
-            background: linear-gradient(135deg, var(--warning-color) 0%, #f1c40f 100%);
-        }
-        
-        .bg-danger-almox {
-            background: linear-gradient(135deg, var(--danger-color) 0%, #c0392b 100%);
-        }
-        
-        .bg-info-almox {
-            background: linear-gradient(135deg, var(--accent-color) 0%, #2980b9 100%);
-        }
-        
-        .table-almox {
-            width: 100%;
-        }
-        
-        .table-almox th {
-            background-color: #f8f9fa;
-            color: var(--primary-color);
-            font-weight: 600;
-            padding: 12px 15px;
-        }
-        
-        .table-almox td {
-            padding: 12px 15px;
-            vertical-align: middle;
-        }
-        
-        .badge-almox {
-            padding: 6px 10px;
-            border-radius: 20px;
-            font-weight: 500;
-        }
-        
-        .progress-almox {
-            height: 8px;
-            border-radius: 4px;
-        }
-        
-        .user-profile img {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: 2px solid #eee;
-        }
-        
-        .page-title {
-            color: var(--primary-color);
-            font-weight: 600;
-            margin-bottom: 20px;
-        }
-        
-        @media (max-width: 768px) {
-            #sidebar {
-                margin-left: -250px;
-            }
-            
-            #sidebar.active {
-                margin-left: 0;
-            }
-            
-            #content {
-                width: 100%;
-                margin-left: 0;
-            }
-            
-            #content.active {
-                margin-left: 250px;
-                width: calc(100% - 250px);
-            }
+        .badge-blue {
+            background-color: #2563eb;
         }
     </style>
 </head>
-<body>
-    <div id="wrapper">
+<body class="bg-gray-50 font-sans">
+    <div class="flex">
         <!-- Sidebar -->
-        <div id="sidebar">
-            <div class="sidebar-brand">
-                <i class="fas fa-warehouse"></i> Almoxarifado
+        <div id="sidebar" class="w-64 sidebar-gradient text-white h-screen fixed transition-all duration-300 z-50 shadow-xl">
+            <div class="p-6 text-center border-b border-green-light border-opacity-20 bg-black bg-opacity-10">
+                <div class="flex items-center justify-center">
+                    <i class="fas fa-warehouse text-2xl mr-3"></i>
+                    <span class="text-xl font-bold">Almoxarifado</span>
+                </div>
             </div>
             
-            <ul class="sidebar-nav">
-                <li class="sidebar-item">
-                    <a href="#" class="sidebar-link active">
-                        <i class="fas fa-home"></i> Dashboard
-                    </a>
-                </li>
-                <li class="sidebar-item">
-                    <a href="#" class="sidebar-link">
-                        <i class="fas fa-boxes"></i> Estoque
-                    </a>
-                </li>
-                <li class="sidebar-item">
-                    <a href="#" class="sidebar-link">
-                        <i class="fas fa-tools"></i> Materiais
-                    </a>
-                </li>
-                <li class="sidebar-item">
-                    <a href="#" class="sidebar-link">
-                        <i class="fas fa-clipboard-list"></i> Solicitações
-                    </a>
-                </li>
-                <li class="sidebar-item">
-                    <a href="#" class="sidebar-link">
-                        <i class="fas fa-truck-loading"></i> Entradas
-                    </a>
-                </li>
-                <li class="sidebar-item">
-                    <a href="#" class="sidebar-link">
-                        <i class="fas fa-external-link-alt"></i> Saídas
-                    </a>
-                </li>
-                <li class="sidebar-item">
-                    <a href="#" class="sidebar-link">
-                        <i class="fas fa-chart-bar"></i> Relatórios
-                    </a>
-                </li>
-                <li class="sidebar-item">
-                    <a href="#" class="sidebar-link">
-                        <i class="fas fa-cog"></i> Configurações
-                    </a>
-                </li>
-                <li class="sidebar-item mt-4">
-                    <a href="#" class="sidebar-link">
-                        <i class="fas fa-sign-out-alt"></i> Sair
-                    </a>
-                </li>
-            </ul>
+            <nav class="mt-6">
+                <ul class="space-y-1">
+                    <li>
+                        <a href="#" class="flex items-center px-6 py-3 text-green-100 hover:text-white hover:bg-green-light hover:bg-opacity-20 transition-all duration-200 sidebar-link-active">
+                            <i class="fas fa-home w-5 mr-3"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center px-6 py-3 text-green-100 hover:text-white hover:bg-green-light hover:bg-opacity-20 transition-all duration-200">
+                            <i class="fas fa-boxes w-5 mr-3"></i>
+                            <span>Estoque</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center px-6 py-3 text-green-100 hover:text-white hover:bg-green-light hover:bg-opacity-20 transition-all duration-200">
+                            <i class="fas fa-tools w-5 mr-3"></i>
+                            <span>Materiais</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center px-6 py-3 text-green-100 hover:text-white hover:bg-green-light hover:bg-opacity-20 transition-all duration-200">
+                            <i class="fas fa-clipboard-list w-5 mr-3"></i>
+                            <span>Solicitações</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center px-6 py-3 text-green-100 hover:text-white hover:bg-green-light hover:bg-opacity-20 transition-all duration-200">
+                            <i class="fas fa-truck-loading w-5 mr-3"></i>
+                            <span>Entradas</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center px-6 py-3 text-green-100 hover:text-white hover:bg-green-light hover:bg-opacity-20 transition-all duration-200">
+                            <i class="fas fa-external-link-alt w-5 mr-3"></i>
+                            <span>Saídas</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center px-6 py-3 text-green-100 hover:text-white hover:bg-green-light hover:bg-opacity-20 transition-all duration-200">
+                            <i class="fas fa-chart-bar w-5 mr-3"></i>
+                            <span>Relatórios</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center px-6 py-3 text-green-100 hover:text-white hover:bg-green-light hover:bg-opacity-20 transition-all duration-200">
+                            <i class="fas fa-cog w-5 mr-3"></i>
+                            <span>Configurações</span>
+                        </a>
+                    </li>
+                    <li class="mt-8">
+                        <a href="../logout.php" class="flex items-center px-6 py-3 text-green-100 hover:text-white hover:bg-red-600 hover:bg-opacity-20 transition-all duration-200">
+                            <i class="fas fa-sign-out-alt w-5 mr-3"></i>
+                            <span>Sair</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
         </div>
 
         <!-- Conteúdo Principal -->
-        <div id="content">
+        <div id="content" class="flex-1 ml-64 min-h-screen">
             <!-- Topbar -->
-            <nav class="topbar navbar navbar-expand navbar-light bg-white mb-4 static-top shadow">
-                <div class="container-fluid">
-                    <button id="sidebarToggle" class="btn btn-link d-md-none rounded-circle mr-3">
+            <nav class="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
+                <div class="flex items-center justify-between">
+                    <button id="sidebarToggle" class="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100">
                         <i class="fa fa-bars"></i>
                     </button>
 
-                    <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
-                        <div class="input-group">
-                            <input type="text" class="form-control bg-light border-0 small" placeholder="Buscar item, material..." aria-label="Search">
-                            <div class="input-group-append">
-                                <button class="btn btn-primary" type="button">
-                                    <i class="fas fa-search fa-sm"></i>
-                                </button>
+                    <div class="hidden sm:flex items-center flex-1 max-w-md mx-4">
+                        <div class="relative w-full">
+                            <input type="text" class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-primary focus:border-transparent" placeholder="Buscar item, material...">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center">
+                                <i class="fas fa-search text-gray-400"></i>
                             </div>
+                            <button class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                <i class="fas fa-search text-green-primary"></i>
+                            </button>
                         </div>
-                    </form>
+                    </div>
 
-                    <ul class="navbar-nav ml-auto">
-                        <li class="nav-item dropdown no-arrow mx-1">
-                            <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-bell fa-fw"></i>
-                                <span class="badge bg-danger badge-counter">3</span>
-                            </a>
-                        </li>
-                        <li class="nav-item dropdown no-arrow mx-1">
-                            <a class="nav-link dropdown-toggle" href="#" id="messagesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-envelope fa-fw"></i>
-                                <span class="badge bg-danger badge-counter">2</span>
-                            </a>
-                        </li>
-                        <li class="nav-item dropdown no-arrow">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">João Silva</span>
-                                <img class="img-profile rounded-circle" src="https://ui-avatars.com/api/?name=João+Silva&background=3498db&color=fff">
-                            </a>
-                        </li>
-                    </ul>
+                    <div class="flex items-center space-x-4">
+                        <div class="relative">
+                            <button class="p-2 text-gray-600 hover:text-green-primary relative">
+                                <i class="fas fa-bell text-lg"></i>
+                                <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
+                            </button>
+                        </div>
+                        <div class="relative">
+                            <button class="p-2 text-gray-600 hover:text-green-primary relative">
+                                <i class="fas fa-envelope text-lg"></i>
+                                <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">2</span>
+                            </button>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="hidden lg:block text-sm text-gray-600">João Silva</span>
+                            <img class="h-8 w-8 rounded-full border-2 border-green-primary" src="https://ui-avatars.com/api/?name=João+Silva&background=059669&color=fff" alt="Profile">
+                        </div>
+                    </div>
                 </div>
             </nav>
 
             <!-- Conteúdo do Dashboard -->
-            <div class="container-fluid">
+            <div class="p-6">
                 <!-- Título da Página -->
-                <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                    <h1 class="h3 page-title mb-0">Dashboard do Almoxarifado</h1>
-                    <div>
-                        <button class="btn btn-sm btn-outline-primary">
-                            <i class="fas fa-download"></i> Exportar Relatório
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
+                    <h1 class="text-3xl font-bold text-gray-900 mb-4 sm:mb-0">Dashboard do Almoxarifado</h1>
+                    <div class="flex space-x-3">
+                        <button class="px-4 py-2 border border-green-primary text-green-primary rounded-lg hover:bg-green-primary hover:text-white transition-colors duration-200">
+                            <i class="fas fa-download mr-2"></i>Exportar Relatório
                         </button>
-                        <button class="btn btn-sm btn-primary">
-                            <i class="fas fa-plus"></i> Novo Item
+                        <button class="px-4 py-2 bg-green-primary text-white rounded-lg hover:bg-green-secondary transition-colors duration-200">
+                            <i class="fas fa-plus mr-2"></i>Novo Item
                         </button>
                     </div>
                 </div>
 
                 <!-- Cards de Estatísticas -->
-                <div class="row">
-                    <div class="col-xl-3 col-md-6 mb-4">
-                        <div class="stat-card bg-primary-almox">
-                            <div class="stat-card-icon">
-                                <i class="fas fa-boxes"></i>
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+                    <div class="stat-card-gradient-1 rounded-xl p-6 text-white card-hover">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-green-100 text-sm font-medium uppercase tracking-wide">Itens em Estoque</p>
+                                <p class="text-3xl font-bold mt-2">1,248</p>
                             </div>
-                            <div class="stat-card-number">1,248</div>
-                            <div class="stat-card-title">Itens em Estoque</div>
+                            <div class="bg-white bg-opacity-20 rounded-lg p-3">
+                                <i class="fas fa-boxes text-2xl"></i>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="col-xl-3 col-md-6 mb-4">
-                        <div class="stat-card bg-success-almox">
-                            <div class="stat-card-icon">
-                                <i class="fas fa-clipboard-check"></i>
+                    <div class="stat-card-gradient-2 rounded-xl p-6 text-white card-hover">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-green-100 text-sm font-medium uppercase tracking-wide">Solicitações Hoje</p>
+                                <p class="text-3xl font-bold mt-2">42</p>
                             </div>
-                            <div class="stat-card-number">42</div>
-                            <div class="stat-card-title">Solicitações Hoje</div>
+                            <div class="bg-white bg-opacity-20 rounded-lg p-3">
+                                <i class="fas fa-clipboard-check text-2xl"></i>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="col-xl-3 col-md-6 mb-4">
-                        <div class="stat-card bg-warning-almox">
-                            <div class="stat-card-icon">
-                                <i class="fas fa-exclamation-triangle"></i>
+                    <div class="stat-card-gradient-3 rounded-xl p-6 text-white card-hover">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-orange-100 text-sm font-medium uppercase tracking-wide">Itens Críticos</p>
+                                <p class="text-3xl font-bold mt-2">18</p>
                             </div>
-                            <div class="stat-card-number">18</div>
-                            <div class="stat-card-title">Itens Críticos</div>
+                            <div class="bg-white bg-opacity-20 rounded-lg p-3">
+                                <i class="fas fa-exclamation-triangle text-2xl"></i>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="col-xl-3 col-md-6 mb-4">
-                        <div class="stat-card bg-danger-almox">
-                            <div class="stat-card-icon">
-                                <i class="fas fa-times-circle"></i>
+                    <div class="stat-card-gradient-4 rounded-xl p-6 text-white card-hover">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-red-100 text-sm font-medium uppercase tracking-wide">Itens em Falta</p>
+                                <p class="text-3xl font-bold mt-2">7</p>
                             </div>
-                            <div class="stat-card-number">7</div>
-                            <div class="stat-card-title">Itens em Falta</div>
+                            <div class="bg-white bg-opacity-20 rounded-lg p-3">
+                                <i class="fas fa-times-circle text-2xl"></i>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Gráficos e Tabelas -->
-                <div class="row">
-                    <!-- Gráfico de Estoque -->
-                    <div class="col-xl-8 col-lg-7">
-                        <div class="card-almox">
-                            <div class="card-header">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span>Movimentação do Estoque</span>
-                                    <div class="dropdown">
-                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                            Últimos 30 dias
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <canvas id="stockChart" height="300"></canvas>
-                            </div>
-                        </div>
-                    </div>
+               
                     
                     <!-- Status de Solicitações -->
-                    <div class="col-xl-4 col-lg-5">
-                        <div class="card-almox">
-                            <div class="card-header">
-                                Status das Solicitações
-                            </div>
-                            <div class="card-body">
-                                <canvas id="requestChart" height="250"></canvas>
-                                <div class="mt-4">
-                                    <div class="d-flex align-items-center justify-content-between mb-2">
-                                        <div class="d-flex align-items-center">
-                                            <span class="badge bg-primary badge-almox me-2">42</span>
-                                            <span>Pendentes</span>
-                                        </div>
-                                        <div class="fw-bold">48%</div>
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 card-hover">
+                        <div class="p-6 border-b border-gray-200">
+                            <h3 class="text-lg font-semibold text-gray-900">Status das Solicitações</h3>
+                        </div>
+                        <div class="p-6">
+                            <canvas id="requestChart" height="250"></canvas>
+                            <div class="mt-6 space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <span class="inline-flex items-center justify-center w-6 h-6 bg-blue-500 text-white text-xs font-medium rounded-full mr-3">42</span>
+                                        <span class="text-sm text-gray-600">Pendentes</span>
                                     </div>
-                                    <div class="d-flex align-items-center justify-content-between mb-2">
-                                        <div class="d-flex align-items-center">
-                                            <span class="badge bg-success badge-almox me-2">32</span>
-                                            <span>Aprovadas</span>
-                                        </div>
-                                        <div class="fw-bold">36%</div>
+                                    <span class="text-sm font-semibold text-gray-900">48%</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <span class="inline-flex items-center justify-center w-6 h-6 bg-green-500 text-white text-xs font-medium rounded-full mr-3">32</span>
+                                        <span class="text-sm text-gray-600">Aprovadas</span>
                                     </div>
-                                    <div class="d-flex align-items-center justify-content-between mb-2">
-                                        <div class="d-flex align-items-center">
-                                            <span class="badge bg-danger badge-almox me-2">8</span>
-                                            <span>Rejeitadas</span>
-                                        </div>
-                                        <div class="fw-bold">9%</div>
+                                    <span class="text-sm font-semibold text-gray-900">36%</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <span class="inline-flex items-center justify-center w-6 h-6 bg-red-500 text-white text-xs font-medium rounded-full mr-3">8</span>
+                                        <span class="text-sm text-gray-600">Rejeitadas</span>
                                     </div>
-                                    <div class="d-flex align-items-center justify-content-between">
-                                        <div class="d-flex align-items-center">
-                                            <span class="badge bg-info badge-almox me-2">7</span>
-                                            <span>Em análise</span>
-                                        </div>
-                                        <div class="fw-bold">8%</div>
+                                    <span class="text-sm font-semibold text-gray-900">9%</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <span class="inline-flex items-center justify-center w-6 h-6 bg-indigo-500 text-white text-xs font-medium rounded-full mr-3">7</span>
+                                        <span class="text-sm text-gray-600">Em análise</span>
                                     </div>
+                                    <span class="text-sm font-semibold text-gray-900">8%</span>
                                 </div>
                             </div>
                         </div>
@@ -451,133 +305,128 @@
                 </div>
 
                 <!-- Tabelas de Itens e Solicitações -->
-                <div class="row">
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
                     <!-- Itens com Estoque Crítico -->
-                    <div class="col-xl-6 col-lg-6">
-                        <div class="card-almox">
-                            <div class="card-header">
-                                Itens com Estoque Crítico
-                            </div>
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table table-almox table-hover">
-                                        <thead>
-                                            <tr>
-                                                <th>Item</th>
-                                                <th>Categoria</th>
-                                                <th>Estoque Atual</th>
-                                                <th>Status</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>Parafuso 5mm Aço Inox</td>
-                                                <td>Fixadores</td>
-                                                <td>12/100</td>
-                                                <td><span class="badge bg-danger badge-almox">Crítico</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td>Fita Isolante Preta</td>
-                                                <td>Elétrica</td>
-                                                <td>3/50</td>
-                                                <td><span class="badge bg-danger badge-almox">Crítico</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td>Resistor 10kΩ</td>
-                                                <td>Componentes</td>
-                                                <td>22/200</td>
-                                                <td><span class="badge bg-warning badge-almox">Baixo</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td>Chave de Fenda Philips</td>
-                                                <td>Ferramentas</td>
-                                                <td>2/15</td>
-                                                <td><span class="badge bg-danger badge-almox">Crítico</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td>Luvas de Proteção</td>
-                                                <td>EPI</td>
-                                                <td>8/40</td>
-                                                <td><span class="badge bg-warning badge-almox">Baixo</span></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <div class="text-center mt-3">
-                                    <a href="#" class="btn btn-sm btn-outline-primary">Ver todos os itens</a>
-                                </div>
-                            </div>
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 card-hover">
+                        <div class="p-6 border-b border-gray-200">
+                            <h3 class="text-lg font-semibold text-gray-900">Itens com Estoque Crítico</h3>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Item</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categoria</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estoque</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200">
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-4 text-sm text-gray-900">Parafuso 5mm Aço Inox</td>
+                                        <td class="px-6 py-4 text-sm text-gray-600">Fixadores</td>
+                                        <td class="px-6 py-4 text-sm text-gray-900">12/100</td>
+                                        <td class="px-6 py-4"><span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Crítico</span></td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-4 text-sm text-gray-900">Fita Isolante Preta</td>
+                                        <td class="px-6 py-4 text-sm text-gray-600">Elétrica</td>
+                                        <td class="px-6 py-4 text-sm text-gray-900">3/50</td>
+                                        <td class="px-6 py-4"><span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Crítico</span></td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-4 text-sm text-gray-900">Resistor 10kΩ</td>
+                                        <td class="px-6 py-4 text-sm text-gray-600">Componentes</td>
+                                        <td class="px-6 py-4 text-sm text-gray-900">22/200</td>
+                                        <td class="px-6 py-4"><span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Baixo</span></td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-4 text-sm text-gray-900">Chave de Fenda Philips</td>
+                                        <td class="px-6 py-4 text-sm text-gray-600">Ferramentas</td>
+                                        <td class="px-6 py-4 text-sm text-gray-900">2/15</td>
+                                        <td class="px-6 py-4"><span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Crítico</span></td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-4 text-sm text-gray-900">Luvas de Proteção</td>
+                                        <td class="px-6 py-4 text-sm text-gray-600">EPI</td>
+                                        <td class="px-6 py-4 text-sm text-gray-900">8/40</td>
+                                        <td class="px-6 py-4"><span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Baixo</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="p-6 border-t border-gray-200 text-center">
+                            <a href="#" class="inline-flex items-center px-4 py-2 border border-green-primary text-green-primary rounded-lg hover:bg-green-primary hover:text-white transition-colors duration-200">
+                                Ver todos os itens
+                            </a>
                         </div>
                     </div>
                     
                     <!-- Últimas Solicitações -->
-                    <div class="col-xl-6 col-lg-6">
-                        <div class="card-almox">
-                            <div class="card-header">
-                                Últimas Solicitações
-                            </div>
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table table-almox table-hover">
-                                        <thead>
-                                            <tr>
-                                                <th>Requisição</th>
-                                                <th>Solicitante</th>
-                                                <th>Data</th>
-                                                <th>Status</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>#REQ-0042</td>
-                                                <td>Carlos Oliveira</td>
-                                                <td>20/06/2023</td>
-                                                <td><span class="badge bg-primary badge-almox">Pendente</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td>#REQ-0041</td>
-                                                <td>Maria Santos</td>
-                                                <td>20/06/2023</td>
-                                                <td><span class="badge bg-success badge-almox">Aprovada</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td>#REQ-0040</td>
-                                                <td>Pedro Alves</td>
-                                                <td>19/06/2023</td>
-                                                <td><span class="badge bg-danger badge-almox">Rejeitada</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td>#REQ-0039</td>
-                                                <td>Ana Costa</td>
-                                                <td>19/06/2023</td>
-                                                <td><span class="badge bg-success badge-almox">Aprovada</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td>#REQ-0038</td>
-                                                <td>João Silva</td>
-                                                <td>18/06/2023</td>
-                                                <td><span class="badge bg-info badge-almox">Em análise</span></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <div class="text-center mt-3">
-                                    <a href="#" class="btn btn-sm btn-outline-primary">Ver todas as solicitações</a>
-                                </div>
-                            </div>
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 card-hover">
+                        <div class="p-6 border-b border-gray-200">
+                            <h3 class="text-lg font-semibold text-gray-900">Últimas Solicitações</h3>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Requisição</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Solicitante</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200">
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-4 text-sm font-medium text-gray-900">#REQ-0042</td>
+                                        <td class="px-6 py-4 text-sm text-gray-600">Carlos Oliveira</td>
+                                        <td class="px-6 py-4 text-sm text-gray-600">20/06/2023</td>
+                                        <td class="px-6 py-4"><span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">Pendente</span></td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-4 text-sm font-medium text-gray-900">#REQ-0041</td>
+                                        <td class="px-6 py-4 text-sm text-gray-600">Maria Santos</td>
+                                        <td class="px-6 py-4 text-sm text-gray-600">20/06/2023</td>
+                                        <td class="px-6 py-4"><span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Aprovada</span></td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-4 text-sm font-medium text-gray-900">#REQ-0040</td>
+                                        <td class="px-6 py-4 text-sm text-gray-600">Pedro Alves</td>
+                                        <td class="px-6 py-4 text-sm text-gray-600">19/06/2023</td>
+                                        <td class="px-6 py-4"><span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Rejeitada</span></td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-4 text-sm font-medium text-gray-900">#REQ-0039</td>
+                                        <td class="px-6 py-4 text-sm text-gray-600">Ana Costa</td>
+                                        <td class="px-6 py-4 text-sm text-gray-600">19/06/2023</td>
+                                        <td class="px-6 py-4"><span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Aprovada</span></td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-4 text-sm font-medium text-gray-900">#REQ-0038</td>
+                                        <td class="px-6 py-4 text-sm text-gray-600">João Silva</td>
+                                        <td class="px-6 py-4 text-sm text-gray-600">18/06/2023</td>
+                                        <td class="px-6 py-4"><span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-indigo-100 text-indigo-800">Em análise</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="p-6 border-t border-gray-200 text-center">
+                            <a href="#" class="inline-flex items-center px-4 py-2 border border-green-primary text-green-primary rounded-lg hover:bg-green-primary hover:text-white transition-colors duration-200">
+                                Ver todas as solicitações
+                            </a>
                         </div>
                     </div>
                 </div>
                 
                 <!-- Footer -->
-                <footer class="py-3 mt-5">
-                    <div class="container-fluid">
-                        <div class="d-flex align-items-center justify-content-between small">
-                            <div class="text-muted">Copyright &copy; Sistema de Almoxarifado 2023</div>
-                            <div>
-                                <a href="#">Política de Privacidade</a> &middot;
-                                <a href="#">Termos de Uso</a>
-                            </div>
+                <footer class="mt-12 py-6">
+                    <div class="flex flex-col sm:flex-row items-center justify-between text-sm text-gray-500">
+                        <div>Copyright &copy; Sistema de Almoxarifado 2023</div>
+                        <div class="mt-2 sm:mt-0">
+                            <a href="#" class="hover:text-green-primary">Política de Privacidade</a>
+                            <span class="mx-2">&middot;</span>
+                            <a href="#" class="hover:text-green-primary">Termos de Uso</a>
                         </div>
                     </div>
                 </footer>
@@ -585,15 +434,17 @@
         </div>
     </div>
 
-    <!-- Bootstrap & ChartJS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <script>
         // Script para toggle da sidebar em dispositivos móveis
         document.getElementById('sidebarToggle').addEventListener('click', function() {
-            document.getElementById('sidebar').classList.toggle('active');
-            document.getElementById('content').classList.toggle('active');
+            const sidebar = document.getElementById('sidebar');
+            const content = document.getElementById('content');
+            
+            sidebar.classList.toggle('-translate-x-full');
+            sidebar.classList.toggle('translate-x-0');
         });
         
         // Gráfico de movimentação de estoque
@@ -605,17 +456,19 @@
                 datasets: [{
                     label: 'Entradas',
                     data: [120, 115, 130, 140, 145, 150, 160],
-                    borderColor: '#27ae60',
-                    backgroundColor: 'rgba(39, 174, 96, 0.1)',
+                    borderColor: '#059669',
+                    backgroundColor: 'rgba(5, 150, 105, 0.1)',
                     tension: 0.3,
-                    fill: true
+                    fill: true,
+                    borderWidth: 3
                 }, {
                     label: 'Saídas',
                     data: [100, 105, 110, 120, 125, 130, 135],
-                    borderColor: '#e74c3c',
-                    backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                    borderColor: '#dc2626',
+                    backgroundColor: 'rgba(220, 38, 38, 0.1)',
                     tension: 0.3,
-                    fill: true
+                    fill: true,
+                    borderWidth: 3
                 }]
             },
             options: {
@@ -623,6 +476,19 @@
                 plugins: {
                     legend: {
                         position: 'top',
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
                     }
                 }
             }
@@ -637,12 +503,13 @@
                 datasets: [{
                     data: [42, 32, 8, 7],
                     backgroundColor: [
-                        '#3498db',
-                        '#27ae60',
-                        '#e74c3c',
-                        '#2980b9'
+                        '#3b82f6',
+                        '#059669',
+                        '#dc2626',
+                        '#6366f1'
                     ],
-                    borderWidth: 1
+                    borderWidth: 0,
+                    hoverOffset: 4
                 }]
             },
             options: {
@@ -651,16 +518,10 @@
                     legend: {
                         display: false
                     }
-                }
+                },
+                cutout: '60%'
             }
         });
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
