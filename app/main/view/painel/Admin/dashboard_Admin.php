@@ -350,7 +350,7 @@
                             <div class="stat-card-icon">
                                 <i class="fas fa-boxes"></i>
                             </div>
-                            <div class="stat-card-number">1,248</div>
+                            <div class="stat-card-number">0</div>
                             <div class="stat-card-title">Itens em Estoque</div>
                         </div>
                     </div>
@@ -360,7 +360,7 @@
                             <div class="stat-card-icon">
                                 <i class="fas fa-clipboard-check"></i>
                             </div>
-                            <div class="stat-card-number">42</div>
+                            <div class="stat-card-number">0</div>
                             <div class="stat-card-title">Solicitações Hoje</div>
                         </div>
                     </div>
@@ -370,7 +370,7 @@
                             <div class="stat-card-icon">
                                 <i class="fas fa-exclamation-triangle"></i>
                             </div>
-                            <div class="stat-card-number">18</div>
+                            <div class="stat-card-number">0</div>
                             <div class="stat-card-title">Itens Críticos</div>
                         </div>
                     </div>
@@ -380,7 +380,7 @@
                             <div class="stat-card-icon">
                                 <i class="fas fa-times-circle"></i>
                             </div>
-                            <div class="stat-card-number">7</div>
+                            <div class="stat-card-number">0</div>
                             <div class="stat-card-title">Itens em Falta</div>
                         </div>
                     </div>
