@@ -66,7 +66,7 @@
 </form>
 
 <?php
-require '../includes/db.php';
+require '../config/db.php';
 
 isset($_POST['email']) ? $email = $_POST['email'] : $email = '';
 
