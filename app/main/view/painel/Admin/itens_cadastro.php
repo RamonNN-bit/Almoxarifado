@@ -221,7 +221,7 @@ header("Location: index.php");
                 <!-- Formulário de Cadastro -->
                 <div class="bg-white rounded-xl shadow-sm p-6 mb-8">
                     <h2 class="text-xl font-semibold text-gray-800 mb-6">Novo Item</h2>
-                    <form method="POST" action="../../control/criarController.php" class="space-y-6">
+                    <form method="POST" action="../../../control/criarController.php" class="space-y-6">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label for="nome" class="block text-sm font-medium text-gray-700 mb-2">

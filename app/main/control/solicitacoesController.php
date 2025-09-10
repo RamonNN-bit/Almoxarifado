@@ -5,40 +5,66 @@ session_start();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Verificar se o usuário está logado
     if (!isset($_SESSION["usuariologado"])) {
-        $_SESSION['erro'] = "Você precisa estar logado para fazer solicitações";
+        $_SESSION['erro'] = "Você precisa estar logado para realizar esta ação";
         header("Location: ../view/painel/Admin/solicitacoes.php");
         exit();
     }
 
-    // Validar dados do formulário
-    if (!empty($_POST['id_item']) && !empty($_POST['quantidade_solicitada'])) {
-        $id_item = intval($_POST['id_item']);
-        $quantidade_solicitada = intval($_POST['quantidade_solicitada']);
-        $observacoes = trim($_POST['observacoes'] ?? '');
-        $id_usuario = $_SESSION["usuariologado"]['id'];
-        
-        // Validação adicional
-        if ($quantidade_solicitada > 0) {
-            try {
-                require_once(__DIR__ . '/../config/db.php');
-                require_once(__DIR__ . '/../model/SolicitacoesModel.php');
-                
-                $solicitacoesModel = new Solicitacoes($pdo);
-                $sucesso = $solicitacoesModel->criarSolicitacao($id_item, $quantidade_solicitada, $id_usuario, $observacoes);
-                
+    require_once(__DIR__ . '/../config/db.php');
+    require_once(__DIR__ . '/../model/SolicitacoesModel.php');
+    
+    $solicitacoesModel = new Solicitacoes($pdo);
+    $action = $_POST['action'] ?? '';
+
+    try {
+        if ($action === 'criar') {
+            // Verificar se o usuário tem permissão para criar solicitações
+            $id_item = intval($_POST['id_item']);
+            $quantidade_solicitada = intval($_POST['quantidade_solicitada']);
+            $id_usuario = $_SESSION["usuariologado"]['id'];
+            
+            if (!$id_item || !$quantidade_solicitada || $quantidade_solicitada <= 0) {
+                throw new Exception("Todos os campos obrigatórios devem ser preenchidos corretamente");
+            }
+            
+            $sucesso = $solicitacoesModel->criarSolicitacao($id_item, $quantidade_solicitada, $id_usuario);
+            
+            if ($sucesso) {
+                $_SESSION['mensagem_sucesso'] = "Solicitação criada com sucesso! Aguarde aprovação.";
+            } else {
+                $_SESSION['erro'] = "Erro ao criar a solicitação";
+            }
+        } elseif ($action === 'aceitar' || $action === 'recusar') {
+            // Verificar se o usuário é administrador
+            if ($_SESSION["usuariologado"]['tipo'] !== 'admin') {
+                throw new Exception("Acesso negado: apenas administradores podem aprovar ou rejeitar solicitações");
+            }
+            
+            $id_solicitacao = intval($_POST['id_mov']);
+            if (!$id_solicitacao) {
+                throw new Exception("ID da solicitação inválido");
+            }
+            
+            if ($action === 'aceitar') {
+                $sucesso = $solicitacoesModel->aprovarSolicitacao($id_solicitacao);
                 if ($sucesso) {
-                    $_SESSION['mensagem_sucesso'] = "Solicitação criada com sucesso! Aguarde aprovação.";
+                    $_SESSION['mensagem_sucesso'] = "Solicitação aprovada com sucesso!";
                 } else {
-                    $_SESSION['erro'] = "Erro ao criar a solicitação";
+                    $_SESSION['erro'] = "Erro ao aprovar a solicitação";
                 }
-            } catch (Exception $e) {
-                $_SESSION['erro'] = "Erro: " . $e->getMessage();
+            } elseif ($action === 'recusar') {
+                $sucesso = $solicitacoesModel->rejeitarSolicitacao($id_solicitacao);
+                if ($sucesso) {
+                    $_SESSION['mensagem_sucesso'] = "Solicitação rejeitada com sucesso!";
+                } else {
+                    $_SESSION['erro'] = "Erro ao rejeitar a solicitação";
+                }
             }
         } else {
-            $_SESSION['erro'] = "Quantidade deve ser maior que zero";
+            throw new Exception("Ação inválida");
         }
-    } else {
-        $_SESSION['erro'] = "Todos os campos obrigatórios devem ser preenchidos";
+    } catch (Exception $e) {
+        $_SESSION['erro'] = "Erro: " . $e->getMessage();
     }
 }
 
@@ -46,4 +72,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 header("Location: ../view/painel/Admin/solicitacoes.php");
 exit();
 ?>
-

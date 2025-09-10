@@ -1,5 +1,7 @@
 <?php
-session_start();
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -18,6 +20,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 require_once(__DIR__ . '/../model/ItensModel.php');
                 
                 $itensModel = new Itens($pdo);
+
+                
                 $sucesso = $itensModel->criar($nome, $quantidade, $unidade, $marca, $modelo);
                 
                 if ($sucesso) {
@@ -37,6 +41,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Redirecionar de volta para a página de cadastro
-header("Location: ../painel/Admin/itens_cadastro.php");
+header("Location: ../view/painel/Admin/itens_cadastro.php");
 exit();
 ?>

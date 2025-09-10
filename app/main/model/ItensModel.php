@@ -14,6 +14,14 @@ class Itens {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    // Buscar item por ID
+    public function buscarItemPorId($id_item) {
+        $sql = "SELECT * FROM itens WHERE id = :id_item";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':id_item' => $id_item]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
     // Criar novo item no banco de dados
     public function criar($nome, $quantidade, $unidade, $marca, $modelo) {
         $sql = "INSERT INTO itens (nome, quantidade, unidade, marca, modelo) 

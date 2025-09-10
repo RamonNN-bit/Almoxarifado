@@ -24,7 +24,7 @@ try {
     $itens_disponiveis = [];
 }
 
-// Buscar todas as solicitações
+// Buscar todas as solicitações com status 'em espera'
 try {
     $solicitacoesModel = new Solicitacoes($pdo);
     $solicitacoes = $solicitacoesModel->buscarTodasSolicitacoes();
@@ -33,20 +33,17 @@ try {
     $solicitacoes = [];
 }
 
-// Função para determinar o status da solicitação
-function getStatusSolicitacao($data) {
-    $hoje = date('Y-m-d');
-    $diferenca = strtotime($hoje) - strtotime($data);
-    $dias = floor($diferenca / (60 * 60 * 24));
-    
-    if ($dias == 0) {
-        return ['status' => 'Hoje', 'class' => 'bg-blue-100 text-blue-800'];
-    } elseif ($dias == 1) {
-        return ['status' => 'Ontem', 'class' => 'bg-yellow-100 text-yellow-800'];
-    } elseif ($dias <= 7) {
-        return ['status' => 'Esta semana', 'class' => 'bg-green-100 text-green-800'];
-    } else {
-        return ['status' => 'Antiga', 'class' => 'bg-gray-100 text-gray-800'];
+// Função para determinar a classe do status
+function getStatusClass($status) {
+    switch ($status) {
+        case 'em espera':
+            return 'bg-yellow-100 text-yellow-800';
+        case 'aceito':
+            return 'bg-green-100 text-green-800';
+        case 'recusado':
+            return 'bg-red-100 text-red-800';
+        default:
+            return 'bg-gray-100 text-gray-800';
     }
 }
 ?>
@@ -267,13 +264,13 @@ function getStatusSolicitacao($data) {
                                 <i class="fas fa-clock text-xl"></i>
                             </div>
                             <div class="ml-4">
-                                <p class="text-sm font-medium text-yellow-100">Pendentes</p>
+                                <p class="text-sm font-medium text-yellow-100">Em Espera</p>
                                 <p class="text-2xl font-semibold">
                                     <?php 
-                                    $pendentes = array_filter($solicitacoes, function($s) { 
-                                        return date('Y-m-d', strtotime($s['data'])) >= date('Y-m-d', strtotime('-7 days')); 
+                                    $em_espera = array_filter($solicitacoes, function($s) { 
+                                        return $s['status'] === 'em espera'; 
                                     });
-                                    echo count($pendentes);
+                                    echo count($em_espera);
                                     ?>
                                 </p>
                             </div>
@@ -290,7 +287,7 @@ function getStatusSolicitacao($data) {
                                 <p class="text-2xl font-semibold">
                                     <?php 
                                     $aprovadas = array_filter($solicitacoes, function($s) { 
-                                        return date('Y-m-d', strtotime($s['data'])) < date('Y-m-d', strtotime('-7 days')); 
+                                        return $s['status'] === 'aprovado'; 
                                     });
                                     echo count($aprovadas);
                                     ?>
@@ -302,11 +299,18 @@ function getStatusSolicitacao($data) {
                     <div class="stat-card-gradient-4 rounded-xl p-6 text-white card-hover">
                         <div class="flex items-center">
                             <div class="p-3 rounded-full bg-white bg-opacity-20">
-                                <i class="fas fa-boxes text-xl"></i>
+                                <i class="fas fa-times-circle text-xl"></i>
                             </div>
                             <div class="ml-4">
-                                <p class="text-sm font-medium text-red-100">Itens Disponíveis</p>
-                                <p class="text-2xl font-semibold"><?php echo count($itens_disponiveis); ?></p>
+                                <p class="text-sm font-medium text-red-100">Recusadas</p>
+                                <p class="text-2xl font-semibold">
+                                    <?php 
+                                    $recusadas = array_filter($solicitacoes, function($s) { 
+                                        return $s['status'] === 'recusado'; 
+                                    });
+                                    echo count($recusadas);
+                                    ?>
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -346,17 +350,8 @@ function getStatusSolicitacao($data) {
                             </div>
                         </div>
                         
-                        <div>
-                            <label for="observacoes" class="block text-sm font-medium text-gray-700 mb-2">
-                                <i class="fas fa-comment mr-2"></i>Observações
-                            </label>
-                            <textarea id="observacoes" name="observacoes" rows="3"
-                                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-primary focus:border-transparent transition-colors"
-                                      placeholder="Adicione observações sobre a solicitação (opcional)"></textarea>
-                        </div>
-                        
                         <div class="flex justify-end">
-                            <button type="submit" class="bg-green-primary hover:bg-green-secondary text-white px-8 py-3 rounded-lg font-semibold transition-colors flex items-center">
+                            <button type="submit" name="action" value="criar" class="bg-green-primary hover:bg-green-secondary text-white px-8 py-3 rounded-lg font-semibold transition-colors flex items-center">
                                 <i class="fas fa-paper-plane mr-2"></i>Enviar Solicitação
                             </button>
                         </div>
@@ -390,9 +385,7 @@ function getStatusSolicitacao($data) {
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200">
-                                    <?php foreach ($solicitacoes as $solicitacao): 
-                                        $status = getStatusSolicitacao($solicitacao['data']);
-                                    ?>
+                                    <?php foreach ($solicitacoes as $solicitacao): ?>
                                         <tr class="hover:bg-gray-50">
                                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                                 #<?php echo str_pad($solicitacao['id'], 3, '0', STR_PAD_LEFT); ?>
@@ -412,18 +405,28 @@ function getStatusSolicitacao($data) {
                                                 <?php echo date('d/m/Y', strtotime($solicitacao['data'])); ?>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
-                                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full <?php echo $status['class']; ?>">
-                                                    <?php echo $status['status']; ?>
+                                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full <?php echo getStatusClass($solicitacao['status']); ?>">
+                                                    <?php echo ucfirst($solicitacao['status']); ?>
                                                 </span>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                 <div class="flex space-x-2">
-                                                    <button class="text-green-600 hover:text-green-900" title="Aprovar">
-                                                        <i class="fas fa-check"></i>
-                                                    </button>
-                                                    <button class="text-red-600 hover:text-red-900" title="Rejeitar">
-                                                        <i class="fas fa-times"></i>
-                                                    </button>
+                                                    <?php if ($_SESSION['usuariologado'] && $solicitacao['status'] === 'em espera'): ?>
+                                                        <form method="POST" action="../../../control/solicitacoesController.php" class="inline">
+                                                            <input type="hidden" name="id_mov" value="<?php echo $solicitacao['id']; ?>">
+                                                            <input type="hidden" name="action" value="aceitar">
+                                                            <button type="submit" class="text-green-600 hover:text-green-900" title="Aprovar">
+                                                                <i class="fas fa-check"></i>
+                                                            </button>
+                                                        </form>
+                                                        <form method="POST" action="../../../control/solicitacoesController.php" class="inline">
+                                                            <input type="hidden" name="id_mov" value="<?php echo $solicitacao['id']; ?>">
+                                                            <input type="hidden" name="action" value="recusar">
+                                                            <button type="submit" class="text-red-600 hover:text-red-900" title="Rejeitar">
+                                                                <i class="fas fa-times"></i>
+                                                            </button>
+                                                        </form>
+                                                    <?php endif; ?>
                                                     <button class="text-blue-600 hover:text-blue-900" title="Ver detalhes">
                                                         <i class="fas fa-eye"></i>
                                                     </button>
@@ -476,4 +479,3 @@ function getStatusSolicitacao($data) {
     </script>
 </body>
 </html>
-

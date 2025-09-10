@@ -9,7 +9,7 @@ class Solicitacoes {
     }
 
     // Criar nova solicitação
-    public function criarSolicitacao($id_item, $quantidade_solicitada, $id_usuario, $observacoes = '') {
+    public function criarSolicitacao($id_item, $quantidade_solicitada, $id_usuario) {
         try {
             $this->pdo->beginTransaction();
             
@@ -27,16 +27,15 @@ class Solicitacoes {
                 throw new Exception("Quantidade solicitada maior que o estoque disponível");
             }
             
-            // Criar solicitação
-            $sql_solicitacao = "INSERT INTO movimentacoes (id_item, tipo, quantidade, data, id_usuario, observacoes) 
-                               VALUES (:id_item, 'saida', :quantidade, CURDATE(), :id_usuario, :observacoes)";
+            // Criar solicitação com status 'em espera'
+            $sql_solicitacao = "INSERT INTO movimentacoes (id_item, tipo, status, quantidade, data, id_usuario) 
+                               VALUES (:id_item, 'saida', 'em espera', :quantidade, CURDATE(), :id_usuario)";
             
             $stmt_solicitacao = $this->pdo->prepare($sql_solicitacao);
             $resultado = $stmt_solicitacao->execute([
                 ':id_item' => $id_item,
                 ':quantidade' => $quantidade_solicitada,
-                ':id_usuario' => $id_usuario,
-                ':observacoes' => $observacoes
+                ':id_usuario' => $id_usuario
             ]);
             
             if ($resultado) {
@@ -71,7 +70,7 @@ class Solicitacoes {
         $sql = "SELECT m.*, i.nome as item_nome, i.unidade 
                 FROM movimentacoes m 
                 INNER JOIN itens i ON m.id_item = i.id 
-                WHERE m.tipo = 'saida' AND m.id_usuario = :id_usuario
+                WHERE m.tipo = 'saida' AND m.id_usuario = :id_usuario AND m.status = 'em espera'
                 ORDER BY m.data DESC, m.id DESC";
         
         $stmt = $this->pdo->prepare($sql);
@@ -79,30 +78,45 @@ class Solicitacoes {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // Aprovar solicitação (atualizar estoque)
+    // Aprovar solicitação (atualizar estoque e status)
     public function aprovarSolicitacao($id_solicitacao) {
         try {
             $this->pdo->beginTransaction();
             
             // Buscar dados da solicitação
-            $sql_buscar = "SELECT * FROM movimentacoes WHERE id = :id";
+            $sql_buscar = "SELECT id_item, quantidade, status FROM movimentacoes WHERE id = :id AND status = 'em espera'";
             $stmt_buscar = $this->pdo->prepare($sql_buscar);
             $stmt_buscar->execute([':id' => $id_solicitacao]);
             $solicitacao = $stmt_buscar->fetch(PDO::FETCH_ASSOC);
             
             if (!$solicitacao) {
-                throw new Exception("Solicitação não encontrada");
+                throw new Exception("Solicitação não encontrada ou já processada");
+            }
+            
+            // Verificar estoque
+            $sql_estoque = "SELECT quantidade FROM itens WHERE id = :id_item";
+            $stmt_estoque = $this->pdo->prepare($sql_estoque);
+            $stmt_estoque->execute([':id_item' => $solicitacao['id_item']]);
+            $item = $stmt_estoque->fetch(PDO::FETCH_ASSOC);
+            
+            if ($item['quantidade'] < $solicitacao['quantidade']) {
+                throw new Exception("Estoque insuficiente para aprovar a solicitação");
             }
             
             // Atualizar estoque
             $sql_estoque = "UPDATE itens SET quantidade = quantidade - :quantidade WHERE id = :id_item";
             $stmt_estoque = $this->pdo->prepare($sql_estoque);
-            $resultado_estoque = $stmt_estoque->execute([
+            $stmt_estoque->execute([
                 ':quantidade' => $solicitacao['quantidade'],
                 ':id_item' => $solicitacao['id_item']
             ]);
             
-            if ($resultado_estoque) {
+            // Atualizar status para 'aprovado' (alinhado com a tabela)
+            $sql_status = "UPDATE movimentacoes SET status = 'aprovado' WHERE id = :id";
+            $stmt_status = $this->pdo->prepare($sql_status);
+            $resultado = $stmt_status->execute([':id' => $id_solicitacao]);
+            
+            if ($resultado) {
                 $this->pdo->commit();
                 return true;
             } else {
@@ -116,12 +130,21 @@ class Solicitacoes {
         }
     }
 
-    // Rejeitar solicitação
+    // Rejeitar solicitação (atualizar status)
     public function rejeitarSolicitacao($id_solicitacao) {
-        $sql = "DELETE FROM movimentacoes WHERE id = :id";
-        $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute([':id' => $id_solicitacao]);
+        try {
+            $sql = "UPDATE movimentacoes SET status = 'recusado' WHERE id = :id AND status = 'em espera'";
+            $stmt = $this->pdo->prepare($sql);
+            $resultado = $stmt->execute([':id' => $id_solicitacao]);
+            
+            if ($resultado && $stmt->rowCount() > 0) {
+                return true;
+            } else {
+                throw new Exception("Solicitação não encontrada ou já processada");
+            }
+        } catch (PDOException $e) {
+            throw $e;
+        }
     }
 }
 ?>
-
