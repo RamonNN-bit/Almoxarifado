@@ -12,10 +12,6 @@
         padding: 20px;
         width: 95%;
     }
-    .notificacao {
-        right: 10px;
-        max-width: 90%;
-    }
 }
 
 h2 {
