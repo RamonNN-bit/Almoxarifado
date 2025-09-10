@@ -5,17 +5,7 @@ header("Location: index.php");
 }
 
 // Incluir o controller para processar o formulário
-require_once '../../includes/db.php';
-require_once '../../model/ItensModel.php';
 
-// Buscar todos os itens para exibir na tabela
-try {
-    $itensModel = new Itens($pdo);
-    $itens = $itensModel->buscarTodosItens();
-} catch (Exception $e) {
-    $erros[] = "Erro ao buscar itens: " . $e->getMessage();
-    $itens = [];
-}
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">

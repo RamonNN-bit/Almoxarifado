@@ -37,6 +37,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Redirecionar de volta para a página de cadastro
-header("Location: ../painel/Admin/itens_cadastro.php");
+header("Location: ../view/successCadastrar.php");
 exit();
 ?>
