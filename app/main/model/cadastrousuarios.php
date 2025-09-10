@@ -1,5 +1,5 @@
 <?php
-require_once '../includes/db.php';
+require_once '../config/db.php';
 
 if (!empty($_POST['nome']) && !empty($_POST['email']) && !empty($_POST['password'])) {
     $nome = $_POST['nome'];

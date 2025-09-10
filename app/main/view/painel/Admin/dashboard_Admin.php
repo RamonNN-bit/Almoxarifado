@@ -220,8 +220,6 @@ header("Location: ../../index.php");
                             <div class="bg-white bg-opacity-20 rounded-lg p-3">
                                 <i class="fas fa-boxes text-2xl"></i>
                             </div>
-                            <div class="stat-card-number">0</div>
-                            <div class="stat-card-title">Itens em Estoque</div>
                         </div>
                     </div>
 
@@ -234,8 +232,6 @@ header("Location: ../../index.php");
                             <div class="bg-white bg-opacity-20 rounded-lg p-3">
                                 <i class="fas fa-clipboard-check text-2xl"></i>
                             </div>
-                            <div class="stat-card-number">0</div>
-                            <div class="stat-card-title">Solicitações Hoje</div>
                         </div>
                     </div>
 
@@ -248,8 +244,6 @@ header("Location: ../../index.php");
                             <div class="bg-white bg-opacity-20 rounded-lg p-3">
                                 <i class="fas fa-exclamation-triangle text-2xl"></i>
                             </div>
-                            <div class="stat-card-number">0</div>
-                            <div class="stat-card-title">Itens Críticos</div>
                         </div>
                     </div>
 
@@ -262,8 +256,6 @@ header("Location: ../../index.php");
                             <div class="bg-white bg-opacity-20 rounded-lg p-3">
                                 <i class="fas fa-times-circle text-2xl"></i>
                             </div>
-                            <div class="stat-card-number">0</div>
-                            <div class="stat-card-title">Itens em Falta</div>
                         </div>
                     </div>
                 </div>
