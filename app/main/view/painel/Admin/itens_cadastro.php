@@ -1,6 +1,6 @@
 <?php
 session_start();
-if (!isset($_SESSION ["usuariologado"])) {
+if (!isset($_SESSION["usuariologado"])) {
 header("Location: ../../view/index.php");
 }
 

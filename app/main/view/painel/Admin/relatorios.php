@@ -1,5 +1,5 @@
 <?php
-require_once '../pdf/fpdf186/fpdf.php';
+require_once '../../../assets/fpdf/fpdf186/fpdf.php';
 require '../config/db.php';
 
 $pdf = new FPDF(P);
@@ -117,8 +117,8 @@ th {
 </head>
 <body>
     <nav>
-        <a href="itenscadastro.php">Itens</a> |
-        <a href="usuarios.php">Usuários</a> |
+        <a href="itens_cadastro.php">Itens</a> |
+        <a href=""></a> |
         <a href="requisicoes.php">Requisições</a> |
         <a href="dashboard_Admin.php">Voltar</a>
     </nav>
