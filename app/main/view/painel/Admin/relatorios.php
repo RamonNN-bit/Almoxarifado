@@ -37,14 +37,14 @@ header("Location: index.php");
 
 body {  
     font-family: 'Roboto', Arial, sans-serif;
-    background-color: #ffffff; /* White background */
-    color: #333333; /* Dark text for contrast */
+    background-color: #ffffff;
+    color: #333333;
     padding: 20px;
     line-height: 1.6;
 }
 
 nav {
-    background: #1565c0; /* Blue navigation background */
+    background: #1565c0;
     padding: 15px;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -55,7 +55,7 @@ nav {
 }
 
 nav a {
-    color: #ffffff; /* White text for nav links */
+    color: #ffffff;
     text-decoration: none;
     font-weight: 500;
     padding: 10px 20px;
@@ -64,13 +64,13 @@ nav a {
 }
 
 nav a:hover {
-    background-color: #003087; /* Darker blue on hover */
+    background-color: #003087;
     color: #ffffff;
 }
 
 h1 {
     text-align: center;
-    color: #1565c0; /* Blue heading */
+    color: #1565c0;
     margin: 20px 0;
     font-size: 2.2rem;
 }
@@ -79,7 +79,7 @@ table {
     width: 80%;
     margin: 20px auto;
     border-collapse: collapse;
-    background: #f5f5f5; /* Light grayish-white table background */
+    background: #f5f5f5;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
     overflow: hidden;
@@ -88,13 +88,13 @@ table {
 th, td {
     padding: 15px;
     text-align: left;
-    border-bottom: 1px solid #e0e0e0; /* Light gray border */
+    border-bottom: 1px solid #e0e0e0;
 }
 
 th {
-    background: #1565c0; /* Blue header background */
-    color: #ffffff; }
-
+    background: #1565c0;
+    color: #ffffff;
+}
     </style> 
 </head>
 <body>

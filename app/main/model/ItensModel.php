@@ -1,9 +1,9 @@
 <?php
-require_once '..includes/db.php';
+require_once '../config/db.php';
 class Itens {
     private $pdo;
 
-    public function __construct(PDO $pdo) {
+    public function __construct(PDO $pdo){
         $this->pdo = $pdo;
     }
 
