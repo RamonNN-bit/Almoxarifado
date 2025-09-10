@@ -88,9 +88,9 @@ header("Location: ../index.php");
                             <a href="#" class="text-white hover:text-green-200 px-3 py-2 rounded-md text-sm font-medium bg-green-600 bg-opacity-50">
                                 <i class="fas fa-home mr-1"></i> Início
                             </a>
-                            <a href="#" class="text-white hover:text-green-200 px-3 py-2 rounded-md text-sm font-medium hover:bg-green-600 hover:bg-opacity-30 transition-colors">
-                                <i class="fas fa-box mr-1"></i> Itens
-                            </a>
+                             <a href="../estoque.php" class="text-white hover:text-green-200 px-3 py-2 rounded-md text-sm font-medium hover:bg-green-600 hover:bg-opacity-30 transition-colors">
+                                 <i class="fas fa-box mr-1"></i> Estoque
+                             </a>
                             <a href="#" class="text-white hover:text-green-200 px-3 py-2 rounded-md text-sm font-medium hover:bg-green-600 hover:bg-opacity-30 transition-colors">
                                 <i class="fas fa-clipboard-list mr-1"></i> Minhas Solicitações
                             </a>
@@ -203,9 +203,9 @@ header("Location: ../index.php");
                     <div class="text-4xl text-green-500 mb-4">
                         <i class="fas fa-boxes"></i>
                     </div>
-                    <h5 class="font-semibold text-gray-800 mb-2">Itens Disponíveis</h5>
-                    <p class="text-gray-600 text-sm mb-4">Verifique os itens disponíveis no estoque</p>
-                    <button class="border border-green-500 text-green-500 hover:bg-green-500 hover:text-white px-4 py-2 rounded-lg transition-colors">Acessar</button>
+                     <h5 class="font-semibold text-gray-800 mb-2">Itens Disponíveis</h5>
+                     <p class="text-gray-600 text-sm mb-4">Verifique os itens disponíveis no estoque</p>
+                     <a href="../estoque.php" class="border border-green-500 text-green-500 hover:bg-green-500 hover:text-white px-4 py-2 rounded-lg transition-colors inline-block">Acessar</a>
                 </div>
                 
                 <div class="bg-white rounded-xl p-6 text-center card-shadow hover-lift">

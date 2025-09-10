@@ -14,8 +14,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Validação adicional
         if ($quantidade > 0) {
             try {
-                require_once('../includes/db.php');
-                require_once('../model/ItensModel.php');
+                require_once(__DIR__ . '/../config/db.php');
+                require_once(__DIR__ . '/../model/ItensModel.php');
                 
                 $itensModel = new Itens($pdo);
                 $sucesso = $itensModel->criar($nome, $quantidade, $unidade, $marca, $modelo);
