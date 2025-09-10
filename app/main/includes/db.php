@@ -5,7 +5,7 @@ $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 $host = 'localhost';
 $usuario = 'root';
-$senha = '' ;
+$senha = '';
 $nome_banco = 'almoxarifado';
 
 $link = mysqli_connect($host, $usuario, $senha, $nome_banco);
