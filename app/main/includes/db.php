@@ -15,11 +15,7 @@ if (!$link) {
 }
 mysqli_set_charset($link, 'utf8');
 
-if ($link) {
-    echo "Conexão bem-sucedida ao banco de dados.";
-} else {
-    echo "Erro ao conectar ao banco de dados:" . mysqli_connect_error();
-}
+
 
 
 date_default_timezone_set('America/Sao_Paulo');
