@@ -1,4 +1,5 @@
 <?php
+
 session_start();
 require_once '../includes/db.php';
 
@@ -31,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($usuario['tipo'] === 'admin') {
             header('Location: ../painel/admin/dashboard_Admin.php');
         } else {
-            header('Location: ../painel/usuario/dashboard_Usuario.php');
+            header('Location: ../painel/Usuario/dashboard_usuario.php');
         }
         exit;
     } else {
@@ -39,4 +40,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header('Location: ../view/index.php');
         exit;
     }
-}?>
+} 
+?>
