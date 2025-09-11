@@ -26,6 +26,7 @@ if (isLoggedIn()) {
         
         body {
             font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #d1fae5 0%, #10b981 100%);
         }
         
         .glass-effect {
@@ -76,10 +77,10 @@ if (isLoggedIn()) {
     </style>
 </head>
 
-<body class="min-h-screen bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 flex items-center justify-center p-4 floating-shapes" style="opacity:0; transition: opacity 1s;" onload="document.body.style.opacity='1'">
+<body class="min-h-screen flex items-center justify-center p-4 floating-shapes" style="opacity:0; transition: opacity 1s;" onload="document.body.style.opacity='1'">
    
     <!-- Reformulando o formulário com design moderno e Tailwind -->
-    <div class="glass-effect rounded-3xl p-8 w-full max-w-md shadow-2xl">
+    <div class="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl">
         <form action="../model/cadastrousuarios.php" method="POST" class="space-y-6">
             <div class="text-center mb-8">
                 <h2 class="text-3xl font-bold text-gray-800 mb-2">Cadastro</h2>
