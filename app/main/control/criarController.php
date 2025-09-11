@@ -1,5 +1,8 @@
 <?php
-session_start();
+require_once '../config/auth.php';
+
+// Verificar se é admin para criar itens
+requireLogin('admin', 'criarController.php');
 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -14,10 +17,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Validação adicional
         if ($quantidade > 0) {
             try {
-                require_once('../includes/db.php');
-                require_once('../model/ItensModel.php');
+                require_once(__DIR__ . '/../config/db.php');
+                require_once(__DIR__ . '/../model/ItensModel.php');
                 
                 $itensModel = new Itens($pdo);
+
+                
                 $sucesso = $itensModel->criar($nome, $quantidade, $unidade, $marca, $modelo);
                 
                 if ($sucesso) {
@@ -37,6 +42,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Redirecionar de volta para a página de cadastro
-header("Location: ../painel/Admin/itens_cadastro.php");
+header("Location: ../view/painel/Admin/itens_cadastro.php");
 exit();
 ?>

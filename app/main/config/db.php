@@ -1,5 +1,5 @@
 <?php
-$pdo = new PDO('mysql:host=localhost;dbname=almoxarifado;charset=utf8', 'root', '');
+$pdo = new PDO('mysql:unix_socket=/Applications/XAMPP/xamppfiles/var/mysql/mysql.sock;dbname=almoxarifado;charset=utf8', 'root', '');
 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 
@@ -8,7 +8,7 @@ $usuario = 'root';
 $senha = '';
 $nome_banco = 'almoxarifado';
 
-$link = mysqli_connect($host, $usuario, $senha, $nome_banco);
+$link = mysqli_connect($host, $usuario, $senha, $nome_banco, 3306, '/Applications/XAMPP/xamppfiles/var/mysql/mysql.sock');
 mysqli_set_charset($link, 'utf8');
 if (!$link) {
     die("A Conexão falhou:" . mysqli_connect_error());

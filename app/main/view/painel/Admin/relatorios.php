@@ -1,20 +1,8 @@
 <?php
-require_once '../../../assets/fpdf/fpdf186/fpdf.php';
-require '../config/db.php';
+require_once '../../config/auth.php';
 
-$pdf = new FPDF(P);
-$pdf->addPage(A4);
-
-$pdf->SetFont('arial', 'B', 15);
-
-$pdf->Cell(0, 10, 'Relatorios', 0, 1, 'C');
-$pdf->Ln(10);
-
-$tipo_pdf = 'I';
-
-$pdf->Output($tipo_pdf, 'relatorios.pdf', true);
-$pdf->Close();
-
+// Verificar se é admin e redirecionar se necessário
+requireLogin('admin', 'relatorios.php');
 
 function getRelatorios() {
     global $conn;

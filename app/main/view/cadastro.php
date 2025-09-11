@@ -1,174 +1,153 @@
+<?php
+require_once '../config/auth.php';
+
+// Se já estiver logado, redirecionar para o dashboard apropriado
+if (isLoggedIn()) {
+    if (isAdmin()) {
+        header('Location: painel/Admin/dashboard_Admin.php');
+    } elseif (isUser()) {
+        header('Location: painel/Usuario/dashboard_usuario.php');
+    }
+    exit;
+}
+?>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <script src="https://cdn.tailwindcss.com"></script>
     <title>Cadastro</title>
 
-<style>
-@media (max-width: 768px) {
-    form {
-        padding: 20px;
-        width: 95%;
-    }
-}
-
-h2 {
-    text-align: center;
-    font-size: 2.5em;
-    margin-top: 20px;
-    margin-bottom: 20px;
-}
-
-body {
-    background: url(../assets/images/backgroundcadst.png) no-repeat center center fixed;
-    background-size: cover;
-    min-height: 100vh;
-    margin: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-family: Arial, sans-serif;
-}
-
-/* formulario de cadastro */
-form {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    background: rgba(255, 255, 255, 0.95);
-    border: 2px solid #e0e0e0;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    padding: 30px;
-    border-radius: 10px;
-    width: 90%;
-    max-width: 400px;
-    min-height: 350px;
-    position: relative;
-}
-
-label {
-    display: block;
-    margin-bottom: 5px;
-    font-size: 16px; 
-    color: #333;
-    font-weight: 500;
-}
-
-input[type="text"],
-input[type="email"],
-input[type="password"] {
-    display: block;
-    margin-bottom: 2px;
-    border-radius: 25px;
-    border: 2px solid #e0e0e0;
-    background: #f9f9f9;
-    font-size: 16px;
-    box-sizing: border-box;
-    width: 280px;
-    height: 50px;
-    padding: 0 40px 0 15px;
-    transition: all 0.3s ease;
-    font-family: Arial, sans-serif;
-}
-
-input:focus {
-    border-color: #ff9500;
-    outline: none;
-}
-
-input:invalid:not(:placeholder-shown) {
-    border-color: #ff4444;
-}
-
-#btn {
-    width: 100%;
-    max-width: 275px;
-    margin-top: 5px;
-    margin-bottom: 20px;
-    background: rgb(50, 190, 0);
-    color: white;
-    border: none;
-    height: auto;
-    padding: 12px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 15px;
-    transition: transform 0.1s, box-shadow 0.1s, background-image 0.1s;
-}
-
-#btn:hover {
-    background: linear-gradient(to right, rgb(50, 190, 0), rgb(0, 150, 0));
-}
-
-#btn:active {
-    transform: scale(1.05);
-    background: linear-gradient(to right, rgb(50, 170, 0), rgb(0, 140, 0));
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-}
-
-p {
-    font-size: 17px;
-    text-align: center;
-}
-
-a {
-    color: gray;
-    outline: none;
-    text-decoration: underline;
-}
-
-#mostrarSenhaBtn {
-    position: absolute;
-    top: 50%;
-    right: 15px;
-    transform: translateY(-50%);
-    cursor: pointer;
-    font-size: 18px;
-    color: #555;
-    border: none;
-    background: none;
-    padding: 0;
-    transition: color 0.3s ease;
-}
-
-#mostrarSenhaBtn:hover {
-    color: #ff7700;
-}
-
-.container {
-    position: relative;
-    margin-bottom: 20px;
-}
-</style>
+    <style>
+        /* Adicionando configuração do Tailwind e estilos customizados */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .floating-shapes::before {
+            content: '';
+            position: absolute;
+            top: 10%;
+            left: 10%;
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(45deg, #10b981, #059669);
+            border-radius: 50%;
+            opacity: 0.1;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .floating-shapes::after {
+            content: '';
+            position: absolute;
+            bottom: 10%;
+            right: 10%;
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(45deg, #34d399, #10b981);
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            opacity: 0.1;
+            animation: float 8s ease-in-out infinite reverse;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+        
+        .input-focus:focus {
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+        
+        .btn-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+        }
+    </style>
 </head>
 
-<body style="opacity:0; transition: opacity 1s;" onload="document.body.style.opacity='1'">
+<body class="min-h-screen bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 flex items-center justify-center p-4 floating-shapes" style="opacity:0; transition: opacity 1s;" onload="document.body.style.opacity='1'">
    
-    <!-- Cadastro -->
-    <form action="../model/cadastrousuarios.php" method="POST">
-    <h2>Cadastro</h2>
-    <div class="container">
-        <label for="nome">Nome:</label>
-        <input type="text" id="nome" name="nome" placeholder="Nome" required><br>
+    <!-- Reformulando o formulário com design moderno e Tailwind -->
+    <div class="glass-effect rounded-3xl p-8 w-full max-w-md shadow-2xl">
+        <form action="../model/cadastrousuarios.php" method="POST" class="space-y-6">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">Cadastro</h2>
+                <p class="text-gray-600">Crie sua conta para continuar</p>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label for="nome" class="block text-sm font-medium text-gray-700 mb-2">Nome</label>
+                    <input 
+                        type="text" 
+                        id="nome" 
+                        name="nome" 
+                        placeholder="Digite seu nome completo" 
+                        required
+                        class="w-full px-4 py-3 bg-white/70 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent input-focus transition-all duration-300"
+                    >
+                </div>
+
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        placeholder="nome@exemplo.com" 
+                        required
+                        class="w-full px-4 py-3 bg-white/70 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent input-focus transition-all duration-300"
+                    >
+                </div>
+
+                <div class="relative">
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-2">Senha</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        placeholder="Digite sua senha" 
+                        required
+                        class="w-full px-4 py-3 pr-12 bg-white/70 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent input-focus transition-all duration-300"
+                    >
+                    <button 
+                        type="button"
+                        id="mostrarSenhaBtn" 
+                        onclick="mostrarSenha()"
+                        class="absolute right-4 top-[38px] text-gray-500 hover:text-emerald-600 transition-colors duration-200"
+                    >
+                        <i class="bi-eye-fill text-lg"></i>
+                    </button>
+                </div>
+            </div>
+
+            <button 
+                type="submit" 
+                class="w-full bg-gradient-to-r from-emerald-500 to-green-600 text-white font-semibold py-3 px-6 rounded-xl hover:from-emerald-600 hover:to-green-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-all duration-300 btn-hover"
+            >
+                Cadastrar
+            </button>
+
+            <p class="text-center text-gray-600 mt-6">
+                Já tem uma conta? 
+                <a href="index.php" class="text-emerald-600 hover:text-emerald-700 font-medium transition-colors duration-200">
+                    Entrar
+                </a>
+            </p>
+        </form>
     </div>
 
-    <div class="container">
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" placeholder="nome@gmail.com" required><br>
-    </div>
-
-    <div class="container">
-        <label for="password">Senha:</label>
-        <input type="password" id="password" name="password" placeholder="senha" required><i class="bi-eye-fill" id="mostrarSenhaBtn" onclick="mostrarSenha()"></i></input><br>
-    </div>
-    <button type="submit" id="btn">Cadastrar</button>
-    <p>Já tem uma conta? <a href="index.php">Entrar</a></p>
-    </form>
-
-
-<script src="../js/mostrarSenha.js"></script> 
+    <script src="../js/mostrarSenha.js"></script> 
 </body>
 </html>
