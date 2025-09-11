@@ -8,7 +8,7 @@ class MovimentacaoController {
     // Exibe a view de registro da movimentação
     public function index() {
         // Certifique-se que o caminho da view está correto
-        $viewPath = __DIR__ . '../view/registrarmovimentacao.php'; 
+        $viewPath = __DIR__ . '../view/painel/Usuario/registrarmovimentacao.php'; 
         if (file_exists($viewPath)) {
             require_once $viewPath;
         } else {
