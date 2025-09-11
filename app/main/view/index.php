@@ -199,7 +199,7 @@ if (isLoggedIn()) {
                     </div>
                     
                     <h1 class="text-3xl lg:text-5xl font-bold mb-6 leading-tight">
-                     <span class="text-green-light">Secretária De Educação</span>
+                     <span class="text-green-light">Secretaria De Educação</span>
                     </h1>
                     
                     <p class="text-lg lg:text-xl mb-8 max-w-md leading-relaxed opacity-90">
@@ -217,7 +217,7 @@ if (isLoggedIn()) {
                         </div>
                         <div class="flex items-center">
                             <i class="fas fa-rocket mr-2 text-green-light"></i>
-                            <span>Inovação</span>
+                            <span>Inovação</span> 
                         </div>
                     </div>
                 </div>
