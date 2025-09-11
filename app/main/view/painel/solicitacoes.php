@@ -8,9 +8,30 @@ requireLogin(null, 'solicitacoes.php');
 // Incluir arquivos necessários
 require_once '../../config/db.php';
 require_once '../../model/ItensModel.php';
-require_once '../../model/SolicitacoesModel.php';
+require_once('../../model/SolicitacoesModel.php');
 
+// Instanciar modelo de solicitações
+$solicitacoesModel = new Solicitacoes($pdo);
 
+// Buscar dados do usuário logado
+$userData = getCurrentUser();
+$id_usuario = $userData['id'];
+$nome_usuario = $userData['nome'];
+
+// Buscar estatísticas do dashboard
+try {
+    $estatisticas = $solicitacoesModel->buscarEstatisticasUsuario($id_usuario);
+    $solicitacoes_recentes = $solicitacoesModel->buscarSolicitacoesRecentesUsuario($id_usuario, 5);
+} catch (Exception $e) {
+    // Em caso de erro, usar valores padrão
+    $estatisticas = [
+        'solicitacoes_pendentes' => 0,
+        'solicitacoes_aprovadas' => 0,
+        'itens_solicitados' => 0,
+        'itens_disponiveis' => 0
+    ];
+    $solicitacoes_recentes = [];
+}
 // Buscar todos os itens disponíveis
 try {
     $itensModel = new Itens($pdo);
@@ -116,7 +137,7 @@ function getStatusClass($status)
     <div class="flex">
         <!-- Sidebar -->
         <div id="sidebar"
-            class="w-64 sidebar-gradient text-white h-screen fixed transition-all duration-300 z-50 shadow-xl">
+            class="w-64 sidebar-gradient text-white h-screen fixed transition-transform -translate-x-full md:translate-x-0 duration-300 z-50 shadow-xl">
             <div class="p-6 text-center border-b border-green-light border-opacity-20 bg-black bg-opacity-10">
                 <div class="flex items-center justify-center">
                     <i class="fas fa-warehouse text-2xl mr-3"></i>
@@ -168,7 +189,7 @@ function getStatusClass($status)
         </div>
 
         <!-- Conteúdo Principal -->
-        <div id="content" class="flex-1 ml-64 min-h-screen">
+        <div id="content" class="flex-1 md:ml-64 min-h-screen w-full overflow-x-hidden">
             <!-- Topbar -->
             <nav class="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
                 <div class="flex items-center justify-between">
@@ -177,17 +198,23 @@ function getStatusClass($status)
                     </button>
 
                     <div class="hidden sm:flex items-center flex-1 max-w-md mx-4">
+                        <div class="relative w-full">
+                        </div>
                     </div>
 
                     <div class="flex items-center space-x-4">
                         <div class="relative">
-                            <button class="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg">
-                                <i class="fas fa-bell"></i>
+                            <?php 
+                                $pendentesCount = 0; 
+                                if (isset($solicitacoes) && is_array($solicitacoes)) { 
+                                    foreach ($solicitacoes as $s) { if (($s['status'] ?? '') === 'em espera') { $pendentesCount++; } }
+                                }
+                            ?>
+                            <button class="p-2 text-gray-600 hover:text-green-primary relative">
+                                <i class="fas fa-bell text-lg"></i>
+                                <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"><?php echo $pendentesCount; ?></span>
                             </button>
-                            <span
-                                class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"><?php echo count($solicitacoes); ?></span>
                         </div>
-
                         <div class="flex items-center space-x-3">
                             <img src="https://ui-avatars.com/api/?name=Admin&background=059669&color=ffffff"
                                 class="w-8 h-8 rounded-full">
@@ -308,7 +335,7 @@ function getStatusClass($status)
                 <div class="bg-white rounded-xl shadow-sm p-6 mb-8">
                     <h2 class="text-xl font-semibold text-gray-800 mb-6">Nova Solicitação</h2>
                     <form method="POST" action="../../control/solicitacoesController.php" class="space-y-6">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label for="id_item"
                                     class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
@@ -336,7 +363,7 @@ function getStatusClass($status)
                                 </label>
                                 <input type="number" id="quantidade_solicitada" name="quantidade_solicitada" required
                                     min="1"
-                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-primary focus:border-transparent transition-colors"
+                                    class="w-full max-w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-primary focus:border-transparent transition-colors"
                                     placeholder="Digite a quantidade">
                                 <p class="text-sm text-gray-500 mt-1" id="estoque-info"></p>
                             </div>
@@ -365,8 +392,8 @@ function getStatusClass($status)
                             <p class="text-gray-400">Faça uma nova solicitação usando o formulário acima.</p>
                         </div>
                     <?php else: ?>
-                        <div class="overflow-x-auto">
-                            <table class="w-full">
+                        <div class="overflow-x-auto w-full">
+                            <table class="min-w-full w-full">
                                 <thead class="bg-gray-50">
                                     <tr>
                                         <th

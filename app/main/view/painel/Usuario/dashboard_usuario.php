@@ -7,6 +7,7 @@ requireLogin('user', 'dashboard_usuario.php');
 // Incluir conexão com banco de dados e modelos
 require_once('../../../config/db.php');
 require_once('../../../model/SolicitacoesModel.php');
+require_once('../../../model/ItensModel.php');
 
 // Instanciar modelo de solicitações
 $solicitacoesModel = new Solicitacoes($pdo);
@@ -29,6 +30,82 @@ try {
         'itens_disponiveis' => 0
     ];
     $solicitacoes_recentes = [];
+}
+// Buscar todos os itens disponíveis
+try {
+    $itensModel = new Itens($pdo);
+    $itens = $itensModel->buscarTodosItens();
+
+    // Filtrar apenas itens com estoque disponível
+    $itens_disponiveis = array_filter($itens, function ($item) {
+        return $item['quantidade'] > 0;
+    });
+} catch (Exception $e) {
+    $erros[] = "Erro ao buscar itens: " . $e->getMessage();
+    $itens_disponiveis = [];
+}
+
+// Buscar todas as solicitações com status 'em espera'
+try {
+    $solicitacoesModel = new Solicitacoes($pdo);
+    $solicitacoes = $solicitacoesModel->buscarTodasSolicitacoes();
+} catch (Exception $e) {
+    $erros[] = "Erro ao buscar solicitações: " . $e->getMessage();
+    $solicitacoes = [];
+}
+
+// Instanciar modelos
+$itensModel = new Itens($pdo);
+$solicitacoesModel = new Solicitacoes($pdo);
+
+// Buscar dados do dashboard
+try {
+    // Buscar todos os itens
+    $itens = $itensModel->buscarTodosItens();
+
+    // Calcular estatísticas de itens
+    $total_itens_estoque = array_sum(array_column($itens, 'quantidade'));
+    $itens_criticos = array_filter($itens, function ($item) {
+        return $item['quantidade'] <= 10; // Considerar crítico se <= 10
+    });
+    $itens_em_falta = array_filter($itens, function ($item) {
+        return $item['quantidade'] == 0;
+    });
+
+    // Buscar todas as solicitações
+    $solicitacoes = $solicitacoesModel->buscarTodasSolicitacoes();
+
+    // Calcular estatísticas de solicitações
+    $solicitacoes_hoje = array_filter($solicitacoes, function ($s) {
+        return date('Y-m-d', strtotime($s['data'])) == date('Y-m-d');
+    });
+
+    $solicitacoes_pendentes = array_filter($solicitacoes, function ($s) {
+        return $s['status'] === 'em espera';
+    });
+
+    $solicitacoes_aprovadas = array_filter($solicitacoes, function ($s) {
+        return $s['status'] === 'aprovado';
+    });
+
+    $solicitacoes_recusadas = array_filter($solicitacoes, function ($s) {
+        return $s['status'] === 'recusado';
+    });
+
+    // Buscar últimas solicitações (limitado a 5)
+    $ultimas_solicitacoes = array_slice($solicitacoes, 0, 5);
+
+} catch (Exception $e) {
+    // Em caso de erro, usar valores padrão
+    $total_itens_estoque = 0;
+    $itens_criticos = [];
+    $itens_em_falta = [];
+    $solicitacoes_hoje = [];
+    $solicitacoes_pendentes = [];
+    $solicitacoes_aprovadas = [];
+    $solicitacoes_recusadas = [];
+    $ultimas_solicitacoes = [];
+    $erro = $e->getMessage();
 }
 ?>
 <!DOCTYPE html>
@@ -124,7 +201,7 @@ try {
 <body class="bg-gray-50 font-sans">
     <div class="flex">
         <!-- Sidebar -->
-        <div id="sidebar" class="w-64 sidebar-gradient text-white h-screen fixed transition-all duration-300 z-50 shadow-xl">
+        <div id="sidebar" class="w-64 sidebar-gradient text-white h-screen fixed transition-transform -translate-x-full md:translate-x-0 duration-300 z-50 shadow-xl">
             <div class="p-6 text-center border-b border-green-light border-opacity-20 bg-black bg-opacity-10">
                 <div class="flex items-center justify-center">
                     <i class="fas fa-warehouse text-2xl mr-3"></i>
@@ -163,7 +240,7 @@ try {
         </div>
 
         <!-- Conteúdo Principal -->
-        <div id="content" class="flex-1 ml-64 min-h-screen">
+        <div id="content" class="flex-1 md:ml-64 min-h-screen w-full overflow-x-hidden">
             <!-- Topbar -->
             <nav class="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
                 <div class="flex items-center justify-between">
@@ -178,15 +255,15 @@ try {
 
                     <div class="flex items-center space-x-4">
                         <div class="relative">
+                            <?php 
+                                try {
+                                    $allS = $solicitacoesModel->buscarTodasSolicitacoes();
+                                    $pendentesCount = 0; foreach ($allS as $s) { if (($s['status'] ?? '') === 'em espera') { $pendentesCount++; } }
+                                } catch (Exception $e) { $pendentesCount = 0; }
+                            ?>
                             <button class="p-2 text-gray-600 hover:text-green-primary relative">
                                 <i class="fas fa-bell text-lg"></i>
-                                <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"><?php echo $estatisticas['solicitacoes_pendentes']; ?></span>
-                            </button>
-                        </div>
-                        <div class="relative">
-                            <button class="p-2 text-gray-600 hover:text-green-primary relative">
-                                <i class="fas fa-envelope text-lg"></i>
-                                <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"><?php echo $estatisticas['solicitacoes_aprovadas']; ?></span>
+                                <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"><?php echo $pendentesCount; ?></span>
                             </button>
                         </div>
                         <div class="flex items-center space-x-3">
@@ -224,7 +301,7 @@ try {
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-green-100 text-sm font-medium uppercase tracking-wide">Solicitações Pendentes</p>
-                                <p class="text-3xl font-bold mt-2"><?php echo $estatisticas['solicitacoes_pendentes']; ?></p>
+                                <p class="text-3xl font-bold mt-2"><?php echo $pendentesCount;?></p>
                             </div>
                             <div class="bg-white bg-opacity-20 rounded-lg p-3">
                                 <i class="fas fa-clock text-2xl"></i>
@@ -272,41 +349,49 @@ try {
                 <!-- Tabelas de Solicitações -->
                 <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
                     <!-- Minhas Solicitações Recentes -->
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 card-hover xl:col-span-2">
-                        <div class="p-10 border-b border-gray-200">
-                            <h3 class="text-lg font-semibold text-gray-900">Minhas Solicitações Recentes</h3>
+                     <!-- Últimas Solicitações -->
+                     <div class="bg-white rounded-xl shadow-sm border border-gray-200 card-hover xl:col-span-2 w-full">
+                        <div class="p-6 border-b border-gray-200">
+                            <h3 class="text-lg font-semibold text-gray-900">Últimas Solicitações</h3>
                         </div>
                         <div class="overflow-x-auto">
                             <table class="w-full">
                                 <thead class="bg-gray-50">
                                     <tr>
-                                        <th class="px-10 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Solicitação</th>
-                                        <th class="px-10 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
-                                        <th class="px-10 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Item</th>
-                                        <th class="px-10 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th
+                                            class="px-4 sm:px-6 md:px-8 lg:px-10 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Requisição</th>
+                                        <th
+                                            class="px-4 sm:px-6 md:px-8 lg:px-10 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Solicitante</th>
+                                        <th
+                                            class="px-4 sm:px-6 md:px-8 lg:px-10 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Data</th>
+                                        <th
+                                            class="px-4 sm:px-6 md:px-8 lg:px-10 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Status</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-200">
-                                    <?php if (empty($solicitacoes_recentes)): ?>
+                                    <?php if (empty($ultimas_solicitacoes)): ?>
                                         <tr>
                                             <td colspan="4" class="px-6 py-8 text-center text-gray-500">
-                                                <i class="fas fa-inbox text-4xl mb-2 block"></i>
+                                                <i class="fas fa-clipboard-list text-4xl mb-2 block"></i>
                                                 Nenhuma solicitação encontrada
                                             </td>
                                         </tr>
                                     <?php else: ?>
-                                        <?php foreach ($solicitacoes_recentes as $solicitacao): ?>
+                                        <?php foreach ($ultimas_solicitacoes as $solicitacao): ?>
                                             <tr class="hover:bg-gray-50">
-                                                <td class="px-6 py-4 text-sm font-medium text-gray-900">
-                                                    #SOL-<?php echo str_pad($solicitacao['id'], 4, '0', STR_PAD_LEFT); ?>
+                                                <td class="px-4 sm:px-6 md:px-8 lg:px-10 py-4 text-sm font-medium text-gray-900">
+                                                    #SOL-<?php echo str_pad($solicitacao['id'], 4, '0', STR_PAD_LEFT); ?></td>
+                                                <td class="px-4 sm:px-6 md:px-8 lg:px-10 py-4 text-sm text-gray-600">
+                                                    <?php echo htmlspecialchars($nome_usuario); ?>
                                                 </td>
-                                                <td class="px-6 py-4 text-sm text-gray-600">
+                                                <td class="px-4 sm:px-6 md:px-8 lg:px-10 py-4 text-sm text-gray-600">
                                                     <?php echo date('d/m/Y', strtotime($solicitacao['data'])); ?>
                                                 </td>
-                                                <td class="px-6 py-4 text-sm text-gray-600">
-                                                    <?php echo $solicitacao['quantidade']; ?> <?php echo $solicitacao['unidade'] == 1 ? 'unidade' : 'unidades'; ?> - <?php echo htmlspecialchars($solicitacao['item_nome']); ?>
-                                                </td>
-                                                <td class="px-6 py-4">
+                                                <td class="px-4 sm:px-6 md:px-8 lg:px-10 py-4">
                                                     <?php
                                                     $status = $solicitacao['status'];
                                                     $status_classes = [
@@ -322,7 +407,8 @@ try {
                                                     $classe = $status_classes[$status] ?? 'bg-gray-100 text-gray-800';
                                                     $texto = $status_texto[$status] ?? ucfirst($status);
                                                     ?>
-                                                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full <?php echo $classe; ?>">
+                                                    <span
+                                                        class="inline-flex px-2 py-1 text-xs font-semibold rounded-full <?php echo $classe; ?>">
                                                         <?php echo $texto; ?>
                                                     </span>
                                                 </td>
@@ -333,11 +419,13 @@ try {
                             </table>
                         </div>
                         <div class="p-6 border-t border-gray-200 text-center">
-                            <a href="../solicitacoes.php" class="inline-flex items-center px-4 py-2 border border-green-primary text-green-primary rounded-lg hover:bg-green-primary hover:text-white transition-colors duration-200">
+                            <a href="../solicitacoes.php"
+                                class="inline-flex items-center px-4 py-2 border border-green-primary text-green-primary rounded-lg hover:bg-green-primary hover:text-white transition-colors duration-200">
                                 Ver todas as solicitações
                             </a>
                         </div>
                     </div>
+                </div>
                 </div>
                 
                 <!-- Footer -->

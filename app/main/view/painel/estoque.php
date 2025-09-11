@@ -7,7 +7,29 @@ requireLogin(null, 'estoque.php');
 // Incluir arquivos necessários
 require_once '../../config/db.php';
 require_once '../../model/ItensModel.php';
+require_once '../../model/SolicitacoesModel.php';
 
+// Instanciar modelo de solicitações
+$solicitacoesModel = new Solicitacoes($pdo);
+
+// Buscar dados do usuário logado   
+$id_usuario = $_SESSION['id'];
+$nome_usuario = $_SESSION['nome'];
+
+// Buscar estatísticas do dashboard
+try {
+    $estatisticas = $solicitacoesModel->buscarEstatisticasUsuario($_SESSION['id']);
+    $solicitacoes_recentes = $solicitacoesModel->buscarSolicitacoesRecentesUsuario($_SESSION['id'], 5);
+} catch (Exception $e) {
+    // Em caso de erro, usar valores padrão
+    $estatisticas = [
+        'solicitacoes_pendentes' => 0,
+        'solicitacoes_aprovadas' => 0,
+        'itens_solicitados' => 0,
+        'itens_disponiveis' => 0
+    ];
+    $solicitacoes_recentes = [];
+}
 // Processar adição de quantidade como movimentação de ENTRADA
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao']) && $_POST['acao'] === 'incrementar') {
     $idItem = isset($_POST['id_item']) ? (int)$_POST['id_item'] : 0;
@@ -78,6 +100,8 @@ function getCategoria($nome) {
     } else {
         return 'Componentes';
     }
+
+    
 }
 ?>
 <!DOCTYPE html>
@@ -153,7 +177,7 @@ function getCategoria($nome) {
 <body class="bg-gray-50 font-sans">
     <div class="flex">
         <!-- Sidebar -->
-        <div id="sidebar" class="w-64 sidebar-gradient text-white h-screen fixed transition-all duration-300 z-50 shadow-xl">
+        <div id="sidebar" class="w-64 sidebar-gradient text-white h-screen fixed transition-transform -translate-x-full md:translate-x-0 duration-300 z-50 shadow-xl">
             <div class="p-6 text-center border-b border-green-light border-opacity-20 bg-black bg-opacity-10">
                 <div class="flex items-center justify-center">
                     <i class="fas fa-warehouse text-2xl mr-3"></i>
@@ -200,7 +224,7 @@ function getCategoria($nome) {
         </div>
 
         <!-- Conteúdo Principal -->
-        <div id="content" class="flex-1 ml-64 min-h-screen">
+        <div id="content" class="flex-1 md:ml-64 min-h-screen w-full overflow-x-hidden">
             <!-- Topbar -->
             <nav class="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
                 <div class="flex items-center justify-between">
@@ -215,12 +239,17 @@ function getCategoria($nome) {
 
                     <div class="flex items-center space-x-4">
                         <div class="relative">
-                            <button class="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg">
-                                <i class="fas fa-bell"></i>
+                            <?php 
+                                try {
+                                    $allS = $solicitacoesModel->buscarTodasSolicitacoes();
+                                    $pendentesCount = 0; foreach ($allS as $s) { if (($s['status'] ?? '') === 'em espera') { $pendentesCount++; } }
+                                } catch (Exception $e) { $pendentesCount = 0; }
+                            ?>
+                            <button class="p-2 text-gray-600 hover:text-green-primary relative">
+                                <i class="fas fa-bell text-lg"></i>
+                                <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"><?php echo $pendentesCount; ?></span>
                             </button>
-                            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
                         </div>
-                        
                         <div class="flex items-center space-x-3">
                             <img src="https://ui-avatars.com/api/?name=Admin&background=059669&color=ffffff"
                                 class="w-8 h-8 rounded-full">
@@ -247,27 +276,27 @@ function getCategoria($nome) {
         </div>
 
                 <!-- Cards de estatísticas -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                    <div class="stat-card-gradient-1 rounded-xl p-6 text-white card-hover">
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
+                    <div class="stat-card-gradient-1 rounded-lg p-3 sm:p-4 text-white card-hover">
                         <div class="flex items-center">
-                            <div class="p-3 rounded-full bg-white bg-opacity-20">
-                                <i class="fas fa-boxes text-xl"></i>
+                            <div class="p-2 rounded-full bg-white bg-opacity-20">
+                                <i class="fas fa-boxes text-sm sm:text-base"></i>
                             </div>
-                            <div class="ml-4">
-                                <p class="text-sm font-medium text-green-100">Total de Itens</p>
-                                <p class="text-2xl font-semibold"><?php echo count($itens); ?></p>
+                            <div class="ml-2 sm:ml-3">
+                                <p class="text-xs sm:text-sm font-medium text-green-100">Total de Itens</p>
+                                <p class="text-lg sm:text-xl font-semibold"><?php echo count($itens); ?></p>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="stat-card-gradient-4 rounded-xl p-6 text-white card-hover">
+                    <div class="stat-card-gradient-4 rounded-lg p-3 sm:p-4 text-white card-hover">
                         <div class="flex items-center">
-                            <div class="p-3 rounded-full bg-white bg-opacity-20">
-                                <i class="fas fa-exclamation-triangle text-xl"></i>
+                            <div class="p-2 rounded-full bg-white bg-opacity-20">
+                                <i class="fas fa-exclamation-triangle text-sm sm:text-base"></i>
                             </div>
-                            <div class="ml-4">
-                                <p class="text-sm font-medium text-red-100">Estoque Crítico</p>
-                                <p class="text-2xl font-semibold">
+                            <div class="ml-2 sm:ml-3">
+                                <p class="text-xs sm:text-sm font-medium text-red-100">Estoque Crítico</p>
+                                <p class="text-lg sm:text-xl font-semibold">
                                     <?php 
                                     $criticos = array_filter($itens, function($item) { return $item['quantidade'] <= 5; });
                                     echo count($criticos);
@@ -277,14 +306,14 @@ function getCategoria($nome) {
                         </div>
                     </div>
                     
-                    <div class="stat-card-gradient-3 rounded-xl p-6 text-white card-hover">
+                    <div class="stat-card-gradient-3 rounded-lg p-3 sm:p-4 text-white card-hover">
                         <div class="flex items-center">
-                            <div class="p-3 rounded-full bg-white bg-opacity-20">
-                                <i class="fas fa-exclamation-circle text-xl"></i>
+                            <div class="p-2 rounded-full bg-white bg-opacity-20">
+                                <i class="fas fa-exclamation-circle text-sm sm:text-base"></i>
                             </div>
-                            <div class="ml-4">
-                                <p class="text-sm font-medium text-yellow-100">Estoque Baixo</p>
-                                <p class="text-2xl font-semibold">
+                            <div class="ml-2 sm:ml-3">
+                                <p class="text-xs sm:text-sm font-medium text-yellow-100">Estoque Baixo</p>
+                                <p class="text-lg sm:text-xl font-semibold">
                                     <?php 
                                     $baixos = array_filter($itens, function($item) { return $item['quantidade'] > 5 && $item['quantidade'] <= 15; });
                                     echo count($baixos);
@@ -294,14 +323,14 @@ function getCategoria($nome) {
                         </div>
                     </div>
                     
-                    <div class="stat-card-gradient-2 rounded-xl p-6 text-white card-hover">
+                    <div class="stat-card-gradient-2 rounded-lg p-3 sm:p-4 text-white card-hover">
                         <div class="flex items-center">
-                            <div class="p-3 rounded-full bg-white bg-opacity-20">
-                                <i class="fas fa-check-circle text-xl"></i>
+                            <div class="p-2 rounded-full bg-white bg-opacity-20">
+                                <i class="fas fa-check-circle text-sm sm:text-base"></i>
                             </div>
-                            <div class="ml-4">
-                                <p class="text-sm font-medium text-green-100">Estoque Normal</p>
-                                <p class="text-2xl font-semibold">
+                            <div class="ml-2 sm:ml-3">
+                                <p class="text-xs sm:text-sm font-medium text-green-100">Estoque Normal</p>
+                                <p class="text-lg sm:text-xl font-semibold">
                                     <?php 
                                     $normais = array_filter($itens, function($item) { return $item['quantidade'] > 15; });
                                     echo count($normais);
@@ -315,11 +344,11 @@ function getCategoria($nome) {
                 <!-- Filtros -->
                 <div class="bg-white rounded-xl p-6 shadow-sm mb-8">
             <div class="flex flex-col md:flex-row gap-4">
-                <div class="flex-1">
+                <div class="flex-1 min-w-0">
                     <label class="block text-sm font-medium text-gray-700 mb-2">Buscar por nome</label>
-                    <input type="text" id="filterNome" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Digite o nome do item...">
+                    <input type="text" id="filterNome" class="w-full max-w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Digite o nome do item...">
                 </div>
-                <div class="md:w-48">
+                <div class="md:w-48 w-full">
                     <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
                     <select id="filterStatus" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
                         <option value="">Todos</option>
