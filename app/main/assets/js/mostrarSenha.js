@@ -1,15 +1,15 @@
 function mostrarSenha() {
     var inputPassword = document.getElementById("password");
-    var eyeIcon = document.getElementById("mostrarSenhaBtn");
+    var button = document.getElementById("mostrarSenhaBtn");
+    if (!inputPassword || !button) return;
 
-    if (inputPassword.type === "password") {
-        inputPassword.type = "text";
-        eyeIcon.classList.remove('bi-eye-fill');
-        eyeIcon.classList.add('bi-eye-slash-fill');
-    } else {
-        inputPassword.type = "password";
-        eyeIcon.classList.remove('bi-eye-slash-fill');
-        eyeIcon.classList.add('bi-eye-fill');
-    }
+    var icon = button.querySelector('i');
+    if (!icon) return;
+
+    var isPassword = inputPassword.type === "password";
+    inputPassword.type = isPassword ? "text" : "password";
+
+    icon.classList.toggle('bi-eye-fill', !isPassword);
+    icon.classList.toggle('bi-eye-slash-fill', isPassword);
 }
 
