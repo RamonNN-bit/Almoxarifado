@@ -43,9 +43,35 @@ class Itens {
         if ($id_item <= 0 || $quantidadeAdicionar <= 0) {
             return false;
         }
-        $sql = "UPDATE itens SET quantidade = quantidade + :qtd WHERE id = :id";
-        $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute([':qtd' => $quantidadeAdicionar, ':id' => $id_item]);
+    
+        if (!isset($_SESSION['usuariologado']['id'])) {
+            return false; // Usuário não está logado
+        }
+    
+        $this->pdo->beginTransaction();
+        try {
+            // Atualiza a quantidade na tabela itens
+            $sql = "UPDATE itens SET quantidade = quantidade + :qtd WHERE id = :id";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([':qtd' => $quantidadeAdicionar, ':id' => $id_item]);
+    
+            // Insere a movimentação na tabela movimentacoes
+            $sqlInsert = "INSERT INTO movimentacoes (id_item, tipo, quantidade, id_usuario, status, data) 
+                          VALUES (:id_item, 'entrada', :quantidade, :id_usuario, 'em espera', NOW())";
+            $stmtInsert = $this->pdo->prepare($sqlInsert);
+            $stmtInsert->execute([
+                ':id_item' => $id_item,
+                ':quantidade' => $quantidadeAdicionar,
+                ':id_usuario' => $_SESSION['usuariologado']['id']
+            ]);
+    
+            $this->pdo->commit();
+            return true;
+        } catch (PDOException $e) {
+            $this->pdo->rollBack();
+            error_log("Erro ao incrementar quantidade: " . $e->getMessage());
+            return false;
+        }
     }
 }
 ?>

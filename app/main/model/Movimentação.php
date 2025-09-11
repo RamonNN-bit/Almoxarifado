@@ -35,14 +35,13 @@ class Movimentacao {
                 return false;
             }
 
-            $sql = "INSERT INTO movimentacoes (id_item, tipo, quantidade, data_movimentacao, id_usuario, created_at) 
-                    VALUES (:id_item, :tipo, :quantidade, :data, :id_usuario, NOW())";
+            $sql = "INSERT INTO movimentacoes (id_item, tipo, quantidade, id_usuario, created_at) 
+                    VALUES (:id_item, :tipo, :quantidade, :id_usuario, NOW())";
 
             $stmt = $this->pdo->prepare($sql);
             $stmt->bindParam(':id_item', $id_item, PDO::PARAM_INT);
             $stmt->bindParam(':tipo', $tipo, PDO::PARAM_STR);
             $stmt->bindParam(':quantidade', $quantidade, PDO::PARAM_INT);
-            $stmt->bindParam(':data', $data, PDO::PARAM_STR);
             $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
 
             return $stmt->execute();

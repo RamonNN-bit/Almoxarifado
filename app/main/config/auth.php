@@ -1,4 +1,5 @@
 <?php
+session_start();
 /**
  * Sistema de Autenticação Centralizado
  * Gerencia sessões e redirecionamentos baseados no tipo de usuário

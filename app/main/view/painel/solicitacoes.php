@@ -1,7 +1,7 @@
 <?php
 
 require_once '../../config/auth.php';
-
+print_r($_SESSION);
 // Verificar se é admin e redirecionar se necessário
 requireLogin(null, 'solicitacoes.php');
 

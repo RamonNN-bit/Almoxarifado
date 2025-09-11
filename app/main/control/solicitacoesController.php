@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         } elseif ($action === 'aceitar' || $action === 'recusar') {
             // Verificar se o usuário é administrador
-            if ($_SESSION["usuariologado"]['tipo'] !== 'admin') {
+            if ($_SESSION["usuariologado"]['TIPO'] !== 'admin') {
                 throw new Exception("Acesso negado: apenas administradores podem aprovar ou rejeitar solicitações");
             }
             

@@ -8,6 +8,42 @@ requireLogin(null, 'estoque.php');
 require_once '../../config/db.php';
 require_once '../../model/ItensModel.php';
 
+// Processar adição de quantidade como movimentação de ENTRADA
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao']) && $_POST['acao'] === 'incrementar') {
+    $idItem = isset($_POST['id_item']) ? (int)$_POST['id_item'] : 0;
+    $qtdAdd = isset($_POST['quantidade']) ? (int)$_POST['quantidade'] : 0;
+    $idUsuario = $_SESSION['id'] ?? null;
+
+    if ($idItem > 0 && $qtdAdd > 0) {
+        try {
+            $pdo->beginTransaction();
+
+            // Atualiza a tabela de itens
+            $stmt = $pdo->prepare('UPDATE itens SET quantidade = quantidade + :qtd WHERE id = :id');
+            $stmt->execute([':qtd' => $qtdAdd, ':id' => $idItem]);
+
+            // Insere registro na tabela movimentacoes (tipo entrada)
+            $stmt2 = $pdo->prepare('INSERT INTO movimentacoes (id_item, tipo, quantidade, data, id_usuario) VALUES (:id_item, :tipo, :quantidade, :data, :id_usuario)');
+            $stmt2->execute([
+                ':id_item' => $idItem,
+                ':tipo' => 'entrada',
+                ':quantidade' => $qtdAdd,
+                ':data' => date('Y-m-d'),
+                ':id_usuario' => $idUsuario
+            ]);
+
+            $pdo->commit();
+            header('Location: estoque.php?ok=1');
+            exit;
+        } catch (Exception $e) {
+            if ($pdo->inTransaction()) { $pdo->rollBack(); }
+            $erros[] = 'Erro ao adicionar quantidade: ' . $e->getMessage();
+        }
+    } else {
+        $erros[] = 'Item ou quantidade inválidos.';
+    }
+}
+
 // Buscar todos os itens do banco de dados
 try {
     $itensModel = new Itens($pdo);
