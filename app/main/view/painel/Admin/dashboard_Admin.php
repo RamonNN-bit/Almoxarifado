@@ -1,7 +1,66 @@
 <?php
-session_start();
-if (!isset($_SESSION ["usuariologado"])) {
-header("Location: ../../index.php");
+require_once '../../../config/auth.php';
+
+// Verificar se é admin e redirecionar se necessário
+requireLogin('admin', 'dashboard_Admin.php');
+
+// Incluir conexão com banco de dados e modelos
+require_once('../../../config/db.php');
+require_once('../../../model/ItensModel.php');
+require_once('../../../model/SolicitacoesModel.php');
+
+// Instanciar modelos
+$itensModel = new Itens($pdo);
+$solicitacoesModel = new Solicitacoes($pdo);
+
+// Buscar dados do dashboard
+try {
+    // Buscar todos os itens
+    $itens = $itensModel->buscarTodosItens();
+    
+    // Calcular estatísticas de itens
+    $total_itens_estoque = array_sum(array_column($itens, 'quantidade'));
+    $itens_criticos = array_filter($itens, function($item) {
+        return $item['quantidade'] <= 10; // Considerar crítico se <= 10
+    });
+    $itens_em_falta = array_filter($itens, function($item) {
+        return $item['quantidade'] == 0;
+    });
+    
+    // Buscar todas as solicitações
+    $solicitacoes = $solicitacoesModel->buscarTodasSolicitacoes();
+    
+    // Calcular estatísticas de solicitações
+    $solicitacoes_hoje = array_filter($solicitacoes, function($s) {
+        return date('Y-m-d', strtotime($s['data'])) == date('Y-m-d');
+    });
+    
+    $solicitacoes_pendentes = array_filter($solicitacoes, function($s) {
+        return $s['status'] === 'em espera';
+    });
+    
+    $solicitacoes_aprovadas = array_filter($solicitacoes, function($s) {
+        return $s['status'] === 'aprovado';
+    });
+    
+    $solicitacoes_recusadas = array_filter($solicitacoes, function($s) {
+        return $s['status'] === 'recusado';
+    });
+    
+    // Buscar últimas solicitações (limitado a 5)
+    $ultimas_solicitacoes = array_slice($solicitacoes, 0, 5);
+    
+} catch (Exception $e) {
+    // Em caso de erro, usar valores padrão
+    $total_itens_estoque = 0;
+    $itens_criticos = [];
+    $itens_em_falta = [];
+    $solicitacoes_hoje = [];
+    $solicitacoes_pendentes = [];
+    $solicitacoes_aprovadas = [];
+    $solicitacoes_recusadas = [];
+    $ultimas_solicitacoes = [];
+    $erro = $e->getMessage();
 }
 ?>
 <!DOCTYPE html>
@@ -113,21 +172,9 @@ header("Location: ../../index.php");
                         </a>
                     </li>
                     <li>
-                        <a href="solicitacoes.php" class="flex items-center px-6 py-3 text-green-100 hover:text-white hover:bg-green-light hover:bg-opacity-20 transition-all duration-200">
+                        <a href="../solicitacoes.php" class="flex items-center px-6 py-3 text-green-100 hover:text-white hover:bg-green-light hover:bg-opacity-20 transition-all duration-200">
                             <i class="fas fa-clipboard-list w-5 mr-3"></i>
                             <span>Solicitações</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="flex items-center px-6 py-3 text-green-100 hover:text-white hover:bg-green-light hover:bg-opacity-20 transition-all duration-200">
-                            <i class="fas fa-truck-loading w-5 mr-3"></i>
-                            <span>Entradas</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="flex items-center px-6 py-3 text-green-100 hover:text-white hover:bg-green-light hover:bg-opacity-20 transition-all duration-200">
-                            <i class="fas fa-external-link-alt w-5 mr-3"></i>
-                            <span>Saídas</span>
                         </a>
                     </li>
                     <li>
@@ -136,14 +183,8 @@ header("Location: ../../index.php");
                             <span>Relatórios</span>
                         </a>
                     </li>
-                    <li>
-                        <a href="#" class="flex items-center px-6 py-3 text-green-100 hover:text-white hover:bg-green-light hover:bg-opacity-20 transition-all duration-200">
-                            <i class="fas fa-cog w-5 mr-3"></i>
-                            <span>Configurações</span>
-                        </a>
-                    </li>
                     <li class="mt-8">
-                        <a href="../logout.php" class="flex items-center px-6 py-3 text-green-100 hover:text-white hover:bg-red-600 hover:bg-opacity-20 transition-all duration-200">
+                        <a href="../../../view/logout.php" class="flex items-center px-6 py-3 text-green-100 hover:text-white hover:bg-red-600 hover:bg-opacity-20 transition-all duration-200">
                             <i class="fas fa-sign-out-alt w-5 mr-3"></i>
                             <span>Sair</span>
                         </a>
@@ -187,8 +228,12 @@ header("Location: ../../index.php");
                             </button>
                         </div>
                         <div class="flex items-center space-x-3">
-                            <span class="hidden lg:block text-sm text-gray-600">João Silva</span>
-                            <img class="h-8 w-8 rounded-full border-2 border-green-primary" src="https://ui-avatars.com/api/?name=João+Silva&background=059669&color=fff" alt="Profile">
+                            <?php 
+                            $userData = getCurrentUser();
+                            $nome_admin = $userData['nome'] ?? 'Admin';
+                            ?>
+                            <span class="hidden lg:block text-sm text-gray-600"><?php echo htmlspecialchars($nome_admin); ?></span>
+                            <img class="h-8 w-8 rounded-full border-2 border-green-primary" src="https://ui-avatars.com/api/?name=<?php echo urlencode($nome_admin); ?>&background=059669&color=fff" alt="Profile">
                         </div>
                     </div>
                 </div>
@@ -215,7 +260,7 @@ header("Location: ../../index.php");
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-green-100 text-sm font-medium uppercase tracking-wide">Itens em Estoque</p>
-                                <p class="text-3xl font-bold mt-2">1,248</p>
+                                <p class="text-3xl font-bold mt-2"><?php echo number_format($total_itens_estoque); ?></p>
                             </div>
                             <div class="bg-white bg-opacity-20 rounded-lg p-3">
                                 <i class="fas fa-boxes text-2xl"></i>
@@ -227,7 +272,7 @@ header("Location: ../../index.php");
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-green-100 text-sm font-medium uppercase tracking-wide">Solicitações Hoje</p>
-                                <p class="text-3xl font-bold mt-2">42</p>
+                                <p class="text-3xl font-bold mt-2"><?php echo count($solicitacoes_hoje); ?></p>
                             </div>
                             <div class="bg-white bg-opacity-20 rounded-lg p-3">
                                 <i class="fas fa-clipboard-check text-2xl"></i>
@@ -239,7 +284,7 @@ header("Location: ../../index.php");
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-orange-100 text-sm font-medium uppercase tracking-wide">Itens Críticos</p>
-                                <p class="text-3xl font-bold mt-2">18</p>
+                                <p class="text-3xl font-bold mt-2"><?php echo count($itens_criticos); ?></p>
                             </div>
                             <div class="bg-white bg-opacity-20 rounded-lg p-3">
                                 <i class="fas fa-exclamation-triangle text-2xl"></i>
@@ -251,7 +296,7 @@ header("Location: ../../index.php");
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-red-100 text-sm font-medium uppercase tracking-wide">Itens em Falta</p>
-                                <p class="text-3xl font-bold mt-2">7</p>
+                                <p class="text-3xl font-bold mt-2"><?php echo count($itens_em_falta); ?></p>
                             </div>
                             <div class="bg-white bg-opacity-20 rounded-lg p-3">
                                 <i class="fas fa-times-circle text-2xl"></i>
@@ -260,44 +305,132 @@ header("Location: ../../index.php");
                     </div>
                 </div>
 
-                <!-- Gráficos e Tabelas -->
-               
-                    
-                    <!-- Status de Solicitações -->
+                <!-- Alertas e Notificações -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                    <!-- Alertas de Estoque -->
                     <div class="bg-white rounded-xl shadow-sm border border-gray-200 card-hover">
                         <div class="p-6 border-b border-gray-200">
-                            <h3 class="text-lg font-semibold text-gray-900">Status das Solicitações</h3>
+                            <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                                <i class="fas fa-exclamation-triangle text-orange-500 mr-2"></i>
+                                Alertas de Estoque
+                            </h3>
+                        </div>
+                        <div class="p-6 space-y-4">
+                            <?php if (count($itens_em_falta) > 0): ?>
+                                <div class="flex items-center p-3 bg-red-50 border border-red-200 rounded-lg">
+                                    <i class="fas fa-times-circle text-red-500 mr-3"></i>
+                                    <div>
+                                        <p class="text-sm font-medium text-red-800"><?php echo count($itens_em_falta); ?> itens em falta</p>
+                                        <p class="text-xs text-red-600">Reabastecimento urgente necessário</p>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+                            
+                            <?php if (count($itens_criticos) > 0): ?>
+                                <div class="flex items-center p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                    <i class="fas fa-exclamation-triangle text-yellow-500 mr-3"></i>
+                                    <div>
+                                        <p class="text-sm font-medium text-yellow-800"><?php echo count($itens_criticos); ?> itens críticos</p>
+                                        <p class="text-xs text-yellow-600">Estoque baixo - atenção necessária</p>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+                            
+                            <?php if (count($itens_em_falta) == 0 && count($itens_criticos) == 0): ?>
+                                <div class="flex items-center p-3 bg-green-50 border border-green-200 rounded-lg">
+                                    <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                                    <div>
+                                        <p class="text-sm font-medium text-green-800">Estoque em dia</p>
+                                        <p class="text-xs text-green-600">Todos os itens com estoque adequado</p>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+
+                    <!-- Solicitações Pendentes -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 card-hover">
+                        <div class="p-6 border-b border-gray-200">
+                            <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                                <i class="fas fa-clock text-blue-500 mr-2"></i>
+                                Solicitações Pendentes
+                            </h3>
                         </div>
                         <div class="p-6">
-                            <canvas id="requestChart" height="250"></canvas>
-                            <div class="mt-6 space-y-4">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center">
-                                        <span class="inline-flex items-center justify-center w-6 h-6 bg-blue-500 text-white text-xs font-medium rounded-full mr-3">42</span>
-                                        <span class="text-sm text-gray-600">Pendentes</span>
-                                    </div>
-                                    <span class="text-sm font-semibold text-gray-900">48%</span>
+                            <?php if (count($solicitacoes_pendentes) > 0): ?>
+                                <div class="text-center mb-4">
+                                    <div class="text-3xl font-bold text-blue-600"><?php echo count($solicitacoes_pendentes); ?></div>
+                                    <p class="text-sm text-gray-600">aguardando aprovação</p>
                                 </div>
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center">
-                                        <span class="inline-flex items-center justify-center w-6 h-6 bg-green-500 text-white text-xs font-medium rounded-full mr-3">32</span>
-                                        <span class="text-sm text-gray-600">Aprovadas</span>
-                                    </div>
-                                    <span class="text-sm font-semibold text-gray-900">36%</span>
+                                <div class="space-y-2">
+                                    <?php foreach (array_slice($solicitacoes_pendentes, 0, 3) as $solicitacao): ?>
+                                        <div class="flex items-center justify-between p-2 bg-blue-50 rounded-lg">
+                                            <div class="flex items-center">
+                                                <i class="fas fa-user text-blue-500 mr-2 text-xs"></i>
+                                                <span class="text-xs text-gray-700"><?php echo htmlspecialchars(substr($solicitacao['usuario_nome'], 0, 15)); ?></span>
+                                            </div>
+                                            <span class="text-xs text-gray-500"><?php echo date('d/m', strtotime($solicitacao['data'])); ?></span>
+                                        </div>
+                                    <?php endforeach; ?>
                                 </div>
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center">
-                                        <span class="inline-flex items-center justify-center w-6 h-6 bg-red-500 text-white text-xs font-medium rounded-full mr-3">8</span>
-                                        <span class="text-sm text-gray-600">Rejeitadas</span>
+                                <?php if (count($solicitacoes_pendentes) > 3): ?>
+                                    <div class="mt-3 text-center">
+                                        <a href="../solicitacoes.php" class="text-xs text-blue-600 hover:text-blue-800">Ver todas (<?php echo count($solicitacoes_pendentes); ?>)</a>
                                     </div>
-                                    <span class="text-sm font-semibold text-gray-900">9%</span>
+                                <?php endif; ?>
+                            <?php else: ?>
+                                <div class="text-center py-4">
+                                    <i class="fas fa-check-circle text-green-500 text-2xl mb-2"></i>
+                                    <p class="text-sm text-gray-600">Nenhuma solicitação pendente</p>
                                 </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+
+                    <!-- Resumo do Dia -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 card-hover">
+                        <div class="p-6 border-b border-gray-200">
+                            <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                                <i class="fas fa-calendar-day text-green-500 mr-2"></i>
+                                Resumo do Dia
+                            </h3>
+                        </div>
+                        <div class="p-6 space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <i class="fas fa-clipboard-list text-blue-500 mr-2"></i>
+                                    <span class="text-sm text-gray-600">Solicitações hoje</span>
+                                </div>
+                                <span class="text-sm font-semibold text-gray-900"><?php echo count($solicitacoes_hoje); ?></span>
+                            </div>
+                            
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                    <span class="text-sm text-gray-600">Aprovadas hoje</span>
+                                </div>
+                                <span class="text-sm font-semibold text-gray-900">
+                                    <?php 
+                                    $aprovadas_hoje = array_filter($solicitacoes_hoje, function($s) {
+                                        return $s['status'] === 'aprovado';
+                                    });
+                                    echo count($aprovadas_hoje);
+                                    ?>
+                                </span>
+                            </div>
+                            
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <i class="fas fa-boxes text-purple-500 mr-2"></i>
+                                    <span class="text-sm text-gray-600">Total em estoque</span>
+                                </div>
+                                <span class="text-sm font-semibold text-gray-900"><?php echo number_format($total_itens_estoque); ?></span>
+                            </div>
+                            
+                            <div class="pt-3 border-t border-gray-200">
                                 <div class="flex items-center justify-between">
-                                    <div class="flex items-center">
-                                        <span class="inline-flex items-center justify-center w-6 h-6 bg-indigo-500 text-white text-xs font-medium rounded-full mr-3">7</span>
-                                        <span class="text-sm text-gray-600">Em análise</span>
-                                    </div>
-                                    <span class="text-sm font-semibold text-gray-900">8%</span>
+                                    <span class="text-xs text-gray-500">Última atualização</span>
+                                    <span class="text-xs text-gray-500"><?php echo date('H:i'); ?></span>
                                 </div>
                             </div>
                         </div>
@@ -316,47 +449,40 @@ header("Location: ../../index.php");
                                 <thead class="bg-gray-50">
                                     <tr>
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Item</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categoria</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Marca</th>
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estoque</th>
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-200">
-                                    <tr class="hover:bg-gray-50">
-                                        <td class="px-6 py-4 text-sm text-gray-900">Parafuso 5mm Aço Inox</td>
-                                        <td class="px-6 py-4 text-sm text-gray-600">Fixadores</td>
-                                        <td class="px-6 py-4 text-sm text-gray-900">12/100</td>
-                                        <td class="px-6 py-4"><span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Crítico</span></td>
-                                    </tr>
-                                    <tr class="hover:bg-gray-50">
-                                        <td class="px-6 py-4 text-sm text-gray-900">Fita Isolante Preta</td>
-                                        <td class="px-6 py-4 text-sm text-gray-600">Elétrica</td>
-                                        <td class="px-6 py-4 text-sm text-gray-900">3/50</td>
-                                        <td class="px-6 py-4"><span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Crítico</span></td>
-                                    </tr>
-                                    <tr class="hover:bg-gray-50">
-                                        <td class="px-6 py-4 text-sm text-gray-900">Resistor 10kΩ</td>
-                                        <td class="px-6 py-4 text-sm text-gray-600">Componentes</td>
-                                        <td class="px-6 py-4 text-sm text-gray-900">22/200</td>
-                                        <td class="px-6 py-4"><span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Baixo</span></td>
-                                    </tr>
-                                    <tr class="hover:bg-gray-50">
-                                        <td class="px-6 py-4 text-sm text-gray-900">Chave de Fenda Philips</td>
-                                        <td class="px-6 py-4 text-sm text-gray-600">Ferramentas</td>
-                                        <td class="px-6 py-4 text-sm text-gray-900">2/15</td>
-                                        <td class="px-6 py-4"><span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Crítico</span></td>
-                                    </tr>
-                                    <tr class="hover:bg-gray-50">
-                                        <td class="px-6 py-4 text-sm text-gray-900">Luvas de Proteção</td>
-                                        <td class="px-6 py-4 text-sm text-gray-600">EPI</td>
-                                        <td class="px-6 py-4 text-sm text-gray-900">8/40</td>
-                                        <td class="px-6 py-4"><span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Baixo</span></td>
-                                    </tr>
+                                    <?php if (empty($itens_criticos)): ?>
+                                        <tr>
+                                            <td colspan="4" class="px-6 py-8 text-center text-gray-500">
+                                                <i class="fas fa-check-circle text-4xl mb-2 block text-green-500"></i>
+                                                Nenhum item com estoque crítico
+                                            </td>
+                                        </tr>
+                                    <?php else: ?>
+                                        <?php foreach (array_slice($itens_criticos, 0, 5) as $item): ?>
+                                            <tr class="hover:bg-gray-50">
+                                                <td class="px-6 py-4 text-sm text-gray-900"><?php echo htmlspecialchars($item['nome']); ?></td>
+                                                <td class="px-6 py-4 text-sm text-gray-600"><?php echo htmlspecialchars($item['marca'] ?? 'N/A'); ?></td>
+                                                <td class="px-6 py-4 text-sm text-gray-900"><?php echo $item['quantidade']; ?> <?php echo htmlspecialchars($item['unidade']); ?></td>
+                                                <td class="px-6 py-4">
+                                                    <?php if ($item['quantidade'] == 0): ?>
+                                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Em Falta</span>
+                                                    <?php else: ?>
+                                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Crítico</span>
+                                                    <?php endif; ?>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
                                 </tbody>
                             </table>
                         </div>
                         <div class="p-6 border-t border-gray-200 text-center">
-                            <a href="#" class="inline-flex items-center px-4 py-2 border border-green-primary text-green-primary rounded-lg hover:bg-green-primary hover:text-white transition-colors duration-200">
+                            <a href="../estoque.php" class="inline-flex items-center px-4 py-2 border border-green-primary text-green-primary rounded-lg hover:bg-green-primary hover:text-white transition-colors duration-200">
                                 Ver todos os itens
                             </a>
                         </div>
@@ -378,41 +504,47 @@ header("Location: ../../index.php");
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-200">
-                                    <tr class="hover:bg-gray-50">
-                                        <td class="px-6 py-4 text-sm font-medium text-gray-900">#REQ-0042</td>
-                                        <td class="px-6 py-4 text-sm text-gray-600">Carlos Oliveira</td>
-                                        <td class="px-6 py-4 text-sm text-gray-600">20/06/2023</td>
-                                        <td class="px-6 py-4"><span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">Pendente</span></td>
-                                    </tr>
-                                    <tr class="hover:bg-gray-50">
-                                        <td class="px-6 py-4 text-sm font-medium text-gray-900">#REQ-0041</td>
-                                        <td class="px-6 py-4 text-sm text-gray-600">Maria Santos</td>
-                                        <td class="px-6 py-4 text-sm text-gray-600">20/06/2023</td>
-                                        <td class="px-6 py-4"><span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Aprovada</span></td>
-                                    </tr>
-                                    <tr class="hover:bg-gray-50">
-                                        <td class="px-6 py-4 text-sm font-medium text-gray-900">#REQ-0040</td>
-                                        <td class="px-6 py-4 text-sm text-gray-600">Pedro Alves</td>
-                                        <td class="px-6 py-4 text-sm text-gray-600">19/06/2023</td>
-                                        <td class="px-6 py-4"><span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Rejeitada</span></td>
-                                    </tr>
-                                    <tr class="hover:bg-gray-50">
-                                        <td class="px-6 py-4 text-sm font-medium text-gray-900">#REQ-0039</td>
-                                        <td class="px-6 py-4 text-sm text-gray-600">Ana Costa</td>
-                                        <td class="px-6 py-4 text-sm text-gray-600">19/06/2023</td>
-                                        <td class="px-6 py-4"><span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Aprovada</span></td>
-                                    </tr>
-                                    <tr class="hover:bg-gray-50">
-                                        <td class="px-6 py-4 text-sm font-medium text-gray-900">#REQ-0038</td>
-                                        <td class="px-6 py-4 text-sm text-gray-600">João Silva</td>
-                                        <td class="px-6 py-4 text-sm text-gray-600">18/06/2023</td>
-                                        <td class="px-6 py-4"><span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-indigo-100 text-indigo-800">Em análise</span></td>
-                                    </tr>
+                                    <?php if (empty($ultimas_solicitacoes)): ?>
+                                        <tr>
+                                            <td colspan="4" class="px-6 py-8 text-center text-gray-500">
+                                                <i class="fas fa-clipboard-list text-4xl mb-2 block"></i>
+                                                Nenhuma solicitação encontrada
+                                            </td>
+                                        </tr>
+                                    <?php else: ?>
+                                        <?php foreach ($ultimas_solicitacoes as $solicitacao): ?>
+                                            <tr class="hover:bg-gray-50">
+                                                <td class="px-6 py-4 text-sm font-medium text-gray-900">#SOL-<?php echo str_pad($solicitacao['id'], 4, '0', STR_PAD_LEFT); ?></td>
+                                                <td class="px-6 py-4 text-sm text-gray-600"><?php echo htmlspecialchars($solicitacao['usuario_nome']); ?></td>
+                                                <td class="px-6 py-4 text-sm text-gray-600"><?php echo date('d/m/Y', strtotime($solicitacao['data'])); ?></td>
+                                                <td class="px-6 py-4">
+                                                    <?php
+                                                    $status = $solicitacao['status'];
+                                                    $status_classes = [
+                                                        'em espera' => 'bg-blue-100 text-blue-800',
+                                                        'aprovado' => 'bg-green-100 text-green-800',
+                                                        'recusado' => 'bg-red-100 text-red-800'
+                                                    ];
+                                                    $status_texto = [
+                                                        'em espera' => 'Pendente',
+                                                        'aprovado' => 'Aprovada',
+                                                        'recusado' => 'Rejeitada'
+                                                    ];
+                                                    $classe = $status_classes[$status] ?? 'bg-gray-100 text-gray-800';
+                                                    $texto = $status_texto[$status] ?? ucfirst($status);
+                                                    ?>
+                                                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full <?php echo $classe; ?>">
+                                                        <?php echo $texto; ?>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
                                 </tbody>
                             </table>
                         </div>
                         <div class="p-6 border-t border-gray-200 text-center">
-                            <a href="#" class="inline-flex items-center px-4 py-2 border border-green-primary text-green-primary rounded-lg hover:bg-green-primary hover:text-white transition-colors duration-200">
+                            <a href="../solicitacoes.php" class="inline-flex items-center px-4 py-2 border border-green-primary text-green-primary rounded-lg hover:bg-green-primary hover:text-white transition-colors duration-200">
                                 Ver todas as solicitações
                             </a>
                         </div>
@@ -499,14 +631,13 @@ header("Location: ../../index.php");
         const requestChart = new Chart(requestCtx, {
             type: 'doughnut',
             data: {
-                labels: ['Pendentes', 'Aprovadas', 'Rejeitadas', 'Em análise'],
+                labels: ['Pendentes', 'Aprovadas', 'Rejeitadas'],
                 datasets: [{
-                    data: [42, 32, 8, 7],
+                    data: [<?php echo $pendentes_count; ?>, <?php echo $aprovadas_count; ?>, <?php echo $recusadas_count; ?>],
                     backgroundColor: [
                         '#3b82f6',
                         '#059669',
-                        '#dc2626',
-                        '#6366f1'
+                        '#dc2626'
                     ],
                     borderWidth: 0,
                     hoverOffset: 4

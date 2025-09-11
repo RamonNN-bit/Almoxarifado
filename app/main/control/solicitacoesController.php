@@ -1,10 +1,10 @@
 <?php
-session_start();
+require_once '../config/auth.php';
 
 // Verificar se é uma requisição POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Verificar se o usuário está logado
-    if (!isset($_SESSION["usuariologado"])) {
+    if (!isLoggedIn()) {
         $_SESSION['erro'] = "Você precisa estar logado para realizar esta ação";
         header("Location: ../view/painel/Admin/solicitacoes.php");
         exit();
@@ -69,6 +69,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Redirecionar de volta para a página de solicitações
-header("Location: ../view/painel/Admin/solicitacoes.php");
+header("Location: ../view/painel/solicitacoes.php");
 exit();
 ?>

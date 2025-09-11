@@ -146,5 +146,67 @@ class Solicitacoes {
             throw $e;
         }
     }
+
+    // Buscar estatísticas para o dashboard do usuário
+    public function buscarEstatisticasUsuario($id_usuario) {
+        try {
+            // Solicitações pendentes (em espera)
+            $sql_pendentes = "SELECT COUNT(*) as total FROM movimentacoes 
+                             WHERE tipo = 'saida' AND id_usuario = :id_usuario AND status = 'em espera'";
+            $stmt_pendentes = $this->pdo->prepare($sql_pendentes);
+            $stmt_pendentes->execute([':id_usuario' => $id_usuario]);
+            $pendentes = $stmt_pendentes->fetch(PDO::FETCH_ASSOC)['total'];
+
+            // Solicitações aprovadas
+            $sql_aprovadas = "SELECT COUNT(*) as total FROM movimentacoes 
+                             WHERE tipo = 'saida' AND id_usuario = :id_usuario AND status = 'aprovado'";
+            $stmt_aprovadas = $this->pdo->prepare($sql_aprovadas);
+            $stmt_aprovadas->execute([':id_usuario' => $id_usuario]);
+            $aprovadas = $stmt_aprovadas->fetch(PDO::FETCH_ASSOC)['total'];
+
+            // Total de itens solicitados pelo usuário
+            $sql_itens_solicitados = "SELECT SUM(quantidade) as total FROM movimentacoes 
+                                     WHERE tipo = 'saida' AND id_usuario = :id_usuario";
+            $stmt_itens_solicitados = $this->pdo->prepare($sql_itens_solicitados);
+            $stmt_itens_solicitados->execute([':id_usuario' => $id_usuario]);
+            $itens_solicitados = $stmt_itens_solicitados->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
+
+            // Total de itens disponíveis no estoque
+            $sql_itens_disponiveis = "SELECT SUM(quantidade) as total FROM itens";
+            $stmt_itens_disponiveis = $this->pdo->query($sql_itens_disponiveis);
+            $itens_disponiveis = $stmt_itens_disponiveis->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
+
+            return [
+                'solicitacoes_pendentes' => (int)$pendentes,
+                'solicitacoes_aprovadas' => (int)$aprovadas,
+                'itens_solicitados' => (int)$itens_solicitados,
+                'itens_disponiveis' => (int)$itens_disponiveis
+            ];
+
+        } catch (PDOException $e) {
+            throw $e;
+        }
+    }
+
+    // Buscar solicitações recentes do usuário para o dashboard
+    public function buscarSolicitacoesRecentesUsuario($id_usuario, $limite = 5) {
+        try {
+            $sql = "SELECT m.*, i.nome as item_nome, i.unidade 
+                    FROM movimentacoes m 
+                    INNER JOIN itens i ON m.id_item = i.id 
+                    WHERE m.tipo = 'saida' AND m.id_usuario = :id_usuario
+                    ORDER BY m.data DESC, m.id DESC
+                    LIMIT :limite";
+            
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->bindValue(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
+            $stmt->execute();
+            
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            throw $e;
+        }
+    }
 }
 ?>

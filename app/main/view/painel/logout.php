@@ -1,7 +1,6 @@
 <?php
-session_start();
-session_unset();
-session_destroy();
-header("Location: ../index.php");
-exit();
+require_once '../config/auth.php';
+
+// Fazer logout usando o sistema centralizado
+logout();
 ?>

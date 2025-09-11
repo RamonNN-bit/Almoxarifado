@@ -1,13 +1,12 @@
 <?php
-session_start();
-if (!isset($_SESSION["usuariologado"])) {
-    header("Location: ../index.php");
-    exit();
-}
+require_once '../../config/auth.php';
+
+// Verificar se está logado e redirecionar se necessário
+requireLogin(null, 'estoque.php');
 
 // Incluir arquivos necessários
-require_once __DIR__ . '/../../config/db.php';
-require_once __DIR__ . '/../../model/ItensModel.php';
+require_once '../../config/db.php';
+require_once '../../model/ItensModel.php';
 
 // Buscar todos os itens do banco de dados
 try {
@@ -140,40 +139,24 @@ function getCategoria($nome) {
                             <span>Estoque</span>
                         </a>
                     </li>
+                    <?php if ($_SESSION['admin']){?>
                     <li>
                         <a href="./Admin/itens_cadastro.php" class="flex items-center px-6 py-3 text-green-100 hover:text-white hover:bg-green-light hover:bg-opacity-20 transition-all duration-200">
                             <i class="fas fa-tools w-5 mr-3"></i>
                             <span>Cadastrar Itens</span>
                         </a>
                     </li>
+                    <?php }?>
                     <li>
-                        <a href="./Admin/solicitacoes.php" class="flex items-center px-6 py-3 text-green-100 hover:text-white hover:bg-green-light hover:bg-opacity-20 transition-all duration-200">
+                        <a href="solicitacoes.php" class="flex items-center px-6 py-3 text-green-100 hover:text-white hover:bg-green-light hover:bg-opacity-20 transition-all duration-200">
                             <i class="fas fa-clipboard-list w-5 mr-3"></i>
                             <span>Solicitações</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="flex items-center px-6 py-3 text-green-100 hover:text-white hover:bg-green-light hover:bg-opacity-20 transition-all duration-200">
-                            <i class="fas fa-truck-loading w-5 mr-3"></i>
-                            <span>Entradas</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="flex items-center px-6 py-3 text-green-100 hover:text-white hover:bg-green-light hover:bg-opacity-20 transition-all duration-200">
-                            <i class="fas fa-external-link-alt w-5 mr-3"></i>
-                            <span>Saídas</span>
                         </a>
                     </li>
                     <li>
                         <a href="../Admin/relatorios.php" class="flex items-center px-6 py-3 text-green-100 hover:text-white hover:bg-green-light hover:bg-opacity-20 transition-all duration-200">
                             <i class="fas fa-chart-bar w-5 mr-3"></i>
                             <span>Relatórios</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="flex items-center px-6 py-3 text-green-100 hover:text-white hover:bg-green-light hover:bg-opacity-20 transition-all duration-200">
-                            <i class="fas fa-cog w-5 mr-3"></i>
-                            <span>Configurações</span>
                         </a>
                     </li>
                     <li class="mt-8">
@@ -213,10 +196,15 @@ function getCategoria($nome) {
                         </div>
                         
                         <div class="flex items-center space-x-3">
-                            <img src="https://ui-avatars.com/api/?name=Admin&background=059669&color=ffffff" class="w-8 h-8 rounded-full">
+                            <img src="https://ui-avatars.com/api/?name=Admin&background=059669&color=ffffff"
+                                class="w-8 h-8 rounded-full">
                             <div class="hidden md:block">
-                                <p class="text-sm font-medium text-gray-700">Administrador</p>
-                                <p class="text-xs text-gray-500">admin@almoxarifado.com</p>
+                                <?php if ($_SESSION['admin']) { ?>
+                                    <p class="text-sm font-medium text-gray-700">Administrador</p>
+                                <?php } else { ?>
+                                    <p class="text-sm font-medium text-gray-700">Usuário</p>
+                                <?php } ?>
+                                <p class="text-xs text-gray-500"><?php echo ($_SESSION['email']); ?></p>
                             </div>
                         </div>
                     </div>

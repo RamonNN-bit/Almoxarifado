@@ -1,11 +1,10 @@
 <?php
-session_start();
-if (!isset($_SESSION ["usuariologado"])) {
-header("Location: index.php");
-}
+require_once '../../../config/auth.php';
+
+// Verificar se é admin e redirecionar se necessário
+requireLogin(null , 'itens_cadastro.php');
 
 // Incluir o controller para processar o formulário
-
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">

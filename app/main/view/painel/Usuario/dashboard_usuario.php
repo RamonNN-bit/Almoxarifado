@@ -1,7 +1,34 @@
 <?php
-session_start();
-if (!isset($_SESSION ["usuariologado"])) {
-header("Location: ../index.php");
+require_once('../../../config/auth.php');
+
+// Verificar se é usuário e redirecionar se necessário
+requireLogin('user', 'dashboard_usuario.php');
+
+// Incluir conexão com banco de dados e modelos
+require_once('../../../config/db.php');
+require_once('../../../model/SolicitacoesModel.php');
+
+// Instanciar modelo de solicitações
+$solicitacoesModel = new Solicitacoes($pdo);
+
+// Buscar dados do usuário logado
+$userData = getCurrentUser();
+$id_usuario = $userData['id'];
+$nome_usuario = $userData['nome'];
+
+// Buscar estatísticas do dashboard
+try {
+    $estatisticas = $solicitacoesModel->buscarEstatisticasUsuario($id_usuario);
+    $solicitacoes_recentes = $solicitacoesModel->buscarSolicitacoesRecentesUsuario($id_usuario, 5);
+} catch (Exception $e) {
+    // Em caso de erro, usar valores padrão
+    $estatisticas = [
+        'solicitacoes_pendentes' => 0,
+        'solicitacoes_aprovadas' => 0,
+        'itens_solicitados' => 0,
+        'itens_disponiveis' => 0
+    ];
+    $solicitacoes_recentes = [];
 }
 ?>
 <!DOCTYPE html>
@@ -31,34 +58,54 @@ header("Location: ../index.php");
         }
     </script>
     <style>
-        /* Estilos customizados para gradientes verdes e animações */
-        .gradient-green {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        .sidebar-gradient {
+            background: linear-gradient(180deg, #065f46 0%, #047857 100%);
         }
         
-        .gradient-green-light {
-            background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+        .stat-card-gradient-1 {
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
         }
         
-        .gradient-emerald {
-            background: linear-gradient(135deg, #10b981 0%, #0d9488 100%);
+        .stat-card-gradient-2 {
+            background: linear-gradient(135deg, #047857 0%, #059669 100%);
         }
         
-        .gradient-teal {
-            background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+        .stat-card-gradient-3 {
+            background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
         }
         
-        .hover-lift {
-            transition: all 0.3s ease;
+        .stat-card-gradient-4 {
+            background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
         }
         
-        .hover-lift:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.15);
+        .card-hover {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         
-        .card-shadow {
-            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.08);
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .sidebar-link-active {
+            background: rgba(16, 185, 129, 0.1);
+            border-left: 3px solid #10b981;
+        }
+        
+        .badge-green {
+            background-color: #059669;
+        }
+        
+        .badge-orange {
+            background-color: #f59e0b;
+        }
+        
+        .badge-red {
+            background-color: #dc2626;
+        }
+        
+        .badge-blue {
+            background-color: #2563eb;
         }
         
         .notification-border-green {
@@ -75,300 +122,309 @@ header("Location: ../index.php");
     </style>
 </head>
 <body class="bg-gray-50 font-sans">
-    <!-- Navbar com design verde e Tailwind -->
-    <nav class="gradient-green shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <div class="flex items-center">
-                    <a href="#" class="flex items-center text-white font-bold text-xl">
-                        <i class="fas fa-warehouse mr-3"></i>Almoxarifado
-                    </a>
-                    <div class="hidden md:block ml-10">
-                        <div class="flex items-baseline space-x-4">
-                            <a href="#" class="text-white hover:text-green-200 px-3 py-2 rounded-md text-sm font-medium bg-green-600 bg-opacity-50">
-                                <i class="fas fa-home mr-1"></i> Início
-                            </a>
-                             <a href="../estoque.php" class="text-white hover:text-green-200 px-3 py-2 rounded-md text-sm font-medium hover:bg-green-600 hover:bg-opacity-30 transition-colors">
-                                 <i class="fas fa-box mr-1"></i> Estoque
-                             </a>
-                            <a href="#" class="text-white hover:text-green-200 px-3 py-2 rounded-md text-sm font-medium hover:bg-green-600 hover:bg-opacity-30 transition-colors">
-                                <i class="fas fa-clipboard-list mr-1"></i> Minhas Solicitações
-                            </a>
-                            <a href="#" class="text-white hover:text-green-200 px-3 py-2 rounded-md text-sm font-medium hover:bg-green-600 hover:bg-opacity-30 transition-colors">
-                                <i class="fas fa-history mr-1"></i> Histórico
-                            </a>
-                            <a href="../logout.php" class="text-white hover:text-green-200 px-3 py-2 rounded-md text-sm font-medium hover:bg-green-600 hover:bg-opacity-30 transition-colors">
-                                <i class="fas fa-sign-out-alt mr-3"></i> Sair
-                            </a>
+    <div class="flex">
+        <!-- Sidebar -->
+        <div id="sidebar" class="w-64 sidebar-gradient text-white h-screen fixed transition-all duration-300 z-50 shadow-xl">
+            <div class="p-6 text-center border-b border-green-light border-opacity-20 bg-black bg-opacity-10">
+                <div class="flex items-center justify-center">
+                    <i class="fas fa-warehouse text-2xl mr-3"></i>
+                    <span class="text-xl font-bold">Almoxarifado</span>
+                </div>
+            </div>
+            
+            <nav class="mt-6">
+                <ul class="space-y-1">
+                    <li>
+                        <a href="#" class="flex items-center px-6 py-3 text-green-100 hover:text-white hover:bg-green-light hover:bg-opacity-20 transition-all duration-200 sidebar-link-active">
+                            <i class="fas fa-home w-5 mr-3"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="../estoque.php" class="flex items-center px-6 py-3 text-green-100 hover:text-white hover:bg-green-light hover:bg-opacity-20 transition-all duration-200">
+                            <i class="fas fa-boxes w-5 mr-3"></i>
+                            <span>Estoque</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="../solicitacoes.php" class="flex items-center px-6 py-3 text-green-100 hover:text-white hover:bg-green-light hover:bg-opacity-20 transition-all duration-200">
+                            <i class="fas fa-clipboard-list w-5 mr-3"></i>
+                            <span>Minhas Solicitações</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center px-6 py-3 text-green-100 hover:text-white hover:bg-green-light hover:bg-opacity-20 transition-all duration-200">
+                            <i class="fas fa-chart-bar w-5 mr-3"></i>
+                            <span>Relatórios</span>
+                        </a>
+                    </li>
+                    <li class="mt-8">
+                        <a href="../../../view/logout.php" class="flex items-center px-6 py-3 text-green-100 hover:text-white hover:bg-red-600 hover:bg-opacity-20 transition-all duration-200">
+                            <i class="fas fa-sign-out-alt w-5 mr-3"></i>
+                            <span>Sair</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Conteúdo Principal -->
+        <div id="content" class="flex-1 ml-64 min-h-screen">
+            <!-- Topbar -->
+            <nav class="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
+                <div class="flex items-center justify-between">
+                    <button id="sidebarToggle" class="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100">
+                        <i class="fa fa-bars"></i>
+                    </button>
+
+                    <div class="hidden sm:flex items-center flex-1 max-w-md mx-4">
+                        <div class="relative w-full">
+                            <input type="text" class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-primary focus:border-transparent" placeholder="Buscar item, material...">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center">
+                                <i class="fas fa-search text-gray-400"></i>
+                            </div>
+                            <button class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                <i class="fas fa-search text-green-primary"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center space-x-4">
+                        <div class="relative">
+                            <button class="p-2 text-gray-600 hover:text-green-primary relative">
+                                <i class="fas fa-bell text-lg"></i>
+                                <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"><?php echo $estatisticas['solicitacoes_pendentes']; ?></span>
+                            </button>
+                        </div>
+                        <div class="relative">
+                            <button class="p-2 text-gray-600 hover:text-green-primary relative">
+                                <i class="fas fa-envelope text-lg"></i>
+                                <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"><?php echo $estatisticas['solicitacoes_aprovadas']; ?></span>
+                            </button>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <img src="https://ui-avatars.com/api/?name=Admin&background=059669&color=ffffff"
+                                class="w-8 h-8 rounded-full">
+                            <div class="hidden md:block">
+                                <?php if ($_SESSION['admin']) { ?>
+                                    <p class="text-sm font-medium text-gray-700">Administrador</p>
+                                <?php } else { ?>
+                                    <p class="text-sm font-medium text-gray-700">Usuário</p>
+                                <?php } ?>
+                                <p class="text-xs text-gray-500"><?php echo ($_SESSION['email']); ?></p>
+                            </div>
                         </div>
                     </div>
                 </div>
-                
-                <div class="flex items-center space-x-4">
-                    <!-- Barra de pesquisa estilizada -->
-                    <div class="relative hidden md:block">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i class="fas fa-search text-gray-400"></i>
+            </nav>
+
+            <!-- Conteúdo do Dashboard -->
+            <div class="p-6">
+
+                <!-- Título da Página -->
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
+                    <h1 class="text-3xl font-bold text-gray-900 mb-4 sm:mb-0">Dashboard do Usuário</h1>
+                    <div class="flex space-x-3">
+                        <button class="px-4 py-2 border border-green-primary text-green-primary rounded-lg hover:bg-green-primary hover:text-white transition-colors duration-200">
+                            <i class="fas fa-download mr-2"></i>Exportar Relatório
+                        </button>
+                        <a href="../solicitacoes.php" class="px-4 py-2 bg-green-primary text-white rounded-lg hover:bg-green-secondary transition-colors duration-200">
+                            <i class="fas fa-plus mr-2"></i>Nova Solicitação
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Cards de Estatísticas -->
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+                    <div class="stat-card-gradient-1 rounded-xl p-6 text-white card-hover">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-green-100 text-sm font-medium uppercase tracking-wide">Solicitações Pendentes</p>
+                                <p class="text-3xl font-bold mt-2"><?php echo $estatisticas['solicitacoes_pendentes']; ?></p>
+                            </div>
+                            <div class="bg-white bg-opacity-20 rounded-lg p-3">
+                                <i class="fas fa-clock text-2xl"></i>
+                            </div>
                         </div>
-                        <input type="text" class="bg-white bg-opacity-20 text-white placeholder-green-200 pl-10 pr-4 py-2 rounded-full focus:outline-none focus:ring-2 focus:ring-white focus:bg-opacity-30 transition-all" placeholder="Buscar itens...">
+                    </div>
+
+                    <div class="stat-card-gradient-2 rounded-xl p-6 text-white card-hover">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-green-100 text-sm font-medium uppercase tracking-wide">Solicitações Aprovadas</p>
+                                <p class="text-3xl font-bold mt-2"><?php echo $estatisticas['solicitacoes_aprovadas']; ?></p>
+                            </div>
+                            <div class="bg-white bg-opacity-20 rounded-lg p-3">
+                                <i class="fas fa-check-circle text-2xl"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card-gradient-3 rounded-xl p-6 text-white card-hover">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-orange-100 text-sm font-medium uppercase tracking-wide">Itens Solicitados</p>
+                                <p class="text-3xl font-bold mt-2"><?php echo $estatisticas['itens_solicitados']; ?></p>
+                            </div>
+                            <div class="bg-white bg-opacity-20 rounded-lg p-3">
+                                <i class="fas fa-tools text-2xl"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card-gradient-4 rounded-xl p-6 text-white card-hover">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-red-100 text-sm font-medium uppercase tracking-wide">Itens Disponíveis</p>
+                                <p class="text-3xl font-bold mt-2"><?php echo $estatisticas['itens_disponiveis']; ?></p>
+                            </div>
+                            <div class="bg-white bg-opacity-20 rounded-lg p-3">
+                                <i class="fas fa-boxes text-2xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabelas de Solicitações -->
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                    <!-- Minhas Solicitações Recentes -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 card-hover">
+                        <div class="p-6 border-b border-gray-200">
+                            <h3 class="text-lg font-semibold text-gray-900">Minhas Solicitações Recentes</h3>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Solicitação</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Item</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200">
+                                    <?php if (empty($solicitacoes_recentes)): ?>
+                                        <tr>
+                                            <td colspan="4" class="px-6 py-8 text-center text-gray-500">
+                                                <i class="fas fa-inbox text-4xl mb-2 block"></i>
+                                                Nenhuma solicitação encontrada
+                                            </td>
+                                        </tr>
+                                    <?php else: ?>
+                                        <?php foreach ($solicitacoes_recentes as $solicitacao): ?>
+                                            <tr class="hover:bg-gray-50">
+                                                <td class="px-6 py-4 text-sm font-medium text-gray-900">
+                                                    #SOL-<?php echo str_pad($solicitacao['id'], 4, '0', STR_PAD_LEFT); ?>
+                                                </td>
+                                                <td class="px-6 py-4 text-sm text-gray-600">
+                                                    <?php echo date('d/m/Y', strtotime($solicitacao['data'])); ?>
+                                                </td>
+                                                <td class="px-6 py-4 text-sm text-gray-600">
+                                                    <?php echo $solicitacao['quantidade']; ?> <?php echo $solicitacao['unidade'] == 1 ? 'unidade' : 'unidades'; ?> - <?php echo htmlspecialchars($solicitacao['item_nome']); ?>
+                                                </td>
+                                                <td class="px-6 py-4">
+                                                    <?php
+                                                    $status = $solicitacao['status'];
+                                                    $status_classes = [
+                                                        'em espera' => 'bg-blue-100 text-blue-800',
+                                                        'aprovado' => 'bg-green-100 text-green-800',
+                                                        'recusado' => 'bg-red-100 text-red-800'
+                                                    ];
+                                                    $status_texto = [
+                                                        'em espera' => 'Pendente',
+                                                        'aprovado' => 'Aprovada',
+                                                        'recusado' => 'Rejeitada'
+                                                    ];
+                                                    $classe = $status_classes[$status] ?? 'bg-gray-100 text-gray-800';
+                                                    $texto = $status_texto[$status] ?? ucfirst($status);
+                                                    ?>
+                                                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full <?php echo $classe; ?>">
+                                                        <?php echo $texto; ?>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="p-6 border-t border-gray-200 text-center">
+                            <a href="#" class="inline-flex items-center px-4 py-2 border border-green-primary text-green-primary rounded-lg hover:bg-green-primary hover:text-white transition-colors duration-200">
+                                Ver todas as solicitações
+                            </a>
+                        </div>
                     </div>
                     
-                    <!-- Dropdown do usuário -->
-                    <div class="relative">
-                        <button class="flex items-center text-white hover:text-green-200 focus:outline-none focus:ring-2 focus:ring-white rounded-full p-1">
-                            <img src="https://ui-avatars.com/api/?name=Usuario&background=ffffff&color=10b981" class="w-8 h-8 rounded-full border-2 border-white mr-2">
-                            <span class="hidden md:block font-medium">Usuário</span>
-                            <i class="fas fa-chevron-down ml-2 text-sm"></i>
-                        </button>
+                    <!-- Notificações e Avisos -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 card-hover">
+                        <div class="p-6 border-b border-gray-200">
+                            <h3 class="text-lg font-semibold text-gray-900">Notificações e Avisos</h3>
+                        </div>
+                        <div class="p-6 space-y-4">
+                            <div class="notification-border-green bg-green-50 p-4 rounded-lg">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h6 class="font-semibold text-gray-800">Nova atualização no sistema</h6>
+                                    <small class="text-gray-500">Hoje</small>
+                                </div>
+                                <p class="text-gray-600 text-sm">O sistema de almoxarifado foi atualizado com novas funcionalidades.</p>
+                            </div>
+                            
+                            <div class="notification-border-yellow bg-yellow-50 p-4 rounded-lg">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h6 class="font-semibold text-gray-800">Solicitação em análise</h6>
+                                    <small class="text-gray-500">2h atrás</small>
+                                </div>
+                                <p class="text-gray-600 text-sm">Sua solicitação está sendo analisada pela equipe.</p>
+                            </div>
+                            
+                            <div class="notification-border-green bg-green-50 p-4 rounded-lg">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h6 class="font-semibold text-gray-800">Item disponível</h6>
+                                    <small class="text-gray-500">1 dia</small>
+                                </div>
+                                <p class="text-gray-600 text-sm">Novos itens foram adicionados ao estoque.</p>
+                            </div>
+                            
+                            <div class="notification-border-red bg-red-50 p-4 rounded-lg">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h6 class="font-semibold text-gray-800">Prazo de retirada</h6>
+                                    <small class="text-gray-500">2 dias</small>
+                                </div>
+                                <p class="text-gray-600 text-sm">Lembre-se de retirar os itens aprovados em tempo hábil.</p>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Conteúdo principal com layout Tailwind -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-
-        <!-- Card de boas-vindas com gradiente verde -->
-        <div class="gradient-green rounded-xl p-6 mb-8 text-white card-shadow">
-            <div class="flex flex-col md:flex-row items-center justify-between">
-                <div class="md:w-2/3 mb-4 md:mb-0">
-                    <h2 class="text-3xl font-bold mb-2">Olá, Usuário!</h2>
-                    <p class="text-green-100 text-lg">Bem-vindo(a) ao sistema de almoxarifado. Aqui você pode solicitar itens, acompanhar seus pedidos e verificar disponibilidade.</p>
-                </div>
-                <div class="md:w-1/3 text-center">
-                    <img src="https://ui-avatars.com/api/?name=Usuario&background=ffffff&color=10b981" class="w-20 h-20 rounded-full border-4 border-white mx-auto">
-                </div>
-            </div>
-        </div>
-
-        <!-- Cards de estatísticas com gradientes verdes -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div class="gradient-green rounded-xl p-6 text-white text-center hover-lift">
-                <div class="text-4xl mb-4 opacity-90">
-                    <i class="fas fa-clock"></i>
-                </div>
-                <div class="text-3xl font-bold mb-2">5</div>
-                <div class="text-green-100">Solicitações Pendentes</div>
-            </div>
-            
-            <div class="gradient-emerald rounded-xl p-6 text-white text-center hover-lift">
-                <div class="text-4xl mb-4 opacity-90">
-                    <i class="fas fa-check-circle"></i>
-                </div>
-                <div class="text-3xl font-bold mb-2">12</div>
-                <div class="text-green-100">Solicitações Aprovadas</div>
-            </div>
-            
-            <div class="gradient-teal rounded-xl p-6 text-white text-center hover-lift">
-                <div class="text-4xl mb-4 opacity-90">
-                    <i class="fas fa-tools"></i>
-                </div>
-                <div class="text-3xl font-bold mb-2">28</div>
-                <div class="text-green-100">Itens Solicitados</div>
-            </div>
-            
-            <div class="gradient-green-light rounded-xl p-6 text-white text-center hover-lift">
-                <div class="text-4xl mb-4 opacity-90">
-                    <i class="fas fa-box-open"></i>
-                </div>
-                <div class="text-3xl font-bold mb-2">342</div>
-                <div class="text-green-100">Itens Disponíveis</div>
-            </div>
-        </div>
-
-        <!-- Seção de ações rápidas -->
-        <div class="mb-8">
-            <h4 class="text-2xl font-bold text-gray-800 mb-6">Ações Rápidas</h4>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div class="bg-white rounded-xl p-6 text-center card-shadow hover-lift">
-                    <div class="text-4xl text-green-500 mb-4">
-                        <i class="fas fa-plus-circle"></i>
-                    </div>
-                    <h5 class="font-semibold text-gray-800 mb-2">Nova Solicitação</h5>
-                    <p class="text-gray-600 text-sm mb-4">Solicite novos itens do almoxarifado</p>
-                    <button class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors">Acessar</button>
                 </div>
                 
-                <div class="bg-white rounded-xl p-6 text-center card-shadow hover-lift">
-                    <div class="text-4xl text-green-500 mb-4">
-                        <i class="fas fa-history"></i>
-                    </div>
-                    <h5 class="font-semibold text-gray-800 mb-2">Histórico</h5>
-                    <p class="text-gray-600 text-sm mb-4">Consulte seu histórico de solicitações</p>
-                    <button class="border border-green-500 text-green-500 hover:bg-green-500 hover:text-white px-4 py-2 rounded-lg transition-colors">Acessar</button>
-                </div>
-                
-                <div class="bg-white rounded-xl p-6 text-center card-shadow hover-lift">
-                    <div class="text-4xl text-green-500 mb-4">
-                        <i class="fas fa-boxes"></i>
-                    </div>
-                     <h5 class="font-semibold text-gray-800 mb-2">Itens Disponíveis</h5>
-                     <p class="text-gray-600 text-sm mb-4">Verifique os itens disponíveis no estoque</p>
-                     <a href="../estoque.php" class="border border-green-500 text-green-500 hover:bg-green-500 hover:text-white px-4 py-2 rounded-lg transition-colors inline-block">Acessar</a>
-                </div>
-                
-                <div class="bg-white rounded-xl p-6 text-center card-shadow hover-lift">
-                    <div class="text-4xl text-green-500 mb-4">
-                        <i class="fas fa-question-circle"></i>
-                    </div>
-                    <h5 class="font-semibold text-gray-800 mb-2">Ajuda</h5>
-                    <p class="text-gray-600 text-sm mb-4">Tutorial e informações sobre o sistema</p>
-                    <button class="border border-green-500 text-green-500 hover:bg-green-500 hover:text-white px-4 py-2 rounded-lg transition-colors">Acessar</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Layout principal com grid Tailwind -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Tabela de solicitações recentes -->
-            <div class="lg:col-span-2">
-                <div class="bg-white rounded-xl card-shadow overflow-hidden">
-                    <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-                        <h5 class="text-lg font-semibold text-gray-800">Minhas Solicitações Recentes</h5>
-                        <a href="#" class="text-green-500 hover:text-green-600 text-sm font-medium">Ver Todas</a>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nº Solicitação</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Itens</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                <tr class="hover:bg-gray-50">
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#SOL-0087</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">25/06/2023</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">3 itens</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">Pendente</span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <button class="text-gray-400 hover:text-gray-600">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr class="hover:bg-gray-50">
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#SOL-0086</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">24/06/2023</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">5 itens</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Aprovada</span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <button class="text-gray-400 hover:text-gray-600">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr class="hover:bg-gray-50">
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#SOL-0085</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">23/06/2023</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2 itens</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Em Análise</span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <button class="text-gray-400 hover:text-gray-600">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr class="hover:bg-gray-50">
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#SOL-0084</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">20/06/2023</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1 item</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Entregue</span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <button class="text-gray-400 hover:text-gray-600">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr class="hover:bg-gray-50">
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#SOL-0083</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">18/06/2023</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">4 itens</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Rejeitada</span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <button class="text-gray-400 hover:text-gray-600">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Painel de notificações -->
-            <div class="lg:col-span-1">
-                <div class="bg-white rounded-xl card-shadow overflow-hidden">
-                    <div class="px-6 py-4 border-b border-gray-200">
-                        <h5 class="text-lg font-semibold text-gray-800">Notificações e Avisos</h5>
-                    </div>
-                    <div class="p-6 space-y-4">
-                        <div class="notification-border-green bg-green-50 p-4 rounded-lg">
-                            <div class="flex justify-between items-start mb-2">
-                                <h6 class="font-semibold text-gray-800">Nova atualização no sistema</h6>
-                                <small class="text-gray-500">Hoje</small>
-                            </div>
-                            <p class="text-gray-600 text-sm">O sistema de almoxarifado foi atualizado com novas funcionalidades.</p>
-                        </div>
-                        
-                        <div class="notification-border-yellow bg-yellow-50 p-4 rounded-lg">
-                            <div class="flex justify-between items-start mb-2">
-                                <h6 class="font-semibold text-gray-800">Solicitação em análise</h6>
-                                <small class="text-gray-500">2h atrás</small>
-                            </div>
-                            <p class="text-gray-600 text-sm">Sua solicitação #SOL-0087 está sendo analisada pela equipe.</p>
-                        </div>
-                        
-                        <div class="notification-border-green bg-green-50 p-4 rounded-lg">
-                            <div class="flex justify-between items-start mb-2">
-                                <h6 class="font-semibold text-gray-800">Item disponível</h6>
-                                <small class="text-gray-500">1 dia</small>
-                            </div>
-                            <p class="text-gray-600 text-sm">O item "Caneta Azul" que você solicitou está novamente disponível.</p>
-                        </div>
-                        
-                        <div class="notification-border-red bg-red-50 p-4 rounded-lg">
-                            <div class="flex justify-between items-start mb-2">
-                                <h6 class="font-semibold text-gray-800">Prazo de retirada</h6>
-                                <small class="text-gray-500">2 dias</small>
-                            </div>
-                            <p class="text-gray-600 text-sm">Lembre-se de retirar os itens aprovados até sexta-feira.</p>
+                <!-- Footer -->
+                <footer class="mt-12 py-6">
+                    <div class="flex flex-col sm:flex-row items-center justify-between text-sm text-gray-500">
+                        <div>Copyright &copy; Sistema de Almoxarifado 2023</div>
+                        <div class="mt-2 sm:mt-0">
+                            <a href="#" class="hover:text-green-primary">Política de Privacidade</a>
+                            <span class="mx-2">&middot;</span>
+                            <a href="#" class="hover:text-green-primary">Termos de Uso</a>
                         </div>
                     </div>
-                </div>
+                </footer>
             </div>
         </div>
     </div>
 
-    <!-- Footer simples -->
-    <footer class="bg-white border-t border-gray-200 mt-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            <div class="text-center text-gray-500 text-sm">
-                © 2023 Sistema de Almoxarifado. Todos os direitos reservados.
-            </div>
-        </div>
-    </footer>
-
     <!-- Scripts JavaScript para interatividade -->
     <script>
+        // Script para toggle da sidebar em dispositivos móveis
+        document.getElementById('sidebarToggle').addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            const content = document.getElementById('content');
+            
+            sidebar.classList.toggle('-translate-x-full');
+            sidebar.classList.toggle('translate-x-0');
+        });
+        
         // Funcionalidade de busca
         document.addEventListener('DOMContentLoaded', function() {
-            const searchInput = document.querySelector('input[placeholder="Buscar itens..."]');
+            const searchInput = document.querySelector('input[placeholder="Buscar item, material..."]');
             if (searchInput) {
                 searchInput.addEventListener('keypress', function(e) {
                     if (e.key === 'Enter') {

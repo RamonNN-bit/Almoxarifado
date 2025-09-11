@@ -1,4 +1,9 @@
 <?php
+require_once '../../config/auth.php';
+
+// Verificar se é admin e redirecionar se necessário
+requireLogin('admin', 'relatorios.php');
+
 function getRelatorios() {
     global $conn;
     if ($conn === null) {
