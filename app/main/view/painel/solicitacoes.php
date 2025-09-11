@@ -156,13 +156,6 @@ function getStatusClass($status)
                             <span>Solicitações</span>
                         </a>
                     </li>
-                    <li>
-                        <a href="relatorios.php"
-                            class="flex items-center px-6 py-3 text-green-100 hover:text-white hover:bg-green-light hover:bg-opacity-20 transition-all duration-200">
-                            <i class="fas fa-chart-bar w-5 mr-3"></i>
-                            <span>Relatórios</span>
-                        </a>
-                    </li>
                     <li class="mt-8">
                         <a href="../logout.php"
                             class="flex items-center px-6 py-3 text-green-100 hover:text-white hover:bg-red-600 hover:bg-opacity-20 transition-all duration-200">
@@ -184,14 +177,6 @@ function getStatusClass($status)
                     </button>
 
                     <div class="hidden sm:flex items-center flex-1 max-w-md mx-4">
-                        <div class="relative w-full">
-                            <input type="text"
-                                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-primary focus:border-transparent"
-                                placeholder="Buscar solicitação...">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center">
-                                <i class="fas fa-search text-gray-400"></i>
-                            </div>
-                        </div>
                     </div>
 
                     <div class="flex items-center space-x-4">

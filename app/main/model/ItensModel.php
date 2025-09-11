@@ -37,5 +37,15 @@ class Itens {
             ':modelo' => $modelo
         ]);
     }
+
+    // Incrementar quantidade existente de um item
+    public function incrementarQuantidade(int $id_item, int $quantidadeAdicionar): bool {
+        if ($id_item <= 0 || $quantidadeAdicionar <= 0) {
+            return false;
+        }
+        $sql = "UPDATE itens SET quantidade = quantidade + :qtd WHERE id = :id";
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute([':qtd' => $quantidadeAdicionar, ':id' => $id_item]);
+    }
 }
 ?>

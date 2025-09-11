@@ -6,6 +6,40 @@ requireLogin(null , 'itens_cadastro.php');
 
 // Incluir o controller para processar o formulário
 ?>
+<?php
+// Conexão e modelo para listar/atualizar itens
+require_once '../../../config/db.php';
+require_once '../../../model/ItensModel.php';
+
+$erros = [];
+$itens = [];
+
+try {
+    $itensModel = new Itens($pdo);
+
+    // Incrementar quantidade (adicionar itens a um item existente)
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao']) && $_POST['acao'] === 'incrementar') {
+        $idItem = (int)($_POST['id_item'] ?? 0);
+        $qtdAdd = (int)($_POST['quantidade'] ?? 0);
+        if ($idItem > 0 && $qtdAdd > 0) {
+            if ($itensModel->incrementarQuantidade($idItem, $qtdAdd)) {
+                $_SESSION['mensagem_sucesso'] = 'Quantidade adicionada com sucesso!';
+                header('Location: itens_cadastro.php');
+                exit;
+            } else {
+                $erros[] = 'Não foi possível adicionar a quantidade.';
+            }
+        } else {
+            $erros[] = 'Selecione um item e informe uma quantidade válida.';
+        }
+    }
+
+    // Buscar itens para listar e popular o select
+    $itens = $itensModel->buscarTodosItens();
+} catch (Exception $e) {
+    $erros[] = 'Erro ao carregar itens: ' . $e->getMessage();
+}
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -104,12 +138,6 @@ requireLogin(null , 'itens_cadastro.php');
                             <span>Solicitações</span>
                         </a>
                     </li>
-                    <li>
-                        <a href="relatorios.php" class="flex items-center px-6 py-3 text-green-100 hover:text-white hover:bg-green-light hover:bg-opacity-20 transition-all duration-200">
-                            <i class="fas fa-chart-bar w-5 mr-3"></i>
-                            <span>Relatórios</span>
-                        </a>
-                    </li>
                     <li class="mt-8">
                         <a href="../logout.php" class="flex items-center px-6 py-3 text-green-100 hover:text-white hover:bg-red-600 hover:bg-opacity-20 transition-all duration-200">
                             <i class="fas fa-sign-out-alt w-5 mr-3"></i>
@@ -130,12 +158,6 @@ requireLogin(null , 'itens_cadastro.php');
                     </button>
 
                     <div class="hidden sm:flex items-center flex-1 max-w-md mx-4">
-                        <div class="relative w-full">
-                            <input type="text" class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-primary focus:border-transparent" placeholder="Buscar item, material...">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center">
-                                <i class="fas fa-search text-gray-400"></i>
-                            </div>
-                        </div>
                     </div>
 
                     <div class="flex items-center space-x-4">
@@ -265,61 +287,32 @@ requireLogin(null , 'itens_cadastro.php');
                     </form>
                 </div>
 
-                <!-- Lista de Itens Cadastrados -->
-                <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-                    <div class="px-6 py-4 border-b border-gray-200">
-                        <h2 class="text-xl font-semibold text-gray-800">Itens Cadastrados</h2>
-                    </div>
-                    
-                    <?php if (empty($itens)): ?>
-                        <div class="p-8 text-center">
-                            <i class="fas fa-box-open text-6xl text-gray-300 mb-4"></i>
-                            <h3 class="text-xl font-semibold text-gray-500 mb-2">Nenhum item encontrado</h3>
-                            <p class="text-gray-400">Cadastre o primeiro item usando o formulário acima.</p>
+                <!-- Adicionar quantidade a item existente -->
+                <div class="bg-white rounded-xl shadow-sm p-6 mb-8">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-6">Adicionar Itens ao Estoque</h2>
+                    <form method="POST" class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+                        <input type="hidden" name="acao" value="incrementar">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Selecionar Item</label>
+                            <select name="id_item" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-primary focus:border-transparent" required>
+                                <option value="">-- Escolha um item --</option>
+                                <?php foreach ($itens as $it): ?>
+                                    <option value="<?php echo $it['id']; ?>">
+                                        #<?php echo str_pad($it['id'], 3, '0', STR_PAD_LEFT); ?> - <?php echo htmlspecialchars($it['nome'], ENT_QUOTES, 'UTF-8'); ?> (<?php echo (int)$it['quantidade']; ?>)
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
                         </div>
-                    <?php else: ?>
-                        <div class="overflow-x-auto">
-                            <table class="w-full">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantidade</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unidade</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Marca</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Modelo</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
-                                    <?php foreach ($itens as $item): ?>
-                                        <tr class="hover:bg-gray-50">
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                                #<?php echo str_pad($item['id'], 3, '0', STR_PAD_LEFT); ?>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                <?php echo htmlspecialchars($item['nome'], ENT_QUOTES, 'UTF-8'); ?>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
-                                                    <?php echo $item['quantidade'] <= 5 ? 'bg-red-100 text-red-800' : ($item['quantidade'] <= 15 ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'); ?>">
-                                                    <?php echo htmlspecialchars($item['quantidade'], ENT_QUOTES, 'UTF-8'); ?>
-                                                </span>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                <?php echo htmlspecialchars($item['unidade'], ENT_QUOTES, 'UTF-8'); ?>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                <?php echo htmlspecialchars($item['marca'] ?? '-', ENT_QUOTES, 'UTF-8'); ?>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                <?php echo htmlspecialchars($item['modelo'] ?? '-', ENT_QUOTES, 'UTF-8'); ?>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Quantidade a adicionar</label>
+                            <input type="number" name="quantidade" min="1" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-primary focus:border-transparent" placeholder="Ex: 10" required>
                         </div>
-                    <?php endif; ?>
+                        <div class="flex justify-end md:justify-start">
+                            <button type="submit" class="bg-green-primary hover:bg-green-secondary text-white px-6 py-3 rounded-lg font-semibold transition-colors flex items-center">
+                                <i class="fas fa-plus mr-2"></i>Adicionar ao Estoque
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

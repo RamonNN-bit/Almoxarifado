@@ -149,13 +149,7 @@ try {
                     <li>
                         <a href="../solicitacoes.php" class="flex items-center px-6 py-3 text-green-100 hover:text-white hover:bg-green-light hover:bg-opacity-20 transition-all duration-200">
                             <i class="fas fa-clipboard-list w-5 mr-3"></i>
-                            <span>Minhas Solicitações</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="flex items-center px-6 py-3 text-green-100 hover:text-white hover:bg-green-light hover:bg-opacity-20 transition-all duration-200">
-                            <i class="fas fa-chart-bar w-5 mr-3"></i>
-                            <span>Relatórios</span>
+                            <span>Solicitações</span>
                         </a>
                     </li>
                     <li class="mt-8">
@@ -179,13 +173,6 @@ try {
 
                     <div class="hidden sm:flex items-center flex-1 max-w-md mx-4">
                         <div class="relative w-full">
-                            <input type="text" class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-primary focus:border-transparent" placeholder="Buscar item, material...">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center">
-                                <i class="fas fa-search text-gray-400"></i>
-                            </div>
-                            <button class="absolute inset-y-0 right-0 pr-3 flex items-center">
-                                <i class="fas fa-search text-green-primary"></i>
-                            </button>
                         </div>
                     </div>
 
@@ -225,11 +212,8 @@ try {
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
                     <h1 class="text-3xl font-bold text-gray-900 mb-4 sm:mb-0">Dashboard do Usuário</h1>
                     <div class="flex space-x-3">
-                        <button class="px-4 py-2 border border-green-primary text-green-primary rounded-lg hover:bg-green-primary hover:text-white transition-colors duration-200">
-                            <i class="fas fa-download mr-2"></i>Exportar Relatório
-                        </button>
                         <a href="../solicitacoes.php" class="px-4 py-2 bg-green-primary text-white rounded-lg hover:bg-green-secondary transition-colors duration-200">
-                            <i class="fas fa-plus mr-2"></i>Nova Solicitação
+                            <i class="fas fa-plus mr-2"></i>Solicitação
                         </a>
                     </div>
                 </div>
@@ -288,18 +272,18 @@ try {
                 <!-- Tabelas de Solicitações -->
                 <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
                     <!-- Minhas Solicitações Recentes -->
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 card-hover">
-                        <div class="p-6 border-b border-gray-200">
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 card-hover xl:col-span-2">
+                        <div class="p-10 border-b border-gray-200">
                             <h3 class="text-lg font-semibold text-gray-900">Minhas Solicitações Recentes</h3>
                         </div>
                         <div class="overflow-x-auto">
                             <table class="w-full">
                                 <thead class="bg-gray-50">
                                     <tr>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Solicitação</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Item</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th class="px-10 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Solicitação</th>
+                                        <th class="px-10 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
+                                        <th class="px-10 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Item</th>
+                                        <th class="px-10 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-200">
@@ -349,49 +333,9 @@ try {
                             </table>
                         </div>
                         <div class="p-6 border-t border-gray-200 text-center">
-                            <a href="#" class="inline-flex items-center px-4 py-2 border border-green-primary text-green-primary rounded-lg hover:bg-green-primary hover:text-white transition-colors duration-200">
+                            <a href="../solicitacoes.php" class="inline-flex items-center px-4 py-2 border border-green-primary text-green-primary rounded-lg hover:bg-green-primary hover:text-white transition-colors duration-200">
                                 Ver todas as solicitações
                             </a>
-                        </div>
-                    </div>
-                    
-                    <!-- Notificações e Avisos -->
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 card-hover">
-                        <div class="p-6 border-b border-gray-200">
-                            <h3 class="text-lg font-semibold text-gray-900">Notificações e Avisos</h3>
-                        </div>
-                        <div class="p-6 space-y-4">
-                            <div class="notification-border-green bg-green-50 p-4 rounded-lg">
-                                <div class="flex justify-between items-start mb-2">
-                                    <h6 class="font-semibold text-gray-800">Nova atualização no sistema</h6>
-                                    <small class="text-gray-500">Hoje</small>
-                                </div>
-                                <p class="text-gray-600 text-sm">O sistema de almoxarifado foi atualizado com novas funcionalidades.</p>
-                            </div>
-                            
-                            <div class="notification-border-yellow bg-yellow-50 p-4 rounded-lg">
-                                <div class="flex justify-between items-start mb-2">
-                                    <h6 class="font-semibold text-gray-800">Solicitação em análise</h6>
-                                    <small class="text-gray-500">2h atrás</small>
-                                </div>
-                                <p class="text-gray-600 text-sm">Sua solicitação está sendo analisada pela equipe.</p>
-                            </div>
-                            
-                            <div class="notification-border-green bg-green-50 p-4 rounded-lg">
-                                <div class="flex justify-between items-start mb-2">
-                                    <h6 class="font-semibold text-gray-800">Item disponível</h6>
-                                    <small class="text-gray-500">1 dia</small>
-                                </div>
-                                <p class="text-gray-600 text-sm">Novos itens foram adicionados ao estoque.</p>
-                            </div>
-                            
-                            <div class="notification-border-red bg-red-50 p-4 rounded-lg">
-                                <div class="flex justify-between items-start mb-2">
-                                    <h6 class="font-semibold text-gray-800">Prazo de retirada</h6>
-                                    <small class="text-gray-500">2 dias</small>
-                                </div>
-                                <p class="text-gray-600 text-sm">Lembre-se de retirar os itens aprovados em tempo hábil.</p>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -408,6 +352,33 @@ try {
                     </div>
                 </footer>
             </div>
+        </div>
+    </div>
+
+    <!-- Modal Exportar Relatório -->
+    <div id="exportModal" class="fixed inset-0 bg-black bg-opacity-40 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-4">
+            <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                <h3 class="text-lg font-semibold text-gray-900">Exportar Relatório por Período</h3>
+                <button id="closeExportModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form action="../relatorios/relatorioPorPeriodo.php" method="get" target="_blank" class="px-6 py-4">
+                <input type="hidden" name="acao" value="pdf">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Data início</label>
+                    <input type="date" name="inicio" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-primary">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Data fim</label>
+                    <input type="date" name="fim" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-primary">
+                </div>
+                <div class="flex items-center justify-end space-x-3 border-t border-gray-200 pt-4 pb-6">
+                    <button type="button" id="cancelExportModal" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 rounded-lg bg-green-primary text-white hover:bg-green-secondary">Gerar PDF</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -434,6 +405,22 @@ try {
                 });
             }
         });
+
+        // Modal Exportar Relatório
+        (function(){
+            const openBtn = document.getElementById('exportReportBtn');
+            const modal = document.getElementById('exportModal');
+            const closeBtn = document.getElementById('closeExportModal');
+            const cancelBtn = document.getElementById('cancelExportModal');
+
+            function openModal(){ modal.classList.remove('hidden'); modal.classList.add('flex'); }
+            function closeModal(){ modal.classList.add('hidden'); modal.classList.remove('flex'); }
+
+            if (openBtn) openBtn.addEventListener('click', openModal);
+            if (closeBtn) closeBtn.addEventListener('click', closeModal);
+            if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+            if (modal) modal.addEventListener('click', function(e){ if (e.target === modal) closeModal(); });
+        })();
     </script>
 </body>
 </html>

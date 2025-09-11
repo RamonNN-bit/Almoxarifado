@@ -153,12 +153,6 @@ function getCategoria($nome) {
                             <span>Solicitações</span>
                         </a>
                     </li>
-                    <li>
-                        <a href="../Admin/relatorios.php" class="flex items-center px-6 py-3 text-green-100 hover:text-white hover:bg-green-light hover:bg-opacity-20 transition-all duration-200">
-                            <i class="fas fa-chart-bar w-5 mr-3"></i>
-                            <span>Relatórios</span>
-                        </a>
-                    </li>
                     <li class="mt-8">
                         <a href="../logout.php" class="flex items-center px-6 py-3 text-green-100 hover:text-white hover:bg-red-600 hover:bg-opacity-20 transition-all duration-200">
                             <i class="fas fa-sign-out-alt w-5 mr-3"></i>
@@ -180,10 +174,6 @@ function getCategoria($nome) {
 
                     <div class="hidden sm:flex items-center flex-1 max-w-md mx-4">
                         <div class="relative w-full">
-                            <input type="text" id="searchInput" class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-primary focus:border-transparent" placeholder="Buscar item, material...">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center">
-                                <i class="fas fa-search text-gray-400"></i>
-                            </div>
                         </div>
                     </div>
 
@@ -302,17 +292,6 @@ function getCategoria($nome) {
                         <option value="normal">Normal</option>
                     </select>
                 </div>
-                <div class="md:w-48">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Categoria</label>
-                    <select id="filterCategoria" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
-                        <option value="">Todas</option>
-                        <option value="Fixadores">Fixadores</option>
-                        <option value="Elétrica">Elétrica</option>
-                        <option value="Ferramentas">Ferramentas</option>
-                        <option value="EPI">EPI</option>
-                        <option value="Componentes">Componentes</option>
-                    </select>
-                </div>
                 <div class="flex items-end">
                     <button id="clearFilters" class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors">
                         <i class="fas fa-times mr-2"></i>Limpar
@@ -345,12 +324,9 @@ function getCategoria($nome) {
                                     <i class="fas fa-sort mr-1"></i>Item
                                 </th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onclick="sortTable(2)">
-                                    <i class="fas fa-sort mr-1"></i>Categoria
-                                </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onclick="sortTable(3)">
                                     <i class="fas fa-sort mr-1"></i>Estoque
                                 </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onclick="sortTable(4)">
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onclick="sortTable(3)">
                                     <i class="fas fa-sort mr-1"></i>Unidade
                                 </th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Marca</th>
@@ -361,22 +337,16 @@ function getCategoria($nome) {
                         <tbody class="bg-white divide-y divide-gray-200">
                             <?php foreach ($itens as $item): 
                                 $status = getStatusEstoque($item['quantidade']);
-                                $categoria = getCategoria($item['nome']);
+                                $statusKey = strtr(mb_strtolower($status['status']), ['á'=>'a','ã'=>'a','â'=>'a','à'=>'a','ç'=>'c','é'=>'e','ê'=>'e','í'=>'i','ó'=>'o','ô'=>'o','õ'=>'o','ú'=>'u']);
                             ?>
                                 <tr class="hover:bg-gray-50 item-row" 
                                     data-nome="<?php echo strtolower($item['nome']); ?>"
-                                    data-categoria="<?php echo $categoria; ?>"
-                                    data-status="<?php echo strtolower($status['status']); ?>">
+                                    data-status="<?php echo $statusKey; ?>">
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                         #<?php echo str_pad($item['id'], 3, '0', STR_PAD_LEFT); ?>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                         <?php echo htmlspecialchars($item['nome'], ENT_QUOTES, 'UTF-8'); ?>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-                                            <?php echo $categoria; ?>
-                                        </span>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                         <div class="flex items-center">
@@ -390,10 +360,10 @@ function getCategoria($nome) {
                                         <?php echo htmlspecialchars($item['unidade'], ENT_QUOTES, 'UTF-8'); ?>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        <?php echo htmlspecialchars($item['marca'] ?? '-', ENT_QUOTES, 'UTF-8'); ?>
+                                        <?php echo htmlspecialchars((isset($item['marca']) && trim($item['marca']) !== '' ? $item['marca'] : 'Marca não informada'), ENT_QUOTES, 'UTF-8'); ?>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        <?php echo htmlspecialchars($item['modelo'] ?? '-', ENT_QUOTES, 'UTF-8'); ?>
+                                        <?php echo htmlspecialchars((isset($item['modelo']) && trim($item['modelo']) !== '' ? $item['modelo'] : 'Modelo não informado'), ENT_QUOTES, 'UTF-8'); ?>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full <?php echo $status['class']; ?>">

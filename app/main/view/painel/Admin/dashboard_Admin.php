@@ -177,12 +177,6 @@ try {
                             <span>Solicitações</span>
                         </a>
                     </li>
-                    <li>
-                        <a href="#" class="flex items-center px-6 py-3 text-green-100 hover:text-white hover:bg-green-light hover:bg-opacity-20 transition-all duration-200">
-                            <i class="fas fa-chart-bar w-5 mr-3"></i>
-                            <span>Relatórios</span>
-                        </a>
-                    </li>
                     <li class="mt-8">
                         <a href="../../../view/logout.php" class="flex items-center px-6 py-3 text-green-100 hover:text-white hover:bg-red-600 hover:bg-opacity-20 transition-all duration-200">
                             <i class="fas fa-sign-out-alt w-5 mr-3"></i>
@@ -203,15 +197,6 @@ try {
                     </button>
 
                     <div class="hidden sm:flex items-center flex-1 max-w-md mx-4">
-                        <div class="relative w-full">
-                            <input type="text" class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-primary focus:border-transparent" placeholder="Buscar item, material...">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center">
-                                <i class="fas fa-search text-gray-400"></i>
-                            </div>
-                            <button class="absolute inset-y-0 right-0 pr-3 flex items-center">
-                                <i class="fas fa-search text-green-primary"></i>
-                            </button>
-                        </div>
                     </div>
 
                     <div class="flex items-center space-x-4">
@@ -243,14 +228,14 @@ try {
             <div class="p-6">
                 <!-- Título da Página -->
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
-                    <h1 class="text-3xl font-bold text-gray-900 mb-4 sm:mb-0">Dashboard do Almoxarifado</h1>
+                    <h1 class="text-3xl font-bold text-gray-900 mb-4 sm:mb-0">Dashboard do Usuário</h1>
                     <div class="flex space-x-3">
-                        <button class="px-4 py-2 border border-green-primary text-green-primary rounded-lg hover:bg-green-primary hover:text-white transition-colors duration-200">
+                        <button id="exportReportBtn" class="px-4 py-2 border border-green-primary text-green-primary rounded-lg hover:bg-green-primary hover:text-white transition-colors duration-200">
                             <i class="fas fa-download mr-2"></i>Exportar Relatório
                         </button>
-                        <button class="px-4 py-2 bg-green-primary text-white rounded-lg hover:bg-green-secondary transition-colors duration-200">
-                            <a href="itens_cadastro.php"><i class="fas fa-plus mr-2"></i>Novo Item</a>
-                        </button>
+                        <a href="../solicitacoes.php" class="px-4 py-2 bg-green-primary text-white rounded-lg hover:bg-green-secondary transition-colors duration-200">
+                            <i class="fas fa-plus mr-2"></i>Nova Solicitação
+                        </a>
                     </div>
                 </div>
 
@@ -566,9 +551,34 @@ try {
         </div>
     </div>
 
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
+     <!-- Modal Exportar Relatório -->
+     <div id="exportModal" class="fixed inset-0 bg-black bg-opacity-40 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-4">
+            <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                <h3 class="text-lg font-semibold text-gray-900">Exportar Relatório por Período</h3>
+                <button id="closeExportModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form action="../relatorios/relatorioPorPeriodo.php" method="get" target="_blank" class="px-6 py-4">
+                <input type="hidden" name="acao" value="pdf">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Data início</label>
+                    <input type="date" name="inicio" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-primary">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Data fim</label>
+                    <input type="date" name="fim" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-primary">
+                </div>
+                <div class="flex items-center justify-end space-x-3 border-t border-gray-200 pt-4 pb-6">
+                    <button type="button" id="cancelExportModal" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 rounded-lg bg-green-primary text-white hover:bg-green-secondary">Gerar PDF</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts JavaScript para interatividade -->
     <script>
         // Script para toggle da sidebar em dispositivos móveis
         document.getElementById('sidebarToggle').addEventListener('click', function() {
@@ -579,80 +589,34 @@ try {
             sidebar.classList.toggle('translate-x-0');
         });
         
-        // Gráfico de movimentação de estoque
-        const stockCtx = document.getElementById('stockChart').getContext('2d');
-        const stockChart = new Chart(stockCtx, {
-            type: 'line',
-            data: {
-                labels: ['01/06', '05/06', '10/06', '15/06', '20/06', '25/06', '30/06'],
-                datasets: [{
-                    label: 'Entradas',
-                    data: [120, 115, 130, 140, 145, 150, 160],
-                    borderColor: '#059669',
-                    backgroundColor: 'rgba(5, 150, 105, 0.1)',
-                    tension: 0.3,
-                    fill: true,
-                    borderWidth: 3
-                }, {
-                    label: 'Saídas',
-                    data: [100, 105, 110, 120, 125, 130, 135],
-                    borderColor: '#dc2626',
-                    backgroundColor: 'rgba(220, 38, 38, 0.1)',
-                    tension: 0.3,
-                    fill: true,
-                    borderWidth: 3
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'top',
+        // Funcionalidade de busca
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.querySelector('input[placeholder="Buscar item, material..."]');
+            if (searchInput) {
+                searchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        console.log('[v0] Busca realizada:', this.value);
+                        // Aqui você pode adicionar a lógica de busca
                     }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: 'rgba(0, 0, 0, 0.05)'
-                        }
-                    },
-                    x: {
-                        grid: {
-                            color: 'rgba(0, 0, 0, 0.05)'
-                        }
-                    }
-                }
+                });
             }
         });
-        
-        // Gráfico de status de solicitações
-        const requestCtx = document.getElementById('requestChart').getContext('2d');
-        const requestChart = new Chart(requestCtx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Pendentes', 'Aprovadas', 'Rejeitadas'],
-                datasets: [{
-                    data: [<?php echo $pendentes_count; ?>, <?php echo $aprovadas_count; ?>, <?php echo $recusadas_count; ?>],
-                    backgroundColor: [
-                        '#3b82f6',
-                        '#059669',
-                        '#dc2626'
-                    ],
-                    borderWidth: 0,
-                    hoverOffset: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
-                cutout: '60%'
-            }
-        });
+
+        // Modal Exportar Relatório
+        (function(){
+            const openBtn = document.getElementById('exportReportBtn');
+            const modal = document.getElementById('exportModal');
+            const closeBtn = document.getElementById('closeExportModal');
+            const cancelBtn = document.getElementById('cancelExportModal');
+
+            function openModal(){ modal.classList.remove('hidden'); modal.classList.add('flex'); }
+            function closeModal(){ modal.classList.add('hidden'); modal.classList.remove('flex'); }
+
+            if (openBtn) openBtn.addEventListener('click', openModal);
+            if (closeBtn) closeBtn.addEventListener('click', closeModal);
+            if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+            if (modal) modal.addEventListener('click', function(e){ if (e.target === modal) closeModal(); });
+        })();
     </script>
 </body>
 </html>

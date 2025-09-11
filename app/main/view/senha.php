@@ -118,7 +118,7 @@ if (isLoggedIn()) {
 
     <?php
     /* Mantendo toda a lógica PHP original */
-    require '../includes/db.php';
+    require '../config/db.php';
 
     isset($_POST['email']) ? $email = $_POST['email'] : $email = '';
 
