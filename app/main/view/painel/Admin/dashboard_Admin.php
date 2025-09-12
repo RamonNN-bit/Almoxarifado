@@ -184,6 +184,13 @@ try {
                             <span>Solicitações</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="usuarios.php"
+                            class="flex items-center px-6 py-3 text-green-100 hover:text-white hover:bg-green-light hover:bg-opacity-20 transition-all duration-200">
+                            <i class="fas fa-users w-5 mr-3"></i>
+                            <span>Usuários</span>
+                        </a>
+                    </li>
                     <li class="mt-8">
                         <a href="../../../view/logout.php"
                             class="flex items-center px-6 py-3 text-green-100 hover:text-white hover:bg-red-600 hover:bg-opacity-20 transition-all duration-200">

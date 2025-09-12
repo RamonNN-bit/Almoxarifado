@@ -56,7 +56,7 @@ class Itens {
             $stmt->execute([':qtd' => $quantidadeAdicionar, ':id' => $id_item]);
     
             // Insere a movimentação na tabela movimentacoes
-            $sqlInsert = "INSERT INTO movimentacoes (id_item, tipo, quantidade, id_usuario, status, data) 
+            $sqlInsert = "INSERT INTO movimentacoes (id_item, tipo, quantidade, id_usuario, status, timestamp) 
                           VALUES (:id_item, 'entrada', :quantidade, :id_usuario, 'em espera', NOW())";
             $stmtInsert = $this->pdo->prepare($sqlInsert);
             $stmtInsert->execute([

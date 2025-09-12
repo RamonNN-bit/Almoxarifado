@@ -29,7 +29,7 @@ class Solicitacoes {
             
             // Criar solicitação com status 'em espera'
             $sql_solicitacao = "INSERT INTO movimentacoes (id_item, tipo, status, quantidade, data, id_usuario) 
-                               VALUES (:id_item, 'saida', 'em espera', :quantidade, CURDATE(), :id_usuario)";
+                               VALUES (:id_item, 'saida', 'em espera', :quantidade, NOW(), :id_usuario)";
             
             $stmt_solicitacao = $this->pdo->prepare($sql_solicitacao);
             $resultado = $stmt_solicitacao->execute([

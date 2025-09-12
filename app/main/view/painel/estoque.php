@@ -45,12 +45,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao']) && $_POST['ac
             $stmt->execute([':qtd' => $qtdAdd, ':id' => $idItem]);
 
             // Insere registro na tabela movimentacoes (tipo entrada)
-            $stmt2 = $pdo->prepare('INSERT INTO movimentacoes (id_item, tipo, quantidade, data, id_usuario) VALUES (:id_item, :tipo, :quantidade, :data, :id_usuario)');
+            $stmt2 = $pdo->prepare('INSERT INTO movimentacoes (id_item, tipo, quantidade, timestamp, id_usuario) VALUES (:id_item, :tipo, :quantidade, NOW(), :id_usuario)');
             $stmt2->execute([
                 ':id_item' => $idItem,
                 ':tipo' => 'entrada',
                 ':quantidade' => $qtdAdd,
-                ':data' => date('Y-m-d'),
                 ':id_usuario' => $idUsuario
             ]);
 
@@ -213,6 +212,14 @@ function getCategoria($nome) {
                             <span>Solicitações</span>
                         </a>
                     </li>
+                    <?php if($_SESSION['admin']){?>
+                    <li>
+                        <a href="./admin/usuarios.php" class="flex items-center px-6 py-3 text-green-100 hover:text-white hover:bg-green-light hover:bg-opacity-20 transition-all duration-200">
+                            <i class="fas fa-users w-5 mr-3"></i>
+                            <span>Usuários</span>
+                        </a>
+                    </li>
+                    <?php }?>
                     <li class="mt-8">
                         <a href="../logout.php" class="flex items-center px-6 py-3 text-green-100 hover:text-white hover:bg-red-600 hover:bg-opacity-20 transition-all duration-200">
                             <i class="fas fa-sign-out-alt w-5 mr-3"></i>

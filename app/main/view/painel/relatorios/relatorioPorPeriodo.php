@@ -14,12 +14,12 @@ if (isset($_GET['acao']) && $_GET['acao'] === 'pdf') {
     $dtIni = date('Y-m-d', strtotime($dataInicio));
     $dtFim = date('Y-m-d', strtotime($dataFim));
 
-    // Ajuste de nomes de campos conforme SQL (banco.sql define `data` em movimentacoes)
-    $sql = "SELECT m.id, m.id_item, m.tipo, m.quantidade, m.data AS data_movimentacao, i.nome AS nome_item
+    // Ajuste de nomes de campos conforme SQL (usando timestamp em movimentacoes)
+    $sql = "SELECT m.id, m.id_item, m.tipo, m.quantidade, m.timestamp AS data_movimentacao, i.nome AS nome_item
             FROM movimentacoes m
             LEFT JOIN itens i ON i.id = m.id_item
-            WHERE m.data BETWEEN ? AND ?
-            ORDER BY m.data ASC, m.id ASC";
+            WHERE DATE(m.timestamp) BETWEEN ? AND ?
+            ORDER BY m.timestamp ASC, m.id ASC";
 
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$dtIni, $dtFim]);

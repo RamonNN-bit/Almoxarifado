@@ -171,7 +171,7 @@ function requireLogin($requiredType = null, $currentPage = '') {
     }
     
     if ($requiredType === 'user' && !isUser()) {
-        header('Location: ../Admin/dashboard_Admin.php');
+        header('Location: ../Admin/dashboard_Admin.php?');
         exit;
     }
     

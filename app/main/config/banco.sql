@@ -48,6 +48,8 @@ CREATE TABLE `movimentacoes` (
   `tipo` enum('entrada','saida') DEFAULT NULL,
   `quantidade` int(11) DEFAULT NULL,
   `data` date DEFAULT NULL,
+  `timestamp` datetime DEFAULT CURRENT_TIMESTAMP,
+  `status` enum('em espera','aprovado','recusado') DEFAULT 'em espera',
   `id_usuario` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
