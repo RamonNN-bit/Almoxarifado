@@ -245,7 +245,7 @@ function getStatusClass($status)
                             </button>
                         </div>
                         <div class="flex items-center space-x-3">
-                            <img src="https://ui-avatars.com/api/?name=Admin&background=059669&color=ffffff"
+                            <img src="https://ui-avatars.com/api/?name=<?php echo substr($nome_usuario, 0, 2); ?>&background=059669&color=ffffff"
                                 class="w-8 h-8 rounded-full">
                             <div class="hidden md:block">
                                 <?php if ($_SESSION['admin']) { ?>
@@ -296,7 +296,7 @@ function getStatusClass($status)
                 <?php endif; ?>
 
                 <!-- Cards de estatísticas -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
                     <div class="stat-card-gradient-1 rounded-xl p-6 text-white card-hover">
                         <div class="flex items-center">
                             <div class="p-3 rounded-full bg-white bg-opacity-20">

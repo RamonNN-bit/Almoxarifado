@@ -260,7 +260,7 @@ function getStatusEstoque($quantidade) {
                             </button>
                         </div>
                         <div class="flex items-center space-x-3">
-                            <img src="https://ui-avatars.com/api/?name=Admin&background=059669&color=ffffff"
+                            <img src="https://ui-avatars.com/api/?name=<?php echo substr($nome_usuario, 0, 2); ?>&background=059669&color=ffffff"
                                 class="w-8 h-8 rounded-full">
                             <div class="hidden md:block">
                                 <?php if ($_SESSION['admin']) { ?>
@@ -286,7 +286,7 @@ function getStatusEstoque($quantidade) {
 
                 <!-- Cards de estatísticas -->
                 <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
-                    <div class="bg-green-500 rounded-lg p-3 sm:p-4 text-white card-hover">
+                    <div class="stat-card-gradient-1 rounded-lg p-3 sm:p-4 text-white card-hover">
                         <div class="flex items-center">
                             <div class="p-2 rounded-full bg-white bg-opacity-20">
                                 <svg class="icon icon-boxes text-sm sm:text-base" viewBox="0 0 24 24">
@@ -302,7 +302,7 @@ function getStatusEstoque($quantidade) {
                         </div>
                     </div>
                     
-                    <div class="bg-red-500 rounded-lg p-3 sm:p-4 text-white card-hover">
+                    <div class="stat-card-gradient-4 rounded-lg p-3 sm:p-4 text-white card-hover">
                         <div class="flex items-center">
                             <div class="p-2 rounded-full bg-white bg-opacity-20">
                                 <svg class="icon icon-exclamation-triangle text-sm sm:text-base" viewBox="0 0 24 24">
@@ -323,7 +323,7 @@ function getStatusEstoque($quantidade) {
                         </div>
                     </div>
                     
-                    <div class="bg-yellow-500 rounded-lg p-3 sm:p-4 text-white card-hover">
+                    <div class="stat-card-gradient-3 rounded-lg p-3 sm:p-4 text-white card-hover">
                         <div class="flex items-center">
                             <div class="p-2 rounded-full bg-white bg-opacity-20">
                                 <svg class="icon icon-exclamation-circle text-sm sm:text-base" viewBox="0 0 24 24">
@@ -344,7 +344,7 @@ function getStatusEstoque($quantidade) {
                         </div>
                     </div>
                     
-                    <div class="bg-green-600 rounded-lg p-3 sm:p-4 text-white card-hover">
+                    <div class="stat-card-gradient-2 rounded-lg p-3 sm:p-4 text-white card-hover">
                         <div class="flex items-center">
                             <div class="p-2 rounded-full bg-white bg-opacity-20">
                                 <svg class="icon icon-check-circle text-sm sm:text-base" viewBox="0 0 24 24">

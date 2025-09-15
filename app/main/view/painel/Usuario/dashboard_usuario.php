@@ -292,7 +292,7 @@ try {
                             </button>
                         </div>
                         <div class="flex items-center space-x-3">
-                            <img src="https://ui-avatars.com/api/?name=Admin&background=059669&color=ffffff"
+                            <img src="https://ui-avatars.com/api/?name=<?php echo substr($nome_usuario, 0, 2); ?>&background=059669&color=ffffff"
                                 class="w-8 h-8 rounded-full">
                             <div class="hidden md:block">
                                 <?php if ($_SESSION['admin']) { ?>
@@ -326,61 +326,49 @@ try {
                 <!-- Cards de Estatísticas -->
                 <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
                     <div class="stat-card-gradient-1 rounded-xl p-6 text-white card-hover">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-green-100 text-sm font-medium uppercase tracking-wide">Solicitações Pendentes</p>
-                                <p class="text-3xl font-bold mt-2"><?php echo $pendentesCount;?></p>
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-white bg-opacity-20">
+                                <i class="fas fa-clock text-xl"></i>
                             </div>
-                            <div class="bg-white bg-opacity-20 rounded-lg p-3">
-                                <svg class="icon icon-clock text-2xl" viewBox="0 0 24 24">
-                                    <circle cx="12" cy="12" r="10"/>
-                                    <polyline points="12,6 12,12 16,14"/>
-                                </svg>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-green-100">Solicitações Pendentes</p>
+                                <p class="text-2xl font-semibold"><?php echo $pendentesCount;?></p>
                             </div>
                         </div>
                     </div>
 
                     <div class="stat-card-gradient-2 rounded-xl p-6 text-white card-hover">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-green-100 text-sm font-medium uppercase tracking-wide">Solicitações Aprovadas</p>
-                                <p class="text-3xl font-bold mt-2"><?php echo $estatisticas['solicitacoes_aprovadas']; ?></p>
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-white bg-opacity-20">
+                                <i class="fas fa-check-circle text-xl"></i>
                             </div>
-                            <div class="bg-white bg-opacity-20 rounded-lg p-3">
-                                <svg class="icon icon-check-circle text-2xl" viewBox="0 0 24 24">
-                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                                    <polyline points="22,4 12,14.01 9,11.01"/>
-                                </svg>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-green-100">Solicitações Aprovadas</p>
+                                <p class="text-2xl font-semibold"><?php echo $estatisticas['solicitacoes_aprovadas']; ?></p>
                             </div>
                         </div>
                     </div>
 
                     <div class="stat-card-gradient-3 rounded-xl p-6 text-white card-hover">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-orange-100 text-sm font-medium uppercase tracking-wide">Itens Solicitados</p>
-                                <p class="text-3xl font-bold mt-2"><?php echo $estatisticas['itens_solicitados']; ?></p>
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-white bg-opacity-20">
+                                <i class="fas fa-tools text-xl"></i>
                             </div>
-                            <div class="bg-white bg-opacity-20 rounded-lg p-3">
-                                <svg class="icon icon-tools text-2xl" viewBox="0 0 24 24">
-                                    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
-                                </svg>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-yellow-100">Itens Solicitados</p>
+                                <p class="text-2xl font-semibold"><?php echo $estatisticas['itens_solicitados']; ?></p>
                             </div>
                         </div>
                     </div>
 
                     <div class="stat-card-gradient-4 rounded-xl p-6 text-white card-hover">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-red-100 text-sm font-medium uppercase tracking-wide">Itens Disponíveis</p>
-                                <p class="text-3xl font-bold mt-2"><?php echo $estatisticas['itens_disponiveis']; ?></p>
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-white bg-opacity-20">
+                                <i class="fas fa-boxes text-xl"></i>
                             </div>
-                            <div class="bg-white bg-opacity-20 rounded-lg p-3">
-                                <svg class="icon icon-boxes text-2xl" viewBox="0 0 24 24">
-                                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-                                    <polyline points="3.27,6.96 12,12.01 20.73,6.96"/>
-                                    <line x1="12" y1="22.08" x2="12" y2="12"/>
-                                </svg>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-red-100">Itens Disponíveis</p>
+                                <p class="text-2xl font-semibold"><?php echo $estatisticas['itens_disponiveis']; ?></p>
                             </div>
                         </div>
                     </div>

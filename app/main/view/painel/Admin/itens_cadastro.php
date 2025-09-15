@@ -206,7 +206,7 @@ try {
                             </button>
                         </div>
                         <div class="flex items-center space-x-3">
-                            <img src="https://ui-avatars.com/api/?name=Admin&background=059669&color=ffffff"
+                            <img src="https://ui-avatars.com/api/?name=<?php echo substr($nome_usuario, 0, 2); ?>&background=059669&color=ffffff"
                                 class="w-8 h-8 rounded-full">
                             <div class="hidden md:block">
                                 <?php if ($_SESSION['admin']) { ?>
@@ -333,7 +333,7 @@ try {
                 <!-- Adicionar quantidade a item existente -->
                 <div class="bg-white rounded-xl shadow-sm p-6 mb-8">
                     <h2 class="text-xl font-semibold text-gray-800 mb-6">Adicionar Itens ao Estoque</h2>
-                    <form method="POST" class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+                    <form method="POST" action="../../../control/movimentacaoController.php" class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
                         <input type="hidden" name="acao" value="incrementar">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Selecionar Item</label>

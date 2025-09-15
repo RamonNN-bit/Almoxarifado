@@ -49,7 +49,6 @@ try {
 
     // Buscar últimas solicitações (limitado a 5)
     $ultimas_solicitacoes = array_slice($solicitacoes, 0, 5);
-
 } catch (Exception $e) {
     // Em caso de erro, usar valores padrão
     $total_itens_estoque = 0;
@@ -245,7 +244,7 @@ try {
                             </button>
                         </div>
                         <div class="flex items-center space-x-3">
-                            <img src="https://ui-avatars.com/api/?name=Admin&background=059669&color=ffffff"
+                            <img src="https://ui-avatars.com/api/?name=<?php echo substr($_SESSION['nome'] ?? 'Admin', 0, 2); ?>&background=059669&color=ffffff"
                                 class="w-8 h-8 rounded-full">
                             <div class="hidden md:block">
                                 <?php if ($_SESSION['admin']) { ?>
@@ -263,8 +262,11 @@ try {
             <!-- Conteúdo do Dashboard -->
             <div class="p-6">
                 <!-- Título da Página -->
+                <div class="mb-8">
+                    <h1 class="text-3xl font-bold text-gray-900 mb-2">Dashboard Administrador</h1>
+                    <p class="text-gray-600">Visualize de forma resumida as funcionalides do sistema</p>
+                </div>
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
-                    <h1 class="text-3xl font-bold text-gray-900 mb-4 sm:mb-0">Dashboard do Administrador</h1>
                     <div class="flex space-x-3">
                         <button id="exportReportBtn"
                             class="px-4 py-2 border border-green-primary text-green-primary rounded-lg hover:bg-green-primary hover:text-white transition-colors duration-200">
@@ -287,69 +289,49 @@ try {
                 <!-- Cards de Estatísticas -->
                 <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
                     <div class="stat-card-gradient-1 rounded-xl p-6 text-white card-hover">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-green-100 text-sm font-medium uppercase tracking-wide">Itens em Estoque
-                                </p>
-                                <p class="text-3xl font-bold mt-2"><?php echo number_format($total_itens_estoque); ?>
-                                </p>
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-white bg-opacity-20">
+                                <i class="fas fa-boxes text-xl"></i>
                             </div>
-                            <div class="bg-white bg-opacity-20 rounded-lg p-3">
-                                <svg class="icon icon-boxes text-2xl" viewBox="0 0 24 24">
-                                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-                                    <polyline points="3.27,6.96 12,12.01 20.73,6.96"/>
-                                    <line x1="12" y1="22.08" x2="12" y2="12"/>
-                                </svg>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-green-100">Itens em Estoque</p>
+                                <p class="text-2xl font-semibold"><?php echo number_format($total_itens_estoque); ?></p>
                             </div>
                         </div>
                     </div>
 
                     <div class="stat-card-gradient-2 rounded-xl p-6 text-white card-hover">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-green-100 text-sm font-medium uppercase tracking-wide">Solicitações Hoje
-                                </p>
-                                <p class="text-3xl font-bold mt-2"><?php echo count($solicitacoes_hoje); ?></p>
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-white bg-opacity-20">
+                                <i class="fas fa-clipboard-check text-xl"></i>
                             </div>
-                            <div class="bg-white bg-opacity-20 rounded-lg p-3">
-                                <svg class="icon icon-clipboard-check text-2xl" viewBox="0 0 24 24">
-                                    <path d="M9 11H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-4"/>
-                                    <rect x="9" y="3" width="6" height="4" rx="2" ry="2"/>
-                                    <polyline points="9,12 11,14 15,10"/>
-                                </svg>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-green-100">Solicitações Hoje</p>
+                                <p class="text-2xl font-semibold"><?php echo count($solicitacoes_hoje); ?></p>
                             </div>
                         </div>
                     </div>
 
                     <div class="stat-card-gradient-3 rounded-xl p-6 text-white card-hover">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-orange-100 text-sm font-medium uppercase tracking-wide">Itens Críticos
-                                </p>
-                                <p class="text-3xl font-bold mt-2"><?php echo count($itens_criticos); ?></p>
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-white bg-opacity-20">
+                                <i class="fas fa-exclamation-triangle text-xl"></i>
                             </div>
-                            <div class="bg-white bg-opacity-20 rounded-lg p-3">
-                                <svg class="icon icon-exclamation-triangle text-2xl" viewBox="0 0 24 24">
-                                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-                                    <line x1="12" y1="9" x2="12" y2="13"/>
-                                    <line x1="12" y1="17" x2="12.01" y2="17"/>
-                                </svg>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-yellow-100">Itens Críticos</p>
+                                <p class="text-2xl font-semibold"><?php echo count($itens_criticos); ?></p>
                             </div>
                         </div>
                     </div>
 
                     <div class="stat-card-gradient-4 rounded-xl p-6 text-white card-hover">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-red-100 text-sm font-medium uppercase tracking-wide">Itens em Falta</p>
-                                <p class="text-3xl font-bold mt-2"><?php echo count($itens_em_falta); ?></p>
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-white bg-opacity-20">
+                                <i class="fas fa-times-circle text-xl"></i>
                             </div>
-                            <div class="bg-white bg-opacity-20 rounded-lg p-3">
-                                <svg class="icon icon-times-circle text-2xl" viewBox="0 0 24 24">
-                                    <circle cx="12" cy="12" r="10"/>
-                                    <line x1="15" y1="9" x2="9" y2="15"/>
-                                    <line x1="9" y1="9" x2="15" y2="15"/>
-                                </svg>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-red-100">Itens em Falta</p>
+                                <p class="text-2xl font-semibold"><?php echo count($itens_em_falta); ?></p>
                             </div>
                         </div>
                     </div>
@@ -708,7 +690,7 @@ try {
                         </div>
                         <span class="hidden sm:inline mx-2">&middot;</span>
                         <div class="text-center">
-                            Desenvolvido por: Fulano, Beltrano e Ciclano
+                            Desenvolvido por: <a href="https://instagram.com/rogercavalcantetz">Roger</a>, Ramon, Larissa e Denilson
                         </div>
                         <span class="hidden sm:inline mx-2">&middot;</span>
                         <div class="mt-2 sm:mt-0">
@@ -789,7 +771,7 @@ try {
     <!-- Scripts JavaScript para interatividade -->
     <script>
         // Script para toggle da sidebar em dispositivos móveis
-        document.getElementById('sidebarToggle').addEventListener('click', function () {
+        document.getElementById('sidebarToggle').addEventListener('click', function() {
             const sidebar = document.getElementById('sidebar');
             const content = document.getElementById('content');
 
@@ -798,10 +780,10 @@ try {
         });
 
         // Funcionalidade de busca
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const searchInput = document.querySelector('input[placeholder="Buscar item, material..."]');
             if (searchInput) {
-                searchInput.addEventListener('keypress', function (e) {
+                searchInput.addEventListener('keypress', function(e) {
                     if (e.key === 'Enter') {
                         console.log('[v0] Busca realizada:', this.value);
                         // Aqui você pode adicionar a lógica de busca
@@ -833,19 +815,28 @@ try {
         });
 
         // Modal Exportar Relatório
-        (function () {
+        (function() {
             const openBtn = document.getElementById('exportReportBtn');
             const modal = document.getElementById('exportModal');
             const closeBtn = document.getElementById('closeExportModal');
             const cancelBtn = document.getElementById('cancelExportModal');
 
-            function openModal() { modal.classList.remove('hidden'); modal.classList.add('flex'); }
-            function closeModal() { modal.classList.add('hidden'); modal.classList.remove('flex'); }
+            function openModal() {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+
+            function closeModal() {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
 
             if (openBtn) openBtn.addEventListener('click', openModal);
             if (closeBtn) closeBtn.addEventListener('click', closeModal);
             if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
-            if (modal) modal.addEventListener('click', function (e) { if (e.target === modal) closeModal(); });
+            if (modal) modal.addEventListener('click', function(e) {
+                if (e.target === modal) closeModal();
+            });
         })();
     </script>
 </body>
