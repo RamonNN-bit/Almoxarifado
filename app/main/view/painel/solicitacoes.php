@@ -32,6 +32,21 @@ try {
     ];
     $solicitacoes_recentes = [];
 }
+
+
+
+// Buscar estatísticas do dashboard
+try {
+    $solicitacoesModel = new Solicitacoes($pdo);
+
+// Buscar dados do usuário logado
+    $userData = $solicitacoesModel->buscarTodosUsuarios();
+    $usuarios = $userData;
+
+} catch (Exception $e) {
+    // Em caso de erro, usar valores padrão
+    
+}
 // Buscar todos os itens disponíveis
 try {
     $itensModel = new Itens($pdo);
@@ -46,10 +61,10 @@ try {
     $itens_disponiveis = [];
 }
 
-// Buscar todas as solicitações com status 'em espera'
+// Buscar todas as solicitações do usuário logado
 try {
     $solicitacoesModel = new Solicitacoes($pdo);
-    $solicitacoes = $solicitacoesModel->buscarTodasSolicitacoes();
+    $solicitacoes = $solicitacoesModel->buscarTodasSolicitacoes($id_usuario);
 } catch (Exception $e) {
     $erros[] = "Erro ao buscar solicitações: " . $e->getMessage();
     $solicitacoes = [];
@@ -188,6 +203,7 @@ function getStatusClass($status)
                             <span>Dashboard</span>
                         </a>
                     </li>
+                    <?php if($_SESSION['usuariologado']['TIPO'] == 'admin'){?>
                     <li>
                         <a href="estoque.php"
                             class="flex items-center px-6 py-3 text-white font-semibold hover:text-white hover:bg-green-light hover:bg-opacity-20 transition-all duration-200">
@@ -199,7 +215,6 @@ function getStatusClass($status)
                             <span>Estoque</span>
                         </a>
                     </li>
-                    <?php if($_SESSION['admin']){?>
                     <li>
                         <a href="./admin/itens_cadastro.php"
                             class="flex items-center px-6 py-3 text-white font-semibold hover:text-white hover:bg-green-light hover:bg-opacity-20 transition-all duration-200">
@@ -434,8 +449,6 @@ function getStatusClass($status)
                                             data-quantidade="<?php echo $item['quantidade']; ?>"
                                             data-unidade="<?php echo htmlspecialchars($item['unidade'], ENT_QUOTES, 'UTF-8'); ?>">
                                             <?php echo htmlspecialchars($item['nome'], ENT_QUOTES, 'UTF-8'); ?>
-                                            (<?php echo $item['quantidade']; ?>
-                                            <?php echo htmlspecialchars($item['unidade'], ENT_QUOTES, 'UTF-8'); ?>)
                                         </option>
                                     <?php endforeach; ?>
                                 </select>
@@ -457,7 +470,28 @@ function getStatusClass($status)
                                     placeholder="Digite a quantidade">
                                 <p class="text-sm text-gray-500 mt-1" id="estoque-info"></p>
                             </div>
+                            
                         </div>
+
+                        <div>
+                                <label for="id_usuario"
+                                    class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                                    <svg class="icon icon-box mr-2 text-gray-500" viewBox="0 0 24 24">
+                                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                                        <polyline points="3.27,6.96 12,12.01 20.73,6.96"/>
+                                        <line x1="12" y1="22.08" x2="12" y2="12"/>
+                                    </svg> Selecionar Usuário
+                                </label>
+                                <select id="id_usuario" name="id_usuario" 
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-primary focus:border-transparent transition-colors appearance-none bg-white">
+                                    <option value="">Selecione um usuário...</option>
+                                    <?php foreach ($usuarios as $usuario): ?>
+                                        <option value="<?php echo $usuario['id']; ?>">
+                                            <?php echo htmlspecialchars($usuario['nome'], ENT_QUOTES, 'UTF-8'); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
 
                         <div class="flex justify-end">
                             <button type="submit" name="action" value="criar"
