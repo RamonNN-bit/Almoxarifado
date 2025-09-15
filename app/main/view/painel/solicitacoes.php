@@ -32,6 +32,21 @@ try {
     ];
     $solicitacoes_recentes = [];
 }
+
+
+
+// Buscar estatísticas do dashboard
+try {
+    $solicitacoesModel = new Solicitacoes($pdo);
+
+// Buscar dados do usuário logado
+    $userData = $solicitacoesModel->buscarTodosUsuarios();
+    $usuarios = $userData;
+
+} catch (Exception $e) {
+    // Em caso de erro, usar valores padrão
+    
+}
 // Buscar todos os itens disponíveis
 try {
     $itensModel = new Itens($pdo);
@@ -46,10 +61,10 @@ try {
     $itens_disponiveis = [];
 }
 
-// Buscar todas as solicitações com status 'em espera'
+// Buscar todas as solicitações do usuário logado
 try {
     $solicitacoesModel = new Solicitacoes($pdo);
-    $solicitacoes = $solicitacoesModel->buscarTodasSolicitacoes();
+    $solicitacoes = $solicitacoesModel->buscarTodasSolicitacoes($id_usuario);
 } catch (Exception $e) {
     $erros[] = "Erro ao buscar solicitações: " . $e->getMessage();
     $solicitacoes = [];
@@ -188,6 +203,7 @@ function getStatusClass($status)
                             <span>Dashboard</span>
                         </a>
                     </li>
+                    <?php if($_SESSION['usuariologado']['TIPO'] == 'admin'){?>
                     <li>
                         <a href="estoque.php"
                             class="flex items-center px-6 py-3 text-white font-semibold hover:text-white hover:bg-green-light hover:bg-opacity-20 transition-all duration-200">
@@ -199,7 +215,6 @@ function getStatusClass($status)
                             <span>Estoque</span>
                         </a>
                     </li>
-                    <?php if($_SESSION['admin']){?>
                     <li>
                         <a href="./admin/itens_cadastro.php"
                             class="flex items-center px-6 py-3 text-white font-semibold hover:text-white hover:bg-green-light hover:bg-opacity-20 transition-all duration-200">
@@ -434,8 +449,6 @@ function getStatusClass($status)
                                             data-quantidade="<?php echo $item['quantidade']; ?>"
                                             data-unidade="<?php echo htmlspecialchars($item['unidade'], ENT_QUOTES, 'UTF-8'); ?>">
                                             <?php echo htmlspecialchars($item['nome'], ENT_QUOTES, 'UTF-8'); ?>
-                                            (<?php echo $item['quantidade']; ?>
-                                            <?php echo htmlspecialchars($item['unidade'], ENT_QUOTES, 'UTF-8'); ?>)
                                         </option>
                                     <?php endforeach; ?>
                                 </select>
@@ -457,7 +470,28 @@ function getStatusClass($status)
                                     placeholder="Digite a quantidade">
                                 <p class="text-sm text-gray-500 mt-1" id="estoque-info"></p>
                             </div>
+                            
                         </div>
+
+                        <div>
+                                <label for="id_usuario"
+                                    class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                                    <svg class="icon icon-box mr-2 text-gray-500" viewBox="0 0 24 24">
+                                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                                        <polyline points="3.27,6.96 12,12.01 20.73,6.96"/>
+                                        <line x1="12" y1="22.08" x2="12" y2="12"/>
+                                    </svg> Selecionar Usuário
+                                </label>
+                                <select id="id_usuario" name="id_usuario" 
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-primary focus:border-transparent transition-colors appearance-none bg-white">
+                                    <option value="">Selecione um usuário...</option>
+                                    <?php foreach ($usuarios as $usuario): ?>
+                                        <option value="<?php echo $usuario['id']; ?>">
+                                            <?php echo htmlspecialchars($usuario['nome'], ENT_QUOTES, 'UTF-8'); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
 
                         <div class="flex justify-end">
                             <button type="submit" name="action" value="criar"
@@ -549,22 +583,38 @@ function getStatusClass($status)
                                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                 <div class="flex space-x-2">
                                                     <?php if ($_SESSION['admin'] && $solicitacao['status'] === 'em espera'): ?>
-                                                        <button onclick="openActionModal(<?php echo $solicitacao['id']; ?>, 'aceitar')" 
-                                                            class="text-green-600 hover:text-green-900 p-1 rounded hover:bg-green-50 transition-colors"
-                                                            title="Aprovar com observação">
-                                                            <svg class="icon icon-check w-5 h-5" viewBox="0 0 24 24">
-                                                                <polyline points="20,6 9,17 4,12"/>
-                                                            </svg>
-                                                        </button>
-                                                        <button onclick="openActionModal(<?php echo $solicitacao['id']; ?>, 'recusar')" 
-                                                            class="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50 transition-colors"
-                                                            title="Rejeitar com observação">
-                                                            <svg class="icon icon-times w-5 h-5" viewBox="0 0 24 24">
-                                                                <line x1="18" y1="6" x2="6" y2="18"/>
-                                                                <line x1="6" y1="6" x2="18" y2="18"/>
-                                                            </svg>
-                                                        </button>
+                                                        <form method="POST" action="../../control/solicitacoesController.php"
+                                                            class="inline">
+                                                            <input type="hidden" name="id_mov"
+                                                                value="<?php echo $solicitacao['id']; ?>">
+                                                            <input type="hidden" name="action" value="aceitar">
+                                                            <button type="submit" class="text-green-600 hover:text-green-900"
+                                                                title="Aprovar">
+                                                                <svg class="icon icon-check" viewBox="0 0 24 24">
+                                                                    <polyline points="20,6 9,17 4,12"/>
+                                                                </svg>
+                                                            </button>
+                                                        </form>
+                                                        <form method="POST" action="../../control/solicitacoesController.php"
+                                                            class="inline">
+                                                            <input type="hidden" name="id_mov"
+                                                                value="<?php echo $solicitacao['id']; ?>">
+                                                            <input type="hidden" name="action" value="recusar">
+                                                            <button type="submit" class="text-red-600 hover:text-red-900"
+                                                                title="Rejeitar">
+                                                                <svg class="icon icon-times" viewBox="0 0 24 24">
+                                                                    <line x1="18" y1="6" x2="6" y2="18"/>
+                                                                    <line x1="6" y1="6" x2="18" y2="18"/>
+                                                                </svg>
+                                                            </button>
+                                                        </form>
                                                     <?php endif; ?>
+                                                    <button class="text-blue-600 hover:text-blue-900" title="Ver detalhes">
+                                                        <svg class="icon icon-eye" viewBox="0 0 24 24">
+                                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                                            <circle cx="12" cy="12" r="3"/>
+                                                        </svg>
+                                                    </button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -676,117 +726,6 @@ function getStatusClass($status)
                     quantidadeInput.max = '';
                 }
             });
-        });
-    </script>
-
-    <!-- Modal de Ação com Observação -->
-    <div id="actionModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 transform transition-all">
-            <div class="p-6">
-                <div class="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-blue-100 rounded-full">
-                    <svg id="modalIcon" class="w-6 h-6 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="20,6 9,17 4,12"></polyline>
-                    </svg>
-                </div>
-                <h3 id="modalTitle" class="text-lg font-semibold text-gray-900 text-center mb-2">Aprovar Solicitação</h3>
-                <p class="text-sm text-gray-600 text-center mb-6">
-                    Adicione uma observação para esta ação (opcional):
-                </p>
-                
-                <form id="actionForm" method="POST" action="../../control/solicitacoesController.php">
-                    <input type="hidden" id="solicitacaoId" name="id_mov" value="">
-                    <input type="hidden" id="actionType" name="action" value="">
-                    
-                    <div class="mb-6">
-                        <label for="observacao" class="block text-sm font-medium text-gray-700 mb-2">
-                            Observação
-                        </label>
-                        <textarea 
-                            id="observacao" 
-                            name="observacao" 
-                            rows="4" 
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-primary focus:border-transparent resize-none"
-                            placeholder="Digite uma observação sobre esta ação..."></textarea>
-                    </div>
-                    
-                    <div class="flex space-x-3">
-                        <button type="button" onclick="closeActionModal()" 
-                            class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200">
-                            Cancelar
-                        </button>
-                        <button type="submit" id="confirmButton"
-                            class="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200">
-                            Confirmar
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Funções do modal de ação
-        function openActionModal(solicitacaoId, action) {
-            const modal = document.getElementById('actionModal');
-            const modalTitle = document.getElementById('modalTitle');
-            const modalIcon = document.getElementById('modalIcon');
-            const confirmButton = document.getElementById('confirmButton');
-            const solicitacaoIdInput = document.getElementById('solicitacaoId');
-            const actionTypeInput = document.getElementById('actionType');
-            const observacaoTextarea = document.getElementById('observacao');
-            
-            // Limpar observação anterior
-            observacaoTextarea.value = '';
-            
-            // Configurar modal baseado na ação
-            if (action === 'aceitar') {
-                modalTitle.textContent = 'Aprovar Solicitação';
-                confirmButton.textContent = 'Aprovar';
-                confirmButton.className = 'flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200';
-                modalIcon.innerHTML = '<polyline points="20,6 9,17 4,12"></polyline>';
-                modalIcon.className = 'w-6 h-6 text-green-600';
-            } else if (action === 'recusar') {
-                modalTitle.textContent = 'Rejeitar Solicitação';
-                confirmButton.textContent = 'Rejeitar';
-                confirmButton.className = 'flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200';
-                modalIcon.innerHTML = '<line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>';
-                modalIcon.className = 'w-6 h-6 text-red-600';
-            }
-            
-            // Configurar valores do formulário
-            solicitacaoIdInput.value = solicitacaoId;
-            actionTypeInput.value = action;
-            
-            // Mostrar modal
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            document.body.style.overflow = 'hidden';
-            
-            // Focar no textarea
-            setTimeout(() => {
-                observacaoTextarea.focus();
-            }, 100);
-        }
-        
-        function closeActionModal() {
-            const modal = document.getElementById('actionModal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-            document.body.style.overflow = 'auto';
-        }
-        
-        // Fechar modal ao clicar fora
-        document.getElementById('actionModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeActionModal();
-            }
-        });
-        
-        // Fechar modal com ESC
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeActionModal();
-            }
         });
     </script>
 </body>

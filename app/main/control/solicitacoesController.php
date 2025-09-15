@@ -1,4 +1,5 @@
 <?php
+
 require_once '../config/auth.php';
 
 // Verificar se é uma requisição POST
@@ -22,12 +23,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id_item = intval($_POST['id_item']);
             $quantidade_solicitada = intval($_POST['quantidade_solicitada']);
             $id_usuario = $_SESSION["usuariologado"]['id'];
+            if (!empty($_POST['id_usuario']))
+            {
+                $id_usuario_s = $_POST['id_usuario'];
+            } else {
+                $id_usuario_s = $_SESSION["usuariologado"]['id'];
+            }
             
-            if (!$id_item || !$quantidade_solicitada || $quantidade_solicitada <= 0) {
+            
+            if (!$id_item || !$quantidade_solicitada || $quantidade_solicitada <= 0 || !$id_usuario_s ) {
                 throw new Exception("Todos os campos obrigatórios devem ser preenchidos corretamente");
             }
             
-            $sucesso = $solicitacoesModel->criarSolicitacao($id_item, $quantidade_solicitada, $id_usuario);
+            $sucesso = $solicitacoesModel->criarSolicitacao($id_item, $quantidade_solicitada, $id_usuario, $id_usuario_s);
             
             if ($sucesso) {
                 $_SESSION['mensagem_sucesso'] = "Solicitação criada com sucesso! Aguarde aprovação.";
@@ -71,4 +79,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Redirecionar de volta para a página de solicitações
 header("Location: ../view/painel/solicitacoes.php");
 exit();
+
 ?>

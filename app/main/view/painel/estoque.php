@@ -2,7 +2,7 @@
 require_once '../../config/auth.php';
 
 // Verificar se está logado e redirecionar se necessário
-requireLogin(null, 'estoque.php');
+requireLogin('admin', 'estoque.php');
 
 // Incluir arquivos necessários
 require_once '../../config/db.php';

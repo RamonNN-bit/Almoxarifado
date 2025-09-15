@@ -45,10 +45,10 @@ try {
     $itens_disponiveis = [];
 }
 
-// Buscar todas as solicitações com status 'em espera'
+// Buscar todas as solicitações do usuário logado
 try {
     $solicitacoesModel = new Solicitacoes($pdo);
-    $solicitacoes = $solicitacoesModel->buscarTodasSolicitacoes();
+    $solicitacoes = $solicitacoesModel->buscarTodasSolicitacoes($id_usuario);
 } catch (Exception $e) {
     $erros[] = "Erro ao buscar solicitações: " . $e->getMessage();
     $solicitacoes = [];
@@ -72,8 +72,8 @@ try {
         return $item['quantidade'] == 0;
     });
 
-    // Buscar todas as solicitações
-    $solicitacoes = $solicitacoesModel->buscarTodasSolicitacoes();
+    // Buscar todas as solicitações do usuário logado
+    $solicitacoes = $solicitacoesModel->buscarTodasSolicitacoes($id_usuario);
 
     // Calcular estatísticas de solicitações
     $solicitacoes_hoje = array_filter($solicitacoes, function ($s) {
@@ -248,16 +248,6 @@ try {
                                 <polyline points="9,22 9,12 15,12 15,22"/>
                             </svg>
                             <span>Dashboard</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="../estoque.php" class="flex items-center px-6 py-3 text-white font-semibold hover:text-white hover:bg-green-light hover:bg-opacity-20 transition-all duration-200">
-                            <svg class="icon icon-boxes w-5 mr-3" viewBox="0 0 24 24">
-                                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-                                <polyline points="3.27,6.96 12,12.01 20.73,6.96"/>
-                                <line x1="12" y1="22.08" x2="12" y2="12"/>
-                            </svg>
-                            <span>Estoque</span>
                         </a>
                     </li>
                     <li>

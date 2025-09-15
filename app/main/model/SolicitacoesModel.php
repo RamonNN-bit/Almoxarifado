@@ -9,7 +9,7 @@ class Solicitacoes {
     }
 
     // Criar nova solicitação
-    public function criarSolicitacao($id_item, $quantidade_solicitada, $id_usuario) {
+    public function criarSolicitacao($id_item, $quantidade_solicitada, $id_usuario, $id_usuario_s) {
         try {
             $this->pdo->beginTransaction();
             
@@ -28,14 +28,15 @@ class Solicitacoes {
             }
             
             // Criar solicitação com status 'em espera'
-            $sql_solicitacao = "INSERT INTO movimentacoes (id_item, tipo, status, quantidade, data, id_usuario) 
-                               VALUES (:id_item, 'saida', 'em espera', :quantidade, NOW(), :id_usuario)";
+            $sql_solicitacao = "INSERT INTO movimentacoes (id_item, tipo, status, quantidade, data, id_usuario, id_solicitante) 
+                               VALUES (:id_item, 'saida', 'em espera', :quantidade, NOW(), :id_usuario, :id_usuario_s)";
             
             $stmt_solicitacao = $this->pdo->prepare($sql_solicitacao);
             $resultado = $stmt_solicitacao->execute([
                 ':id_item' => $id_item,
                 ':quantidade' => $quantidade_solicitada,
-                ':id_usuario' => $id_usuario
+                ':id_usuario' => $id_usuario,
+                ':id_usuario_s' => $id_usuario_s
             ]);
             
             if ($resultado) {
@@ -53,15 +54,27 @@ class Solicitacoes {
     }
 
     // Buscar todas as solicitações com informações dos itens
-    public function buscarTodasSolicitacoes() {
-        $sql = "SELECT m.*, i.nome as item_nome, i.unidade, u.nome as usuario_nome 
-                FROM movimentacoes m 
-                INNER JOIN itens i ON m.id_item = i.id 
-                INNER JOIN usuario u ON m.id_usuario = u.id 
-                WHERE m.tipo = 'saida'
-                ORDER BY m.data DESC, m.id DESC";
-        
-        $stmt = $this->pdo->query($sql);
+    public function buscarTodasSolicitacoes($id_usuario = null) {
+        if ($_SESSION['usuariologado']['TIPO'] == 'usuario') {
+            $sql = "SELECT m.*, i.nome as item_nome, i.unidade, u.nome as usuario_nome 
+                    FROM movimentacoes m 
+                    INNER JOIN itens i ON m.id_item = i.id 
+                    INNER JOIN usuario u ON m.id_usuario = u.id 
+                    WHERE m.tipo = 'saida' AND m.id_usuario = :id_usuario
+                    ORDER BY m.data DESC, m.id DESC";
+            
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([':id_usuario' => $id_usuario]);
+        } else {
+            $sql = "SELECT m.*, i.nome as item_nome, i.unidade, u.nome as usuario_nome 
+                    FROM movimentacoes m 
+                    INNER JOIN itens i ON m.id_item = i.id 
+                    INNER JOIN usuario u ON m.id_usuario = u.id 
+                    WHERE m.tipo = 'saida'
+                    ORDER BY m.data DESC, m.id DESC";
+            
+            $stmt = $this->pdo->query($sql);
+        }
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
@@ -77,6 +90,8 @@ class Solicitacoes {
         $stmt->execute([':id_usuario' => $id_usuario]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+
 
     // Aprovar solicitação (atualizar estoque e status)
     public function aprovarSolicitacao($id_solicitacao) {
@@ -208,5 +223,12 @@ class Solicitacoes {
             throw $e;
         }
     }
+
+    public function buscarTodosUsuarios() {
+        $sql = "SELECT * FROM usuario ORDER BY id DESC";
+        $stmt = $this->pdo->query($sql);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    
 }
 ?>
