@@ -267,7 +267,7 @@ try {
                             </button>
                         </div>
                         <div class="flex items-center space-x-3">
-                            <img src="https://ui-avatars.com/api/?name=Admin&background=059669&color=ffffff"
+                            <img src="https://ui-avatars.com/api/?name=<?php echo substr($nome_usuario, 0, 2); ?>&background=059669&color=ffffff"
                                 class="w-8 h-8 rounded-full">
                             <div class="hidden md:block">
                                 <?php if ($_SESSION['admin']) { ?>
@@ -298,49 +298,49 @@ try {
                 <!-- Cards de Estatísticas -->
                 <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
                     <div class="stat-card-gradient-1 rounded-xl p-6 text-white card-hover">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-green-100 text-sm font-medium uppercase tracking-wide">Solicitações Pendentes</p>
-                                <p class="text-3xl font-bold mt-2"><?php echo $pendentesCount;?></p>
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-white bg-opacity-20">
+                                <i class="fas fa-clock text-xl"></i>
                             </div>
-                            <div class="bg-white bg-opacity-20 rounded-lg p-3">
-                                <i class="fas fa-clock text-2xl"></i>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-green-100">Solicitações Pendentes</p>
+                                <p class="text-2xl font-semibold"><?php echo $pendentesCount;?></p>
                             </div>
                         </div>
                     </div>
 
                     <div class="stat-card-gradient-2 rounded-xl p-6 text-white card-hover">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-green-100 text-sm font-medium uppercase tracking-wide">Solicitações Aprovadas</p>
-                                <p class="text-3xl font-bold mt-2"><?php echo $estatisticas['solicitacoes_aprovadas']; ?></p>
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-white bg-opacity-20">
+                                <i class="fas fa-check-circle text-xl"></i>
                             </div>
-                            <div class="bg-white bg-opacity-20 rounded-lg p-3">
-                                <i class="fas fa-check-circle text-2xl"></i>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-green-100">Solicitações Aprovadas</p>
+                                <p class="text-2xl font-semibold"><?php echo $estatisticas['solicitacoes_aprovadas']; ?></p>
                             </div>
                         </div>
                     </div>
 
                     <div class="stat-card-gradient-3 rounded-xl p-6 text-white card-hover">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-orange-100 text-sm font-medium uppercase tracking-wide">Itens Solicitados</p>
-                                <p class="text-3xl font-bold mt-2"><?php echo $estatisticas['itens_solicitados']; ?></p>
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-white bg-opacity-20">
+                                <i class="fas fa-tools text-xl"></i>
                             </div>
-                            <div class="bg-white bg-opacity-20 rounded-lg p-3">
-                                <i class="fas fa-tools text-2xl"></i>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-yellow-100">Itens Solicitados</p>
+                                <p class="text-2xl font-semibold"><?php echo $estatisticas['itens_solicitados']; ?></p>
                             </div>
                         </div>
                     </div>
 
                     <div class="stat-card-gradient-4 rounded-xl p-6 text-white card-hover">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-red-100 text-sm font-medium uppercase tracking-wide">Itens Disponíveis</p>
-                                <p class="text-3xl font-bold mt-2"><?php echo $estatisticas['itens_disponiveis']; ?></p>
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-white bg-opacity-20">
+                                <i class="fas fa-boxes text-xl"></i>
                             </div>
-                            <div class="bg-white bg-opacity-20 rounded-lg p-3">
-                                <i class="fas fa-boxes text-2xl"></i>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-red-100">Itens Disponíveis</p>
+                                <p class="text-2xl font-semibold"><?php echo $estatisticas['itens_disponiveis']; ?></p>
                             </div>
                         </div>
                     </div>

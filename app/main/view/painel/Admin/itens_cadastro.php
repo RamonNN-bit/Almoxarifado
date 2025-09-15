@@ -206,7 +206,7 @@ try {
                             </button>
                         </div>
                         <div class="flex items-center space-x-3">
-                            <img src="https://ui-avatars.com/api/?name=Admin&background=059669&color=ffffff"
+                            <img src="https://ui-avatars.com/api/?name=<?php echo substr($nome_usuario, 0, 2); ?>&background=059669&color=ffffff"
                                 class="w-8 h-8 rounded-full">
                             <div class="hidden md:block">
                                 <?php if ($_SESSION['admin']) { ?>
