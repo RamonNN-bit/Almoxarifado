@@ -76,6 +76,7 @@ function getStatusClass($status)
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../../assets/images/brasao.png" type="image/x-icon">
     <title>Solicitações - Almoxarifado</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -595,6 +596,21 @@ function getStatusClass($status)
 
     <!-- Scripts JavaScript -->
     <script>
+        // Modal de Logout - Funções globais
+        function showLogoutModal() {
+            const modal = document.getElementById('logoutModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function hideLogoutModal() {
+            const modal = document.getElementById('logoutModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.style.overflow = 'auto';
+        }
+
         // Toggle da sidebar
         document.addEventListener('DOMContentLoaded', function () {
             const sidebarToggle = document.getElementById('sidebarToggle');
@@ -606,21 +622,6 @@ function getStatusClass($status)
                     sidebar.classList.toggle('-translate-x-full');
                     content.classList.toggle('ml-0');
                 });
-            }
-
-            // Modal de Logout
-            function showLogoutModal() {
-                const modal = document.getElementById('logoutModal');
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
-                document.body.style.overflow = 'hidden';
-            }
-
-            function hideLogoutModal() {
-                const modal = document.getElementById('logoutModal');
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
-                document.body.style.overflow = 'auto';
             }
 
             // Fechar modal ao clicar fora

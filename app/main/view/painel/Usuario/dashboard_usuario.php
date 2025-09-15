@@ -115,7 +115,7 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Usuário - Almoxarifado</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="icon" href="../assets/images/brasao.png" type="image/x-icon">
+    <link rel="icon" href="../../../assets/images/brasao.png" type="image/x-icon">
         <link rel="stylesheet" href="../../../assets/css/icons.css">
     <script>
         tailwind.config = {
@@ -474,6 +474,24 @@ try {
                 </div>
                 </div>
                 
+                <!-- Footer -->
+                <footer class="mt-12 py-6 w-full">
+                    <div class="flex flex-col sm:flex-row items-center justify-center text-sm text-gray-500 gap-2">
+                        <div class="text-center">
+                            Copyright &copy; Prefeitura de Maranguape Sistema de Almoxarifado 2025
+                        </div>
+                        <span class="hidden sm:inline mx-2">&middot;</span>
+                        <div class="text-center">
+                            Desenvolvido por: Fulano, Beltrano e Ciclano
+                        </div>
+                        <span class="hidden sm:inline mx-2">&middot;</span>
+                        <div class="mt-2 sm:mt-0">
+                            <a href="#" class="hover:text-green-primary">Política de Privacidade</a>
+                            <span class="mx-2">&middot;</span>
+                            <a href="#" class="hover:text-green-primary">Termos de Uso</a>
+                        </div>
+                    </div>
+                </footer>
             </div>
         </div>
     </div>
