@@ -228,7 +228,7 @@ if (isLoggedIn()) {
                 
                 <!-- Header do formulário -->
                 <div class="text-center mb-4 sm:mb-6">
-                    <div class="inline-block p-3 sm:p-4 rounded-2xl bg-green-light mb-6">
+                    <div class="inline-block mb-6">
                         <img src="../assets/images/brasao.png" 
                              alt="Logo EEEP Salaberga" 
                              class="w-12 h-12 sm:w-16 sm:h-16 object-contain">
