@@ -124,11 +124,11 @@ function getStatusEstoque($quantidade) {
         }
         
         .stat-card-gradient-3 {
-            background: linear-gradient(135deg, 'text-yellow-800' 0%, '#f97316' 100%);
+            background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
         }
         
         .stat-card-gradient-4 {
-            background: linear-gradient(135deg, '#dc2626' 0%, '#ef4444' 100%);
+            background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
         }
         
         .card-hover {
@@ -194,14 +194,7 @@ function getStatusEstoque($quantidade) {
                             <span>Solicitações</span>
                         </a>
                     </li>
-                    <?php if($_SESSION['admin']){?>
-                    <li>
-                        <a href="./admin/usuarios.php" class="flex items-center px-6 py-3 text-green-100 hover:text-white hover:bg-green-light hover:bg-opacity-20 transition-all duration-200">
-                            <i class="fas fa-users w-5 mr-3"></i>
-                            <span>Usuários</span>
-                        </a>
-                    </li>
-                    <?php }?>
+
                     <li class="mt-8">
                         <a href="../logout.php" class="flex items-center px-6 py-3 text-green-100 hover:text-white hover:bg-red-600 hover:bg-opacity-20 transition-all duration-200">
                             <i class="fas fa-sign-out-alt w-5 mr-3"></i>
