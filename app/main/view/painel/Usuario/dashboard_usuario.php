@@ -428,17 +428,6 @@ try {
                 </div>
                 </div>
                 
-                <!-- Footer -->
-                <footer class="mt-12 py-6">
-                    <div class="flex flex-col sm:flex-row items-center justify-between text-sm text-gray-500">
-                        <div>Copyright &copy; Sistema de Almoxarifado 2023</div>
-                        <div class="mt-2 sm:mt-0">
-                            <a href="#" class="hover:text-green-primary">Política de Privacidade</a>
-                            <span class="mx-2">&middot;</span>
-                            <a href="#" class="hover:text-green-primary">Termos de Uso</a>
-                        </div>
-                    </div>
-                </footer>
             </div>
         </div>
     </div>

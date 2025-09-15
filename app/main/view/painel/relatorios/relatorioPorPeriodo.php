@@ -14,12 +14,12 @@ if (isset($_GET['acao']) && $_GET['acao'] === 'pdf') {
     $dtIni = date('Y-m-d', strtotime($dataInicio));
     $dtFim = date('Y-m-d', strtotime($dataFim));
 
-    // Ajuste de nomes de campos conforme SQL (usando timestamp em movimentacoes)
-    $sql = "SELECT m.id, m.id_item, m.tipo, m.quantidade, m.timestamp AS data_movimentacao, i.nome AS nome_item
+    // Ajuste de nomes de campos conforme SQL (banco.sql define `data` em movimentacoes)
+    $sql = "SELECT m.id, m.id_item, m.tipo, m.quantidade, m.data AS data_movimentacao, i.nome AS nome_item
             FROM movimentacoes m
             LEFT JOIN itens i ON i.id = m.id_item
-            WHERE DATE(m.timestamp) BETWEEN ? AND ?
-            ORDER BY m.timestamp ASC, m.id ASC";
+            WHERE m.data BETWEEN ? AND ?
+            ORDER BY m.data ASC, m.id ASC";
 
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$dtIni, $dtFim]);
@@ -152,6 +152,24 @@ if (isset($_GET['acao']) && $_GET['acao'] === 'pdf') {
             <button type="submit">Gerar PDF</button>
         </form>
     </div>
+    <!-- Footer -->
+    <footer class="mt-12 py-6 w-full">
+        <div class="flex flex-col sm:flex-row items-center justify-center text-sm text-gray-500 gap-2">
+            <div class="text-center">
+                Copyright &copy; Sistema de Almoxarifado 2025
+            </div>
+            <span class="hidden sm:inline mx-2">&middot;</span>
+            <div class="text-center">
+                Desenvolvido por: Fulano, Beltrano e Ciclano
+            </div>
+            <span class="hidden sm:inline mx-2">&middot;</span>
+            <div class="mt-2 sm:mt-0">
+                <a href="#" class="hover:text-green-primary">Política de Privacidade</a>
+                <span class="mx-2">&middot;</span>
+                <a href="#" class="hover:text-green-primary">Termos de Uso</a>
+            </div>
+        </div>
+    </footer>
 </body>
 </html>
 

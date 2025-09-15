@@ -173,8 +173,8 @@ function getCategoria($nome) {
         }
     </style>
 </head>
-<body class="bg-gray-50 font-sans">
-    <div class="flex">
+<body class="bg-gray-50 font-sans min-h-screen flex flex-col">
+    <div class="flex flex-1">
         <!-- Sidebar -->
         <div id="sidebar" class="w-64 sidebar-gradient text-white h-screen fixed transition-transform -translate-x-full md:translate-x-0 duration-300 z-50 shadow-xl">
             <div class="p-6 text-center border-b border-green-light border-opacity-20 bg-black bg-opacity-10">
