@@ -84,24 +84,6 @@ function getStatusEstoque($quantidade) {
         return ['status' => 'Normal', 'class' => 'bg-green-100 text-green-800'];
     }
 }
-
-// Função para determinar a categoria baseada no nome
-function getCategoria($nome) {
-    $nome = strtolower($nome);
-    if (strpos($nome, 'parafuso') !== false || strpos($nome, 'porca') !== false || strpos($nome, 'arruela') !== false) {
-        return 'Fixadores';
-    } elseif (strpos($nome, 'fita') !== false || strpos($nome, 'cabo') !== false || strpos($nome, 'resistor') !== false) {
-        return 'Elétrica';
-    } elseif (strpos($nome, 'chave') !== false || strpos($nome, 'martelo') !== false || strpos($nome, 'alicate') !== false) {
-        return 'Ferramentas';
-    } elseif (strpos($nome, 'luva') !== false || strpos($nome, 'capacete') !== false || strpos($nome, 'óculos') !== false) {
-        return 'EPI';
-    } else {
-        return 'Componentes';
-    }
-
-    
-}
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -142,11 +124,11 @@ function getCategoria($nome) {
         }
         
         .stat-card-gradient-3 {
-            background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+            background: linear-gradient(135deg, 'text-yellow-800' 0%, '#f97316' 100%);
         }
         
         .stat-card-gradient-4 {
-            background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+            background: linear-gradient(135deg, '#dc2626' 0%, '#ef4444' 100%);
         }
         
         .card-hover {
@@ -284,7 +266,7 @@ function getCategoria($nome) {
 
                 <!-- Cards de estatísticas -->
                 <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
-                    <div class="stat-card-gradient-1 rounded-lg p-3 sm:p-4 text-white card-hover">
+                    <div class="bg-green-500 rounded-lg p-3 sm:p-4 text-white card-hover">
                         <div class="flex items-center">
                             <div class="p-2 rounded-full bg-white bg-opacity-20">
                                 <i class="fas fa-boxes text-sm sm:text-base"></i>
@@ -296,7 +278,7 @@ function getCategoria($nome) {
                         </div>
                     </div>
                     
-                    <div class="stat-card-gradient-4 rounded-lg p-3 sm:p-4 text-white card-hover">
+                    <div class="bg-red-500 rounded-lg p-3 sm:p-4 text-white card-hover">
                         <div class="flex items-center">
                             <div class="p-2 rounded-full bg-white bg-opacity-20">
                                 <i class="fas fa-exclamation-triangle text-sm sm:text-base"></i>
@@ -313,7 +295,7 @@ function getCategoria($nome) {
                         </div>
                     </div>
                     
-                    <div class="stat-card-gradient-3 rounded-lg p-3 sm:p-4 text-white card-hover">
+                    <div class="bg-yellow-500 rounded-lg p-3 sm:p-4 text-white card-hover">
                         <div class="flex items-center">
                             <div class="p-2 rounded-full bg-white bg-opacity-20">
                                 <i class="fas fa-exclamation-circle text-sm sm:text-base"></i>
@@ -330,7 +312,7 @@ function getCategoria($nome) {
                         </div>
                     </div>
                     
-                    <div class="stat-card-gradient-2 rounded-lg p-3 sm:p-4 text-white card-hover">
+                    <div class="bg-green-600 rounded-lg p-3 sm:p-4 text-white card-hover">
                         <div class="flex items-center">
                             <div class="p-2 rounded-full bg-white bg-opacity-20">
                                 <i class="fas fa-check-circle text-sm sm:text-base"></i>
@@ -476,32 +458,25 @@ function getCategoria($nome) {
                     content.classList.toggle('ml-0');
                 });
             }
-        });
 
-        // Funcionalidade de busca e filtros
-        document.addEventListener('DOMContentLoaded', function() {
-            const searchInput = document.getElementById('searchInput');
+            // Funcionalidade de busca e filtros
             const filterNome = document.getElementById('filterNome');
             const filterStatus = document.getElementById('filterStatus');
-            const filterCategoria = document.getElementById('filterCategoria');
             const clearFilters = document.getElementById('clearFilters');
             const rows = document.querySelectorAll('.item-row');
 
             function filterTable() {
                 const nomeFilter = filterNome.value.toLowerCase();
                 const statusFilter = filterStatus.value.toLowerCase();
-                const categoriaFilter = filterCategoria.value;
 
                 rows.forEach(row => {
                     const nome = row.dataset.nome;
                     const status = row.dataset.status;
-                    const categoria = row.dataset.categoria;
 
                     const nomeMatch = nome.includes(nomeFilter);
                     const statusMatch = !statusFilter || status === statusFilter;
-                    const categoriaMatch = !categoriaFilter || categoria === categoriaFilter;
 
-                    if (nomeMatch && statusMatch && categoriaMatch) {
+                    if (nomeMatch && statusMatch) {
                         row.style.display = '';
                     } else {
                         row.style.display = 'none';
@@ -512,26 +487,11 @@ function getCategoria($nome) {
             // Event listeners
             filterNome.addEventListener('input', filterTable);
             filterStatus.addEventListener('change', filterTable);
-            filterCategoria.addEventListener('change', filterTable);
 
             clearFilters.addEventListener('click', function() {
                 filterNome.value = '';
                 filterStatus.value = '';
-                filterCategoria.value = '';
                 filterTable();
-            });
-
-            // Busca global
-            searchInput.addEventListener('input', function() {
-                const searchTerm = this.value.toLowerCase();
-                rows.forEach(row => {
-                    const nome = row.dataset.nome;
-                    if (nome.includes(searchTerm)) {
-                        row.style.display = '';
-                    } else {
-                        row.style.display = 'none';
-                    }
-                });
             });
         });
 
@@ -546,7 +506,7 @@ function getCategoria($nome) {
                 const bText = b.cells[columnIndex].textContent.trim();
                 
                 // Para números (ID e quantidade)
-                if (columnIndex === 0 || columnIndex === 3) {
+                if (columnIndex === 0 || columnIndex === 2) {
                     return parseInt(aText.replace('#', '')) - parseInt(bText.replace('#', ''));
                 }
                 
