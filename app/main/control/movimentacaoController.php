@@ -1,61 +1,56 @@
 <?php
-namespace App\Main\Control;
+// Garantir que a sessão esteja iniciada
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 
-use App\Model\Movimentacao;
+// Incluir o modelo de itens e a conexão com o banco de dados
+require_once __DIR__ . '/../model/ItensModel.php';
+require_once __DIR__ . '/../config/db.php';
 
-class MovimentacaoController {
+// Verificar se a conexão com o banco de dados foi estabelecida
+if (!isset($pdo) || !($pdo instanceof PDO)) {
+    $_SESSION['erro'] = 'Erro de conexão com o banco de dados.';
+    header('Location: ../view/painel/Admin/itens_cadastro.php');
+    exit;
+}
 
-    // Exibe a view de registro da movimentação
-    public function index() {
-        // Certifique-se que o caminho da view está correto
-        $viewPath = __DIR__ . '../view/registrarmovimentacao.php'; 
-        if (file_exists($viewPath)) {
-            require_once $viewPath;
-        } else {
-            echo "Erro: View não encontrada!";
-        }
-    }
-
-    // Método para registrar movimentação, recebendo parâmetros
-    public function registrar($id_item, $tipo, $quantidade, $data, $id_usuario) {
-        // Validação simples
-        if (empty($id_item) || empty($tipo) || empty($quantidade) || empty($data) || empty($id_usuario)) {
-            echo "Erro: Todos os campos são obrigatórios!";
-            return;
-        }
-
-        // Normaliza e limpa o tipo para evitar problemas com acentos
-        $tipo = mb_strtolower($tipo);
-        $tipo = str_replace('á', 'a', $tipo);
-
-        if (!in_array($tipo, ['entrada', 'saida'])) {
-            echo "Erro: Tipo deve ser 'entrada' ou 'saida'!";
-            return;
-        }
-
-        if (!is_numeric($quantidade) || $quantidade <= 0) {
-            echo "Erro: Quantidade deve ser maior que zero!";
-            return;
-        }
-
-        // Evita erros passando apenas dados válidos
-        $id_item = (int) $id_item;
-        $quantidade = (int) $quantidade;
-        $id_usuario = (int) $id_usuario;
-
+// Verificar se é uma requisição POST para incrementar quantidade
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao']) && $_POST['acao'] === 'incrementar') {
+    $idItem = (int) ($_POST['id_item'] ?? 0);
+    $qtdAdd = (int) ($_POST['quantidade'] ?? 0);
+    
+    if ($idItem > 0 && $qtdAdd > 0) {
         try {
-            $movimentacao = new Movimentacao();
-            $resultado = $movimentacao->registrar($id_item, $tipo, $quantidade, $data, $id_usuario);
-
-            if ($resultado) {
-                echo "Movimentação de " . $tipo . " registrada com sucesso!";
+            $itensModel = new Itens($pdo);
+            if ($itensModel->incrementarQuantidade($idItem, $qtdAdd)) {
+                $_SESSION['mensagem_sucesso'] = 'Quantidade adicionada com sucesso!';
             } else {
-                echo "Erro ao registrar a movimentação.";
+                // Registrar o erro em log para diagnóstico
+                error_log("Falha ao incrementar quantidade do item ID: $idItem. Quantidade: $qtdAdd");
+                $_SESSION['erro'] = 'Não foi possível adicionar a quantidade. Verifique os logs para mais detalhes.';
+                
+                // Verificar se o item existe
+                $checkItem = $pdo->prepare("SELECT id FROM itens WHERE id = ?");
+                $checkItem->execute([$idItem]);
+                if ($checkItem->rowCount() === 0) {
+                    error_log("Item ID $idItem não encontrado no banco de dados");
+                    $_SESSION['erro'] = 'Item não encontrado no banco de dados.';
+                }
             }
         } catch (\Exception $e) {
-            // Exibe o erro para debugging (apenas em desenvolvimento)
-            echo "Erro inesperado: " . $e->getMessage();
+            // Registrar a exceção em log
+            error_log("Exceção ao incrementar quantidade: " . $e->getMessage());
+            $_SESSION['erro'] = 'Erro ao processar a solicitação: ' . $e->getMessage();
         }
+    } else {
+        $_SESSION['erro'] = 'Selecione um item e informe uma quantidade válida.';
     }
+    
+    // Redirecionar de volta para a página de cadastro
+    header('Location: ../view/painel/Admin/itens_cadastro.php');
+    exit;
 }
+
+// Fim do arquivo
 ?>

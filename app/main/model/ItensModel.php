@@ -1,5 +1,9 @@
 <?php
 require_once __DIR__ . '/../config/db.php';
+// Garantir que a sessão esteja iniciada
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 class Itens {
     private $pdo;
 
@@ -24,6 +28,9 @@ class Itens {
 
     // Criar novo item no banco de dados
     public function criar($nome, $quantidade, $unidade, $marca, $modelo) {
+        // Converter unidade para string se necessário, já que na tabela está definido como INT
+        $unidade_valor = is_numeric($unidade) ? (int)$unidade : $unidade;
+        
         $sql = "INSERT INTO itens (nome, quantidade, unidade, marca, modelo) 
                 VALUES (:nome, :quantidade, :unidade, :marca, :modelo)";
         
@@ -32,7 +39,7 @@ class Itens {
         return $stmt->execute([
             ':nome' => $nome,
             ':quantidade' => $quantidade,
-            ':unidade' => $unidade,
+            ':unidade' => $unidade_valor,
             ':marca' => $marca,
             ':modelo' => $modelo
         ]);
@@ -44,26 +51,71 @@ class Itens {
             return false;
         }
     
-        if (!isset($_SESSION['usuariologado']['id'])) {
+        if (!isset($_SESSION['id'])) {
             return false; // Usuário não está logado
         }
     
         $this->pdo->beginTransaction();
         try {
+            // Verificar se o item existe
+            $checkSql = "SELECT id FROM itens WHERE id = :id";
+            $checkStmt = $this->pdo->prepare($checkSql);
+            $checkStmt->execute([':id' => $id_item]);
+            
+            if ($checkStmt->rowCount() === 0) {
+                // Item não existe
+                $this->pdo->rollBack();
+                error_log("Erro ao incrementar quantidade: Item não existe");
+                return false;
+            }
+            
             // Atualiza a quantidade na tabela itens
             $sql = "UPDATE itens SET quantidade = quantidade + :qtd WHERE id = :id";
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([':qtd' => $quantidadeAdicionar, ':id' => $id_item]);
+            
+            if ($stmt->rowCount() === 0) {
+                // Nenhuma linha foi atualizada
+                $this->pdo->rollBack();
+                error_log("Erro ao incrementar quantidade: Nenhuma linha foi atualizada");
+                return false;
+            }
     
             // Insere a movimentação na tabela movimentacoes
-            $sqlInsert = "INSERT INTO movimentacoes (id_item, tipo, quantidade, id_usuario, status, timestamp) 
-                          VALUES (:id_item, 'entrada', :quantidade, :id_usuario, 'em espera', NOW())";
+            // Verificando a estrutura da tabela movimentacoes no banco.sql
+            // Campos: id, id_item, tipo, quantidade, data, timestamp, status, id_usuario
+            $sqlInsert = "INSERT INTO movimentacoes (id_item, tipo, quantidade, id_usuario, status, data) 
+                          VALUES (:id_item, 'entrada', :quantidade, :id_usuario, 'em espera', CURDATE())";
             $stmtInsert = $this->pdo->prepare($sqlInsert);
-            $stmtInsert->execute([
-                ':id_item' => $id_item,
-                ':quantidade' => $quantidadeAdicionar,
-                ':id_usuario' => $_SESSION['usuariologado']['id']
-            ]);
+            
+            try {
+                // Log para diagnóstico antes da execução
+                error_log("Tentando inserir movimentação: ID Item=$id_item, Quantidade=$quantidadeAdicionar, ID Usuário={$_SESSION['id']}");
+                
+                $result = $stmtInsert->execute([
+                    ':id_item' => $id_item,
+                    ':quantidade' => $quantidadeAdicionar,
+                    ':id_usuario' => $_SESSION['id']
+                ]);
+                
+                // Registrar o erro específico se houver
+                if (!$result) {
+                    $errorInfo = $stmtInsert->errorInfo();
+                    error_log("Erro SQL ao inserir movimentação: " . json_encode($errorInfo));
+                } else {
+                    error_log("Movimentação inserida com sucesso. ID da movimentação: " . $this->pdo->lastInsertId());
+                }
+            } catch (PDOException $ex) {
+                error_log("Exceção ao inserir movimentação: " . $ex->getMessage());
+                $result = false;
+            }
+            
+            if (!$result) {
+                // Erro ao inserir na tabela de movimentações
+                $this->pdo->rollBack();
+                error_log("Erro ao incrementar quantidade: Falha ao inserir movimentação");
+                return false;
+            }
     
             $this->pdo->commit();
             return true;

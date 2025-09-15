@@ -333,7 +333,7 @@ try {
                 <!-- Adicionar quantidade a item existente -->
                 <div class="bg-white rounded-xl shadow-sm p-6 mb-8">
                     <h2 class="text-xl font-semibold text-gray-800 mb-6">Adicionar Itens ao Estoque</h2>
-                    <form method="POST" class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+                    <form method="POST" action="../../../control/movimentacaoController.php" class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
                         <input type="hidden" name="acao" value="incrementar">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Selecionar Item</label>
