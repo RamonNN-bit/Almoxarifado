@@ -203,7 +203,7 @@ if (isLoggedIn()) {
                     </div>
                     
                     <h1 class="text-3xl lg:text-5xl font-bold mb-6 leading-tight">
-                     <span class="text-green-light">Secretaria De Educação</span>
+                     <span class="text-green-light">Secretaria Da Educação</span>
                     </h1>
                     
                     <p class="text-lg lg:text-xl mb-8 max-w-md leading-relaxed opacity-90">
