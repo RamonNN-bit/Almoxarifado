@@ -168,6 +168,34 @@ try {
             border-left: 3px solid #10b981;
         }
         
+        /* Mobile sidebar overlay */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 40;
+            display: none;
+        }
+        
+        .sidebar-overlay.active {
+            display: block;
+        }
+        
+        /* Mobile sidebar improvements */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease-in-out;
+            }
+            
+            .sidebar.open {
+                transform: translateX(0);
+            }
+        }
+        
         .badge-green {
             background-color: #059669;
         }
@@ -199,16 +227,14 @@ try {
 </head>
 <body class="bg-gray-50 font-sans">
     <div class="flex">
+        <!-- Sidebar Overlay for Mobile -->
+        <div id="sidebarOverlay" class="sidebar-overlay"></div>
+        
         <!-- Sidebar -->
-        <div id="sidebar" class="w-64 sidebar-gradient text-white h-screen fixed transition-transform -translate-x-full md:translate-x-0 duration-300 z-50 shadow-xl">
+        <div id="sidebar" class="sidebar w-64 sidebar-gradient text-white h-screen fixed transition-transform -translate-x-full md:translate-x-0 duration-300 z-50 shadow-xl">
             <div class="p-6 text-center border-b border-green-light border-opacity-20 bg-black bg-opacity-10">
                 <div class="flex items-center justify-center">
-                    <svg class="icon icon-warehouse text-2xl mr-3" viewBox="0 0 24 24">
-                        <path d="M3 21h18l-1-7H4l-1 7z"/>
-                        <path d="M3 10h18l-1-7H4l-1 7z"/>
-                        <path d="M9 10v11"/>
-                        <path d="M15 10v11"/>
-                    </svg>
+                    <img src="../../../assets/images/brasao.png" alt="Brasão" class="w-8 h-8 mr-3 object-contain">
                     <span class="text-xl font-bold">Almoxarifado</span>
                 </div>
             </div>
@@ -266,8 +292,12 @@ try {
             <!-- Topbar -->
             <nav class="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
                 <div class="flex items-center justify-between">
-                    <button id="sidebarToggle" class="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100">
-                        <i class="fa fa-bars"></i>
+                    <button id="sidebarToggle" class="md:hidden p-2 rounded-lg text-gray-800 hover:bg-gray-100">
+                        <svg class="icon icon-menu text-xl" viewBox="0 0 24 24">
+                            <line x1="3" y1="6" x2="21" y2="6"/>
+                            <line x1="3" y1="12" x2="21" y2="12"/>
+                            <line x1="3" y1="18" x2="21" y2="18"/>
+                        </svg>
                     </button>
 
                     <div class="hidden sm:flex items-center flex-1 max-w-md mx-4">
@@ -546,12 +576,33 @@ try {
     <!-- Scripts JavaScript para interatividade -->
     <script>
         // Script para toggle da sidebar em dispositivos móveis
+        // Sidebar toggle functionality
         document.getElementById('sidebarToggle').addEventListener('click', function() {
             const sidebar = document.getElementById('sidebar');
-            const content = document.getElementById('content');
+            const overlay = document.getElementById('sidebarOverlay');
             
-            sidebar.classList.toggle('-translate-x-full');
-            sidebar.classList.toggle('translate-x-0');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+        });
+        
+        // Close sidebar when clicking outside
+        document.getElementById('sidebarOverlay').addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            
+            sidebar.classList.remove('open');
+            overlay.classList.remove('active');
+        });
+        
+        // Close sidebar on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.getElementById('sidebarOverlay');
+                
+                sidebar.classList.remove('open');
+                overlay.classList.remove('active');
+            }
         });
         
         // Funcionalidade de busca
