@@ -228,7 +228,7 @@ if (isLoggedIn()) {
                 
                 <!-- Header do formulário -->
                 <div class="text-center mb-4 sm:mb-6">
-                    <div class="inline-block p-3 sm:p-4 rounded-2xl bg-green-light mb-6">
+                    <div class="inline-block p-3 sm:p-4 rounded-2xl mb-6">
                         <img src="../assets/images/brasao.png" 
                              alt="Logo EEEP Salaberga" 
                              class="w-12 h-12 sm:w-16 sm:h-16 object-contain">
@@ -348,16 +348,16 @@ if (isLoggedIn()) {
     <footer class="mt-12 py-6 w-full">
         <div class="flex flex-col sm:flex-row items-center justify-center text-sm text-gray-500 gap-2">
             <div class="text-center">
-                Copyright &copy; Sistema de Almoxarifado 2025
+                Copyright © Sistema de Almoxarifado 2025
             </div>
-            <span class="hidden sm:inline mx-2">&middot;</span>
+            <span class="hidden sm:inline mx-2">•</span>
             <div class="text-center">
                 Desenvolvido por: Fulano, Beltrano e Ciclano
             </div>
-            <span class="hidden sm:inline mx-2">&middot;</span>
+            <span class="hidden sm:inline mx-2">•</span>
             <div class="mt-2 sm:mt-0">
                 <a href="#" class="hover:text-green-primary">Política de Privacidade</a>
-                <span class="mx-2">&middot;</span>
+                <span class="mx-2">•</span>
                 <a href="#" class="hover:text-green-primary">Termos de Uso</a>
             </div>
         </div>
