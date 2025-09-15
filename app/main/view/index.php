@@ -295,10 +295,6 @@ if (isLoggedIn()) {
                                    class="w-4 h-4 text-green-primary border-gray-300 rounded focus:ring-green-primary focus:ring-2">
                             <span>Lembrar-me</span>
                         </label>
-                        <a href="senha.php" 
-                           class="text-green-primary hover:text-green-secondary font-medium transition-colors duration-200">
-                            Esqueci a senha
-                        </a>
                     </div>
                     
                     <!-- Botão de Submit -->
