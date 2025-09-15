@@ -144,34 +144,6 @@ function getStatusEstoque($quantidade) {
             border-left: 3px solid #10b981;
         }
         
-        /* Mobile sidebar overlay */
-        .sidebar-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 40;
-            display: none;
-        }
-        
-        .sidebar-overlay.active {
-            display: block;
-        }
-        
-        /* Mobile sidebar improvements */
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-                transition: transform 0.3s ease-in-out;
-            }
-            
-            .sidebar.open {
-                transform: translateX(0);
-            }
-        }
-        
         .status-critical {
             animation: pulse 2s infinite;
         }
@@ -184,14 +156,16 @@ function getStatusEstoque($quantidade) {
 </head>
 <body class="bg-gray-50 font-sans min-h-screen flex flex-col">
     <div class="flex flex-1">
-        <!-- Sidebar Overlay for Mobile -->
-        <div id="sidebarOverlay" class="sidebar-overlay"></div>
-        
         <!-- Sidebar -->
-        <div id="sidebar" class="sidebar w-64 sidebar-gradient text-white h-screen fixed transition-transform -translate-x-full md:translate-x-0 duration-300 z-50 shadow-xl">
+        <div id="sidebar" class="w-64 sidebar-gradient text-white h-screen fixed transition-transform -translate-x-full md:translate-x-0 duration-300 z-50 shadow-xl">
             <div class="p-6 text-center border-b border-green-light border-opacity-20 bg-black bg-opacity-10">
                 <div class="flex items-center justify-center">
-                    <img src="../../assets/images/brasao.png" alt="Brasão" class="w-8 h-8 mr-3 object-contain">
+                    <svg class="icon icon-warehouse text-2xl mr-3" viewBox="0 0 24 24">
+                        <path d="M3 21h18l-1-7H4l-1 7z"/>
+                        <path d="M3 10h18l-1-7H4l-1 7z"/>
+                        <path d="M9 10v11"/>
+                        <path d="M15 10v11"/>
+                    </svg>
                     <span class="text-xl font-bold">Almoxarifado</span>
                 </div>
             </div>
@@ -260,12 +234,8 @@ function getStatusEstoque($quantidade) {
             <!-- Topbar -->
             <nav class="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
                 <div class="flex items-center justify-between">
-                    <button id="sidebarToggle" class="md:hidden p-2 rounded-lg text-gray-800 hover:bg-gray-100">
-                        <svg class="icon icon-menu text-xl" viewBox="0 0 24 24">
-                            <line x1="3" y1="6" x2="21" y2="6"/>
-                            <line x1="3" y1="12" x2="21" y2="12"/>
-                            <line x1="3" y1="18" x2="21" y2="18"/>
-                        </svg>
+                    <button id="sidebarToggle" class="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100">
+                        <i class="fa fa-bars"></i>
                     </button>
 
                     <div class="hidden sm:flex items-center flex-1 max-w-md mx-4">
@@ -315,81 +285,81 @@ function getStatusEstoque($quantidade) {
         </div>
 
                 <!-- Cards de estatísticas -->
-                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
-                    <div class="stat-card-gradient-1 rounded-xl p-6 text-white card-hover">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-green-100 text-sm font-medium uppercase tracking-wide">Total de Itens</p>
-                                <p class="text-3xl font-bold mt-2"><?php echo count($itens); ?></p>
-                            </div>
-                            <div class="bg-white bg-opacity-20 rounded-lg p-3">
-                                <svg class="icon icon-boxes text-2xl" viewBox="0 0 24 24">
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
+                    <div class="bg-green-500 rounded-lg p-3 sm:p-4 text-white card-hover">
+                        <div class="flex items-center">
+                            <div class="p-2 rounded-full bg-white bg-opacity-20">
+                                <svg class="icon icon-boxes text-sm sm:text-base" viewBox="0 0 24 24">
                                     <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
                                     <polyline points="3.27,6.96 12,12.01 20.73,6.96"/>
                                     <line x1="12" y1="22.08" x2="12" y2="12"/>
                                 </svg>
                             </div>
+                            <div class="ml-2 sm:ml-3">
+                                <p class="text-xs sm:text-sm font-medium text-green-100">Total de Itens</p>
+                                <p class="text-lg sm:text-xl font-semibold"><?php echo count($itens); ?></p>
+                            </div>
                         </div>
                     </div>
                     
-                    <div class="stat-card-gradient-4 rounded-xl p-6 text-white card-hover">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-red-100 text-sm font-medium uppercase tracking-wide">Estoque Crítico</p>
-                                <p class="text-3xl font-bold mt-2">
+                    <div class="bg-red-500 rounded-lg p-3 sm:p-4 text-white card-hover">
+                        <div class="flex items-center">
+                            <div class="p-2 rounded-full bg-white bg-opacity-20">
+                                <svg class="icon icon-exclamation-triangle text-sm sm:text-base" viewBox="0 0 24 24">
+                                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                                    <line x1="12" y1="9" x2="12" y2="13"/>
+                                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                                </svg>
+                            </div>
+                            <div class="ml-2 sm:ml-3">
+                                <p class="text-xs sm:text-sm font-medium text-red-100">Estoque Crítico</p>
+                                <p class="text-lg sm:text-xl font-semibold">
                                     <?php 
                                     $criticos = array_filter($itens, function($item) { return $item['quantidade'] <= 5; });
                                     echo count($criticos);
                                     ?>
                                 </p>
                             </div>
-                            <div class="bg-white bg-opacity-20 rounded-lg p-3">
-                                <svg class="icon icon-exclamation-triangle text-2xl" viewBox="0 0 24 24">
-                                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-                                    <line x1="12" y1="9" x2="12" y2="13"/>
-                                    <line x1="12" y1="17" x2="12.01" y2="17"/>
-                                </svg>
-                            </div>
                         </div>
                     </div>
                     
-                    <div class="stat-card-gradient-3 rounded-xl p-6 text-white card-hover">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-orange-100 text-sm font-medium uppercase tracking-wide">Estoque Baixo</p>
-                                <p class="text-3xl font-bold mt-2">
+                    <div class="bg-yellow-500 rounded-lg p-3 sm:p-4 text-white card-hover">
+                        <div class="flex items-center">
+                            <div class="p-2 rounded-full bg-white bg-opacity-20">
+                                <svg class="icon icon-exclamation-circle text-sm sm:text-base" viewBox="0 0 24 24">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <line x1="12" y1="8" x2="12" y2="12"/>
+                                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                                </svg>
+                            </div>
+                            <div class="ml-2 sm:ml-3">
+                                <p class="text-xs sm:text-sm font-medium text-yellow-100">Estoque Baixo</p>
+                                <p class="text-lg sm:text-xl font-semibold">
                                     <?php 
                                     $baixos = array_filter($itens, function($item) { return $item['quantidade'] > 5 && $item['quantidade'] <= 15; });
                                     echo count($baixos);
                                     ?>
                                 </p>
                             </div>
-                            <div class="bg-white bg-opacity-20 rounded-lg p-3">
-                                <svg class="icon icon-exclamation-circle text-2xl" viewBox="0 0 24 24">
-                                    <circle cx="12" cy="12" r="10"/>
-                                    <line x1="12" y1="8" x2="12" y2="12"/>
-                                    <line x1="12" y1="16" x2="12.01" y2="16"/>
-                                </svg>
-                            </div>
                         </div>
                     </div>
                     
-                    <div class="stat-card-gradient-2 rounded-xl p-6 text-white card-hover">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-green-100 text-sm font-medium uppercase tracking-wide">Estoque Normal</p>
-                                <p class="text-3xl font-bold mt-2">
+                    <div class="bg-green-600 rounded-lg p-3 sm:p-4 text-white card-hover">
+                        <div class="flex items-center">
+                            <div class="p-2 rounded-full bg-white bg-opacity-20">
+                                <svg class="icon icon-check-circle text-sm sm:text-base" viewBox="0 0 24 24">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                    <polyline points="22,4 12,14.01 9,11.01"/>
+                                </svg>
+                            </div>
+                            <div class="ml-2 sm:ml-3">
+                                <p class="text-xs sm:text-sm font-medium text-green-100">Estoque Normal</p>
+                                <p class="text-lg sm:text-xl font-semibold">
                                     <?php 
                                     $normais = array_filter($itens, function($item) { return $item['quantidade'] > 15; });
                                     echo count($normais);
                                     ?>
                                 </p>
-                            </div>
-                            <div class="bg-white bg-opacity-20 rounded-lg p-3">
-                                <svg class="icon icon-check-circle text-2xl" viewBox="0 0 24 24">
-                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                                    <polyline points="22,4 12,14.01 9,11.01"/>
-                                </svg>
                             </div>
                         </div>
                     </div>
@@ -582,23 +552,8 @@ function getStatusEstoque($quantidade) {
 
             if (sidebarToggle) {
                 sidebarToggle.addEventListener('click', function() {
-                    const overlay = document.getElementById('sidebarOverlay');
-                    sidebar.classList.toggle('open');
-                    overlay.classList.toggle('active');
-                });
-                
-                // Close sidebar when clicking outside
-                document.getElementById('sidebarOverlay').addEventListener('click', function() {
-                    sidebar.classList.remove('open');
-                    this.classList.remove('active');
-                });
-                
-                // Close sidebar on escape key
-                document.addEventListener('keydown', function(e) {
-                    if (e.key === 'Escape') {
-                        sidebar.classList.remove('open');
-                        document.getElementById('sidebarOverlay').classList.remove('active');
-                    }
+                    sidebar.classList.toggle('-translate-x-full');
+                    content.classList.toggle('ml-0');
                 });
             }
 
