@@ -17,6 +17,7 @@ if (isLoggedIn()) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="icon" href="../assets/images/brasao.png" type="image/x-icon">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -35,7 +36,7 @@ if (isLoggedIn()) {
             }
         }
     </script>
-    <title>Portal - EEEP Salaberga Torquato Gomes de Matos</title>
+    <title>Login - Almoxarifado</title>
     <style>
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -228,7 +229,7 @@ if (isLoggedIn()) {
                 
                 <!-- Header do formulário -->
                 <div class="text-center mb-4 sm:mb-6">
-                    <div class="inline-block p-3 sm:p-4 rounded-2xl bg-green-light mb-6">
+                <div class="inline-block p-3 sm:p-4 rounded-2xl mb-6">
                         <img src="../assets/images/brasao.png" 
                              alt="Logo EEEP Salaberga" 
                              class="w-12 h-12 sm:w-16 sm:h-16 object-contain">

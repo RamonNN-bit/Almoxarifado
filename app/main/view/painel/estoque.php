@@ -91,10 +91,9 @@ function getStatusEstoque($quantidade) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Estoque - Almoxarifado</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" href="../assets/images/brasao.png" type="image/x-icon">
+    <link rel="stylesheet" href="../../assets/css/icons.css">
     <script>
         tailwind.config = {
             theme: {
@@ -161,7 +160,12 @@ function getStatusEstoque($quantidade) {
         <div id="sidebar" class="w-64 sidebar-gradient text-white h-screen fixed transition-transform -translate-x-full md:translate-x-0 duration-300 z-50 shadow-xl">
             <div class="p-6 text-center border-b border-green-light border-opacity-20 bg-black bg-opacity-10">
                 <div class="flex items-center justify-center">
-                    <i class="fas fa-warehouse text-2xl mr-3"></i>
+                    <svg class="icon icon-warehouse text-2xl mr-3" viewBox="0 0 24 24">
+                        <path d="M3 21h18l-1-7H4l-1 7z"/>
+                        <path d="M3 10h18l-1-7H4l-1 7z"/>
+                        <path d="M9 10v11"/>
+                        <path d="M15 10v11"/>
+                    </svg>
                     <span class="text-xl font-bold">Almoxarifado</span>
                 </div>
             </div>
@@ -169,37 +173,57 @@ function getStatusEstoque($quantidade) {
             <nav class="mt-6">
                 <ul class="space-y-1">
                     <li>
-                        <a href="./Admin/dashboard_Admin.php" class="flex items-center px-6 py-3 text-green-100 hover:text-white hover:bg-green-light hover:bg-opacity-20 transition-all duration-200">
-                            <i class="fas fa-home w-5 mr-3"></i>
+                        <a href="./Admin/dashboard_Admin.php" class="flex items-center px-6 py-3 text-white font-semibold hover:text-white hover:bg-green-light hover:bg-opacity-20 transition-all duration-200">
+                            <svg class="icon icon-home w-5 mr-3" viewBox="0 0 24 24">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                                <polyline points="9,22 9,12 15,12 15,22"/>
+                            </svg>
                             <span>Dashboard</span>
                         </a>
                     </li>
                     <li>
-                        <a href="estoque.php" class="flex items-center px-6 py-3 text-green-100 hover:text-white hover:bg-green-light hover:bg-opacity-20 transition-all duration-200 sidebar-link-active">
-                            <i class="fas fa-boxes w-5 mr-3"></i>
+                        <a href="estoque.php" class="flex items-center px-6 py-3 text-white font-semibold hover:text-white hover:bg-green-light hover:bg-opacity-20 transition-all duration-200 sidebar-link-active">
+                            <svg class="icon icon-boxes w-5 mr-3" viewBox="0 0 24 24">
+                                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                                <polyline points="3.27,6.96 12,12.01 20.73,6.96"/>
+                                <line x1="12" y1="22.08" x2="12" y2="12"/>
+                            </svg>
                             <span>Estoque</span>
                         </a>
                     </li>
                     <?php if ($_SESSION['admin']){?>
                     <li>
-                        <a href="./Admin/itens_cadastro.php" class="flex items-center px-6 py-3 text-green-100 hover:text-white hover:bg-green-light hover:bg-opacity-20 transition-all duration-200">
-                            <i class="fas fa-tools w-5 mr-3"></i>
+                        <a href="./Admin/itens_cadastro.php" class="flex items-center px-6 py-3 text-white font-semibold hover:text-white hover:bg-green-light hover:bg-opacity-20 transition-all duration-200">
+                            <svg class="icon icon-tools w-5 mr-3" viewBox="0 0 24 24">
+                                <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+                            </svg>
                             <span>Cadastrar Itens</span>
                         </a>
                     </li>
                     <?php }?>
                     <li>
-                        <a href="solicitacoes.php" class="flex items-center px-6 py-3 text-green-100 hover:text-white hover:bg-green-light hover:bg-opacity-20 transition-all duration-200">
-                            <i class="fas fa-clipboard-list w-5 mr-3"></i>
+                        <a href="solicitacoes.php" class="flex items-center px-6 py-3 text-white font-semibold hover:text-white hover:bg-green-light hover:bg-opacity-20 transition-all duration-200">
+                            <svg class="icon icon-clipboard-list w-5 mr-3" viewBox="0 0 24 24">
+                                <path d="M9 11H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-4"/>
+                                <rect x="9" y="3" width="6" height="4" rx="2" ry="2"/>
+                                <line x1="9" y1="12" x2="15" y2="12"/>
+                                <line x1="9" y1="16" x2="15" y2="16"/>
+                                <line x1="9" y1="20" x2="15" y2="20"/>
+                            </svg>
                             <span>Solicitações</span>
                         </a>
                     </li>
 
                     <li class="mt-8">
-                        <a href="../logout.php" class="flex items-center px-6 py-3 text-green-100 hover:text-white hover:bg-red-600 hover:bg-opacity-20 transition-all duration-200">
-                            <i class="fas fa-sign-out-alt w-5 mr-3"></i>
+                        <button onclick="showLogoutModal()"
+                            class="flex items-center px-6 py-3 text-red-500 font-semibold hover:text-white hover:bg-red-600 transition-all duration-200 w-full text-left">
+                            <svg class="icon icon-sign-out w-5 mr-3" viewBox="0 0 24 24" style="stroke-width: 2.5;">
+                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                                <polyline points="16,17 21,12 16,7"/>
+                                <line x1="21" y1="12" x2="9" y2="12"/>
+                            </svg>
                             <span>Sair</span>
-                        </a>
+                        </button>
                     </li>
                 </ul>
             </nav>
@@ -228,7 +252,10 @@ function getStatusEstoque($quantidade) {
                                 } catch (Exception $e) { $pendentesCount = 0; }
                             ?>
                             <button class="p-2 text-gray-600 hover:text-green-primary relative">
-                                <i class="fas fa-bell text-lg"></i>
+                                <svg class="icon icon-bell text-lg" viewBox="0 0 24 24">
+                                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                                    <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                                </svg>
                                 <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"><?php echo $pendentesCount; ?></span>
                             </button>
                         </div>
@@ -262,7 +289,11 @@ function getStatusEstoque($quantidade) {
                     <div class="bg-green-500 rounded-lg p-3 sm:p-4 text-white card-hover">
                         <div class="flex items-center">
                             <div class="p-2 rounded-full bg-white bg-opacity-20">
-                                <i class="fas fa-boxes text-sm sm:text-base"></i>
+                                <svg class="icon icon-boxes text-sm sm:text-base" viewBox="0 0 24 24">
+                                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                                    <polyline points="3.27,6.96 12,12.01 20.73,6.96"/>
+                                    <line x1="12" y1="22.08" x2="12" y2="12"/>
+                                </svg>
                             </div>
                             <div class="ml-2 sm:ml-3">
                                 <p class="text-xs sm:text-sm font-medium text-green-100">Total de Itens</p>
@@ -274,7 +305,11 @@ function getStatusEstoque($quantidade) {
                     <div class="bg-red-500 rounded-lg p-3 sm:p-4 text-white card-hover">
                         <div class="flex items-center">
                             <div class="p-2 rounded-full bg-white bg-opacity-20">
-                                <i class="fas fa-exclamation-triangle text-sm sm:text-base"></i>
+                                <svg class="icon icon-exclamation-triangle text-sm sm:text-base" viewBox="0 0 24 24">
+                                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                                    <line x1="12" y1="9" x2="12" y2="13"/>
+                                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                                </svg>
                             </div>
                             <div class="ml-2 sm:ml-3">
                                 <p class="text-xs sm:text-sm font-medium text-red-100">Estoque Crítico</p>
@@ -291,7 +326,11 @@ function getStatusEstoque($quantidade) {
                     <div class="bg-yellow-500 rounded-lg p-3 sm:p-4 text-white card-hover">
                         <div class="flex items-center">
                             <div class="p-2 rounded-full bg-white bg-opacity-20">
-                                <i class="fas fa-exclamation-circle text-sm sm:text-base"></i>
+                                <svg class="icon icon-exclamation-circle text-sm sm:text-base" viewBox="0 0 24 24">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <line x1="12" y1="8" x2="12" y2="12"/>
+                                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                                </svg>
                             </div>
                             <div class="ml-2 sm:ml-3">
                                 <p class="text-xs sm:text-sm font-medium text-yellow-100">Estoque Baixo</p>
@@ -308,7 +347,10 @@ function getStatusEstoque($quantidade) {
                     <div class="bg-green-600 rounded-lg p-3 sm:p-4 text-white card-hover">
                         <div class="flex items-center">
                             <div class="p-2 rounded-full bg-white bg-opacity-20">
-                                <i class="fas fa-check-circle text-sm sm:text-base"></i>
+                                <svg class="icon icon-check-circle text-sm sm:text-base" viewBox="0 0 24 24">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                    <polyline points="22,4 12,14.01 9,11.01"/>
+                                </svg>
                             </div>
                             <div class="ml-2 sm:ml-3">
                                 <p class="text-xs sm:text-sm font-medium text-green-100">Estoque Normal</p>
@@ -341,7 +383,10 @@ function getStatusEstoque($quantidade) {
                 </div>
                 <div class="flex items-end">
                     <button id="clearFilters" class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors">
-                        <i class="fas fa-times mr-2"></i>Limpar
+                        <svg class="icon icon-times mr-2 inline" viewBox="0 0 24 24">
+                            <line x1="18" y1="6" x2="6" y2="18"/>
+                            <line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>Limpar
                     </button>
                 </div>
             </div>
@@ -355,7 +400,11 @@ function getStatusEstoque($quantidade) {
             
             <?php if (empty($itens)): ?>
                 <div class="p-8 text-center">
-                    <i class="fas fa-box-open text-6xl text-gray-300 mb-4"></i>
+                    <svg class="icon icon-box-open text-6xl text-gray-300 mb-4 mx-auto" viewBox="0 0 24 24">
+                        <path d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2H5a2 2 0 0 0-2-2z"/>
+                        <path d="M8 21v-4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v4"/>
+                        <path d="M12 3v18"/>
+                    </svg>
                     <h3 class="text-xl font-semibold text-gray-500 mb-2">Nenhum item encontrado</h3>
                     <p class="text-gray-400">Cadastre o primeiro item para começar a gerenciar o estoque.</p>
                 </div>
@@ -365,16 +414,32 @@ function getStatusEstoque($quantidade) {
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onclick="sortTable(0)">
-                                    <i class="fas fa-sort mr-1"></i>ID
+                                    <svg class="icon icon-sort mr-1 inline" viewBox="0 0 24 24">
+                                        <path d="M3 6h18"/>
+                                        <path d="M7 12h10"/>
+                                        <path d="M10 18h4"/>
+                                    </svg>ID
                                 </th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onclick="sortTable(1)">
-                                    <i class="fas fa-sort mr-1"></i>Item
+                                    <svg class="icon icon-sort mr-1 inline" viewBox="0 0 24 24">
+                                        <path d="M3 6h18"/>
+                                        <path d="M7 12h10"/>
+                                        <path d="M10 18h4"/>
+                                    </svg>Item
                                 </th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onclick="sortTable(2)">
-                                    <i class="fas fa-sort mr-1"></i>Estoque
+                                    <svg class="icon icon-sort mr-1 inline" viewBox="0 0 24 24">
+                                        <path d="M3 6h18"/>
+                                        <path d="M7 12h10"/>
+                                        <path d="M10 18h4"/>
+                                    </svg>Estoque
                                 </th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onclick="sortTable(3)">
-                                    <i class="fas fa-sort mr-1"></i>Unidade
+                                    <svg class="icon icon-sort mr-1 inline" viewBox="0 0 24 24">
+                                        <path d="M3 6h18"/>
+                                        <path d="M7 12h10"/>
+                                        <path d="M10 18h4"/>
+                                    </svg>Unidade
                                 </th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Marca</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Modelo</th>
@@ -399,7 +464,11 @@ function getStatusEstoque($quantidade) {
                                         <div class="flex items-center">
                                             <span class="font-semibold"><?php echo $item['quantidade']; ?></span>
                                             <?php if ($item['quantidade'] <= 5): ?>
-                                                <i class="fas fa-exclamation-triangle text-red-500 ml-2 status-critical"></i>
+                                                <svg class="icon icon-exclamation-triangle text-red-500 ml-2 status-critical" viewBox="0 0 24 24">
+                                                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                                                    <line x1="12" y1="9" x2="12" y2="13"/>
+                                                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                                                </svg>
                                             <?php endif; ?>
                                         </div>
                                     </td>
@@ -429,10 +498,46 @@ function getStatusEstoque($quantidade) {
                 <?php if (count($itens) > 10): ?>
                     <div class="text-center mt-6">
                         <button class="bg-green-primary hover:bg-green-secondary text-white px-6 py-3 rounded-lg transition-colors">
-                            <i class="fas fa-list mr-2"></i>Ver todos os itens
+                            <svg class="icon icon-list mr-2 inline" viewBox="0 0 24 24">
+                                <line x1="8" y1="6" x2="21" y2="6"/>
+                                <line x1="8" y1="12" x2="21" y2="12"/>
+                                <line x1="8" y1="18" x2="21" y2="18"/>
+                                <line x1="3" y1="6" x2="3.01" y2="6"/>
+                                <line x1="3" y1="12" x2="3.01" y2="12"/>
+                                <line x1="3" y1="18" x2="3.01" y2="18"/>
+                            </svg>Ver todos os itens
                         </button>
                     </div>
                 <?php endif; ?>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Logout -->
+    <div id="logoutModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 transform transition-all">
+            <div class="p-6">
+                <div class="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-red-100 rounded-full">
+                    <svg class="icon icon-sign-out w-6 h-6 text-red-600" viewBox="0 0 24 24">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                        <polyline points="16,17 21,12 16,7"/>
+                        <line x1="21" y1="12" x2="9" y2="12"/>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 text-center mb-2">Confirmar Saída</h3>
+                <p class="text-sm text-gray-600 text-center mb-6">
+                    Tem certeza que deseja sair do sistema? Você precisará fazer login novamente.
+                </p>
+                <div class="flex space-x-3">
+                    <button onclick="hideLogoutModal()" 
+                        class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200">
+                        Cancelar
+                    </button>
+                    <a href="../logout.php" 
+                        class="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 text-center">
+                        Sim, Sair
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -486,6 +591,28 @@ function getStatusEstoque($quantidade) {
                 filterStatus.value = '';
                 filterTable();
             });
+        });
+
+        // Modal de Logout
+        function showLogoutModal() {
+            const modal = document.getElementById('logoutModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function hideLogoutModal() {
+            const modal = document.getElementById('logoutModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Fechar modal ao clicar fora
+        document.getElementById('logoutModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                hideLogoutModal();
+            }
         });
 
         // Funcionalidade de ordenação

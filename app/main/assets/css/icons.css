@@ -1,0 +1,190 @@
+/* Ícones SVG finos e modernos para substituir Font Awesome */
+
+.icon {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.icon-thin {
+    stroke-width: 1;
+}
+
+.icon-thick {
+    stroke-width: 2;
+}
+
+/* Ícones específicos */
+.icon-warehouse {
+    width: 1.2em;
+    height: 1.2em;
+}
+
+.icon-home {
+    width: 1em;
+    height: 1em;
+}
+
+.icon-boxes {
+    width: 1em;
+    height: 1em;
+}
+
+.icon-tools {
+    width: 1em;
+    height: 1em;
+}
+
+.icon-clipboard-list {
+    width: 1em;
+    height: 1em;
+}
+
+.icon-sign-out {
+    width: 1em;
+    height: 1em;
+}
+
+.icon-bell {
+    width: 1em;
+    height: 1em;
+}
+
+.icon-check-circle {
+    width: 1em;
+    height: 1em;
+}
+
+.icon-exclamation-circle {
+    width: 1em;
+    height: 1em;
+}
+
+.icon-exclamation-triangle {
+    width: 1em;
+    height: 1em;
+}
+
+.icon-clock {
+    width: 1em;
+    height: 1em;
+}
+
+.icon-times-circle {
+    width: 1em;
+    height: 1em;
+}
+
+.icon-box {
+    width: 1em;
+    height: 1em;
+}
+
+.icon-hashtag {
+    width: 1em;
+    height: 1em;
+}
+
+.icon-paper-plane {
+    width: 1em;
+    height: 1em;
+}
+
+.icon-check {
+    width: 1em;
+    height: 1em;
+}
+
+.icon-times {
+    width: 1em;
+    height: 1em;
+}
+
+.icon-eye {
+    width: 1em;
+    height: 1em;
+}
+
+.icon-plus {
+    width: 1em;
+    height: 1em;
+}
+
+.icon-sort {
+    width: 1em;
+    height: 1em;
+}
+
+.icon-box-open {
+    width: 1em;
+    height: 1em;
+}
+
+.icon-list {
+    width: 1em;
+    height: 1em;
+}
+
+.icon-tag {
+    width: 1em;
+    height: 1em;
+}
+
+.icon-ruler {
+    width: 1em;
+    height: 1em;
+}
+
+.icon-industry {
+    width: 1em;
+    height: 1em;
+}
+
+.icon-cube {
+    width: 1em;
+    height: 1em;
+}
+
+.icon-download {
+    width: 1em;
+    height: 1em;
+}
+
+.icon-clipboard-check {
+    width: 1em;
+    height: 1em;
+}
+
+.icon-user {
+    width: 1em;
+    height: 1em;
+}
+
+.icon-calendar-day {
+    width: 1em;
+    height: 1em;
+}
+
+/* Animações */
+.icon-pulse {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+/* Cores específicas para ícones */
+.icon-red { color: #dc2626; }
+.icon-green { color: #059669; }
+.icon-yellow { color: #f59e0b; }
+.icon-blue { color: #2563eb; }
+.icon-purple { color: #7c3aed; }
+.icon-orange { color: #f97316; }
+.icon-gray { color: #6b7280; }

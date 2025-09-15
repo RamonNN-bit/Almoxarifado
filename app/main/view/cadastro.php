@@ -17,7 +17,8 @@ if (isLoggedIn()) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="icon" href="../assets/images/brasao.png" type="image/x-icon">
+    <link rel="stylesheet" href="../assets/css/icons.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -182,7 +183,7 @@ if (isLoggedIn()) {
 <body class="min-h-screen flex items-center justify-center p-0 sm:p-4 floating-shapes">
     
     <div class="main-container w-full max-w-6xl bg-white rounded-none sm:rounded-3xl shadow-2xl overflow-hidden fade-in relative z-10">
-        <div class="flex flex-col lg:flex-row min-h-[120vh] sm:min-h-[600px]">
+        <div class="flex flex-col lg:flex-row min-h-[100vh] sm:min-h-[600px]">
             
             <!-- Criando seção lateral com informações da escola em verde -->
             <div class="hidden md:block lg:flex-1 bg-gradient-to-br from-green-primary to-green-secondary relative overflow-hidden slide-in-left">
@@ -195,7 +196,10 @@ if (isLoggedIn()) {
                 
                 <div class="relative z-10 h-full flex flex-col justify-center items-center p-8 lg:p-12 text-center text-white">
                     <div class="mb-8">
-                        <i class="fas fa-graduation-cap text-6xl lg:text-8xl mb-6 text-green-light"></i>
+                        <svg class="icon text-6xl lg:text-8xl mb-6 text-green-light" viewBox="0 0 24 24">
+                            <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+                            <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+                        </svg>
                     </div>
                     
                     <h1 class="text-3xl lg:text-5xl font-bold mb-6 leading-tight">
@@ -208,15 +212,28 @@ if (isLoggedIn()) {
                     
                     <div class="flex space-x-6 text-sm opacity-90">
                         <div class="flex items-center">
-                            <i class="fas fa-users mr-2 text-green-light"></i>
+                            <svg class="icon mr-2 text-green-light" viewBox="0 0 24 24">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                <circle cx="9" cy="7" r="4"/>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                            </svg>
                             <span>Comunidade</span>
                         </div>
                         <div class="flex items-center">
-                            <i class="fas fa-award mr-2 text-green-light"></i>
+                            <svg class="icon mr-2 text-green-light" viewBox="0 0 24 24">
+                                <circle cx="12" cy="8" r="6"/>
+                                <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/>
+                            </svg>
                             <span>Excelência</span>
                         </div>
                         <div class="flex items-center">
-                            <i class="fas fa-rocket mr-2 text-green-light"></i>
+                            <svg class="icon mr-2 text-green-light" viewBox="0 0 24 24">
+                                <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
+                                <path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/>
+                                <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/>
+                                <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>
+                            </svg>
                             <span>Inovação</span>
                         </div>
                     </div>
@@ -251,7 +268,10 @@ if (isLoggedIn()) {
                     <!-- Campo Nome -->
                     <div class="space-y-2">
                         <label for="nome" class="block text-sm font-semibold text-green-forest">
-                            <i class="fas fa-user mr-2 green-accent"></i>Nome
+                            <svg class="icon mr-2 green-accent inline" viewBox="0 0 24 24">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                <circle cx="12" cy="7" r="4"/>
+                            </svg>Nome
                         </label>
                         <div class="relative">
                             <input type="text" 
@@ -261,7 +281,10 @@ if (isLoggedIn()) {
                                    required 
                                    autocomplete="off"
                                    class="enhanced-input w-full px-4 py-2 sm:py-3 pl-12 rounded-xl focus:outline-none input-focus transition-all duration-300 text-sm sm:text-base">
-                            <i class="fas fa-user absolute left-4 top-1/2 transform -translate-y-1/2 text-green-primary text-lg"></i>
+                            <svg class="icon absolute left-4 top-1/2 transform -translate-y-1/2 text-green-primary text-lg" viewBox="0 0 24 24">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                <circle cx="12" cy="7" r="4"/>
+                            </svg>
                         </div>
 
                     </div>
@@ -269,7 +292,10 @@ if (isLoggedIn()) {
                     <!-- Campo Email -->
                     <div class="space-y-2">
                         <label for="email" class="block text-sm font-semibold text-green-forest">
-                            <i class="fas fa-envelope mr-2 green-accent"></i>Email
+                            <svg class="icon mr-2 green-accent inline" viewBox="0 0 24 24">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                                <polyline points="22,6 12,13 2,6"/>
+                            </svg>Email
                         </label>
                         <div class="relative">
                             <input type="email" 
@@ -279,14 +305,21 @@ if (isLoggedIn()) {
                                    required 
                                    autocomplete="off"
                                    class="enhanced-input w-full px-4 py-2 sm:py-3 pl-12 rounded-xl focus:outline-none input-focus transition-all duration-300 text-sm sm:text-base">
-                            <i class="fas fa-envelope absolute left-4 top-1/2 transform -translate-y-1/2 text-green-primary text-lg"></i>
+                            <svg class="icon absolute left-4 top-1/2 transform -translate-y-1/2 text-green-primary text-lg" viewBox="0 0 24 24">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                                <polyline points="22,6 12,13 2,6"/>
+                            </svg>
                         </div>
                     </div>
                     
                     <!-- Campo Senha -->
                     <div class="space-y-2">
                         <label for="password" class="block text-sm font-semibold text-green-forest">
-                            <i class="fas fa-lock mr-2 green-accent"></i>Senha
+                            <svg class="icon mr-2 green-accent inline" viewBox="0 0 24 24">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                                <circle cx="12" cy="16" r="1"/>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                            </svg>Senha
                         </label>
                         <div class="relative">
                             <input type="password" 
@@ -296,7 +329,11 @@ if (isLoggedIn()) {
                                    required 
                                    autocomplete="off"
                                    class="enhanced-input w-full px-4 py-2 sm:py-3 pl-12 pr-12 rounded-xl focus:outline-none input-focus transition-all duration-300 text-sm sm:text-base">
-                            <i class="fas fa-lock absolute left-4 top-1/2 transform -translate-y-1/2 text-green-primary text-lg"></i>
+                            <svg class="icon absolute left-4 top-1/2 transform -translate-y-1/2 text-green-primary text-lg" viewBox="0 0 24 24">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                                <circle cx="12" cy="16" r="1"/>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                            </svg>
                             <button type="button" 
                                     id="mostrarSenhaBtn" 
                                     onclick="mostrarSenha()"
@@ -312,7 +349,12 @@ if (isLoggedIn()) {
                     <button type="submit" 
                             id="btn"
                             class="btn-enhanced btn-hover w-full text-white font-semibold py-2 sm:py-3 px-6 rounded-xl transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-green-primary/30 text-sm sm:text-base">
-                        <i class="fas fa-user-plus mr-2"></i>
+                        <svg class="icon mr-2 inline" viewBox="0 0 24 24">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                            <circle cx="8.5" cy="7" r="4"/>
+                            <line x1="20" y1="8" x2="20" y2="14"/>
+                            <line x1="23" y1="11" x2="17" y2="11"/>
+                        </svg>
                         <span>Cadastrar</span>
                     </button>
                     
@@ -344,25 +386,6 @@ if (isLoggedIn()) {
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="mt-12 py-6 w-full">
-        <div class="flex flex-col sm:flex-row items-center justify-center text-sm text-gray-500 gap-2">
-            <div class="text-center">
-                Copyright © Sistema de Almoxarifado 2025
-            </div>
-            <span class="hidden sm:inline mx-2">•</span>
-            <div class="text-center">
-                Desenvolvido por: Fulano, Beltrano e Ciclano
-            </div>
-            <span class="hidden sm:inline mx-2">•</span>
-            <div class="mt-2 sm:mt-0">
-                <a href="#" class="hover:text-green-primary">Política de Privacidade</a>
-                <span class="mx-2">•</span>
-                <a href="#" class="hover:text-green-primary">Termos de Uso</a>
-            </div>
-        </div>
-    </footer>
-
     <!-- Scripts -->
     <script src="../assets/js/script.js"></script>
     <script src="../assets/js/mostrarSenha.js"></script>
@@ -379,7 +402,7 @@ if (isLoggedIn()) {
                 submitButton.disabled = true;
                 
                 const originalText = submitButton.innerHTML;
-                submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Cadastrando...';
+                submitButton.innerHTML = '<svg class="icon mr-2 inline animate-spin" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 10 10"/></svg>Cadastrando...';
                 
                 setTimeout(() => {
                     if (submitButton.disabled) {
