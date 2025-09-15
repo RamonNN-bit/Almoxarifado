@@ -332,18 +332,11 @@ function getStatusEstoque($quantidade) {
                         </div>
                     </div>
                     
-                    <div class="stat-card-gradient-4 rounded-lg p-3 sm:p-4 text-white card-hover">
-                        <div class="flex items-center">
-                            <div class="p-2 rounded-full bg-white bg-opacity-20">
-                                <svg class="icon icon-exclamation-triangle text-sm sm:text-base" viewBox="0 0 24 24">
-                                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-                                    <line x1="12" y1="9" x2="12" y2="13"/>
-                                    <line x1="12" y1="17" x2="12.01" y2="17"/>
-                                </svg>
-                            </div>
-                            <div class="ml-2 sm:ml-3">
-                                <p class="text-xs sm:text-sm font-medium text-red-100">Estoque Crítico</p>
-                                <p class="text-lg sm:text-xl font-semibold">
+                    <div class="stat-card-gradient-4 rounded-xl p-6 text-white card-hover">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-red-100 text-sm font-medium uppercase tracking-wide">Estoque Crítico</p>
+                                <p class="text-3xl font-bold mt-2">
                                     <?php 
                                     $criticos = array_filter($itens, function($item) { return $item['quantidade'] <= 5; });
                                     echo count($criticos);
@@ -360,18 +353,11 @@ function getStatusEstoque($quantidade) {
                         </div>
                     </div>
                     
-                    <div class="stat-card-gradient-3 rounded-lg p-3 sm:p-4 text-white card-hover">
-                        <div class="flex items-center">
-                            <div class="p-2 rounded-full bg-white bg-opacity-20">
-                                <svg class="icon icon-exclamation-circle text-sm sm:text-base" viewBox="0 0 24 24">
-                                    <circle cx="12" cy="12" r="10"/>
-                                    <line x1="12" y1="8" x2="12" y2="12"/>
-                                    <line x1="12" y1="16" x2="12.01" y2="16"/>
-                                </svg>
-                            </div>
-                            <div class="ml-2 sm:ml-3">
-                                <p class="text-xs sm:text-sm font-medium text-yellow-100">Estoque Baixo</p>
-                                <p class="text-lg sm:text-xl font-semibold">
+                    <div class="stat-card-gradient-3 rounded-xl p-6 text-white card-hover">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-orange-100 text-sm font-medium uppercase tracking-wide">Estoque Baixo</p>
+                                <p class="text-3xl font-bold mt-2">
                                     <?php 
                                     $baixos = array_filter($itens, function($item) { return $item['quantidade'] > 5 && $item['quantidade'] <= 15; });
                                     echo count($baixos);
@@ -388,17 +374,11 @@ function getStatusEstoque($quantidade) {
                         </div>
                     </div>
                     
-                    <div class="stat-card-gradient-2 rounded-lg p-3 sm:p-4 text-white card-hover">
-                        <div class="flex items-center">
-                            <div class="p-2 rounded-full bg-white bg-opacity-20">
-                                <svg class="icon icon-check-circle text-sm sm:text-base" viewBox="0 0 24 24">
-                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                                    <polyline points="22,4 12,14.01 9,11.01"/>
-                                </svg>
-                            </div>
-                            <div class="ml-2 sm:ml-3">
-                                <p class="text-xs sm:text-sm font-medium text-green-100">Estoque Normal</p>
-                                <p class="text-lg sm:text-xl font-semibold">
+                    <div class="stat-card-gradient-2 rounded-xl p-6 text-white card-hover">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-green-100 text-sm font-medium uppercase tracking-wide">Estoque Normal</p>
+                                <p class="text-3xl font-bold mt-2">
                                     <?php 
                                     $normais = array_filter($itens, function($item) { return $item['quantidade'] > 15; });
                                     echo count($normais);

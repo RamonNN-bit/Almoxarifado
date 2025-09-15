@@ -70,7 +70,7 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Almoxarifado</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="icon" href="../../../assets/images/brasao.png" type="image/x-icon">
+    <link rel="icon" href="../../assets/images/brasao.png" type="image/x-icon">
     <!-- CSS para ícones SVG -->
     <link rel="stylesheet" href="../../../assets/css/icons.css">
     <script>
@@ -178,7 +178,7 @@ try {
         <div id="sidebar" class="sidebar w-64 sidebar-gradient text-white h-screen fixed transition-transform -translate-x-full md:translate-x-0 duration-300 z-50 shadow-xl">
             <div class="p-6 text-center border-b border-green-light border-opacity-20 bg-black bg-opacity-10">
                 <div class="flex items-center justify-center">
-                    <img src="../../assets/images/brasao.png" alt="Brasão" class="w-8 h-8 mr-3 object-contain">
+                    <img src="../../../assets/images/brasao.png" alt="Brasão" class="w-8 h-8 mr-3 object-contain">
                     <span class="text-xl font-bold">Almoxarifado</span>
                 </div>
             </div>
@@ -318,49 +318,65 @@ try {
                 <!-- Cards de Estatísticas -->
                 <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
                     <div class="stat-card-gradient-1 rounded-xl p-6 text-white card-hover">
-                        <div class="flex items-center">
-                            <div class="p-3 rounded-full bg-white bg-opacity-20">
-                                <i class="fas fa-boxes text-xl"></i>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-green-100 text-sm font-medium uppercase tracking-wide">Itens em Estoque</p>
+                                <p class="text-3xl font-bold mt-2"><?php echo number_format($total_itens_estoque); ?></p>
                             </div>
-                            <div class="ml-4">
-                                <p class="text-sm font-medium text-green-100">Itens em Estoque</p>
-                                <p class="text-2xl font-semibold"><?php echo number_format($total_itens_estoque); ?></p>
+                            <div class="bg-white bg-opacity-20 rounded-lg p-3">
+                                <svg class="icon icon-boxes text-2xl" viewBox="0 0 24 24">
+                                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                                    <polyline points="3.27,6.96 12,12.01 20.73,6.96"/>
+                                    <line x1="12" y1="22.08" x2="12" y2="12"/>
+                                </svg>
                             </div>
                         </div>
                     </div>
 
                     <div class="stat-card-gradient-2 rounded-xl p-6 text-white card-hover">
-                        <div class="flex items-center">
-                            <div class="p-3 rounded-full bg-white bg-opacity-20">
-                                <i class="fas fa-clipboard-check text-xl"></i>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-green-100 text-sm font-medium uppercase tracking-wide">Solicitações Hoje</p>
+                                <p class="text-3xl font-bold mt-2"><?php echo count($solicitacoes_hoje); ?></p>
                             </div>
-                            <div class="ml-4">
-                                <p class="text-sm font-medium text-green-100">Solicitações Hoje</p>
-                                <p class="text-2xl font-semibold"><?php echo count($solicitacoes_hoje); ?></p>
+                            <div class="bg-white bg-opacity-20 rounded-lg p-3">
+                                <svg class="icon icon-clipboard-check text-2xl" viewBox="0 0 24 24">
+                                    <path d="M9 11H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-4"/>
+                                    <rect x="9" y="3" width="6" height="4" rx="2" ry="2"/>
+                                    <polyline points="9,12 11,14 15,10"/>
+                                </svg>
                             </div>
                         </div>
                     </div>
 
                     <div class="stat-card-gradient-3 rounded-xl p-6 text-white card-hover">
-                        <div class="flex items-center">
-                            <div class="p-3 rounded-full bg-white bg-opacity-20">
-                                <i class="fas fa-exclamation-triangle text-xl"></i>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-orange-100 text-sm font-medium uppercase tracking-wide">Itens Críticos</p>
+                                <p class="text-3xl font-bold mt-2"><?php echo count($itens_criticos); ?></p>
                             </div>
-                            <div class="ml-4">
-                                <p class="text-sm font-medium text-yellow-100">Itens Críticos</p>
-                                <p class="text-2xl font-semibold"><?php echo count($itens_criticos); ?></p>
+                            <div class="bg-white bg-opacity-20 rounded-lg p-3">
+                                <svg class="icon icon-exclamation-triangle text-2xl" viewBox="0 0 24 24">
+                                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                                    <line x1="12" y1="9" x2="12" y2="13"/>
+                                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                                </svg>
                             </div>
                         </div>
                     </div>
 
                     <div class="stat-card-gradient-4 rounded-xl p-6 text-white card-hover">
-                        <div class="flex items-center">
-                            <div class="p-3 rounded-full bg-white bg-opacity-20">
-                                <i class="fas fa-times-circle text-xl"></i>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-red-100 text-sm font-medium uppercase tracking-wide">Itens em Falta</p>
+                                <p class="text-3xl font-bold mt-2"><?php echo count($itens_em_falta); ?></p>
                             </div>
-                            <div class="ml-4">
-                                <p class="text-sm font-medium text-red-100">Itens em Falta</p>
-                                <p class="text-2xl font-semibold"><?php echo count($itens_em_falta); ?></p>
+                            <div class="bg-white bg-opacity-20 rounded-lg p-3">
+                                <svg class="icon icon-times-circle text-2xl" viewBox="0 0 24 24">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <line x1="15" y1="9" x2="9" y2="15"/>
+                                    <line x1="9" y1="9" x2="15" y2="15"/>
+                                </svg>
                             </div>
                         </div>
                     </div>
