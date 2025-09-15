@@ -36,7 +36,7 @@ if (isLoggedIn()) {
             }
         }
     </script>
-    <title>Portal - Secretaria de Educação</title>
+    <title>Cadastro - Almoxarifado</title>
     <style>
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
