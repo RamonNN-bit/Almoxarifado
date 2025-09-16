@@ -719,6 +719,7 @@ function getStatusClass($status)
                 if (selectedOption.value) {
                     const quantidade = selectedOption.dataset.quantidade;
                     const unidade = selectedOption.dataset.unidade;
+                    estoqueInfo.textContent = `Estoque disponível: ${quantidade} ${unidade}`;
                     quantidadeInput.max = quantidade;
                 } else {
                     estoqueInfo.textContent = '';
