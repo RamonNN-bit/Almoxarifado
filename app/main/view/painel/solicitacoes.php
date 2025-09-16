@@ -174,6 +174,93 @@ function getStatusClass($status)
                 transform: translateX(0);
             }
         }
+
+        /* Modal Styles */
+        .modal-overlay {
+            backdrop-filter: blur(4px);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal-container {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .modal-container.show {
+            transform: scale(1) !important;
+            opacity: 1 !important;
+        }
+
+        /* Modal Header Colors */
+        .modal-header-approve {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .modal-header-reject {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        /* Modal Icon Colors */
+        .modal-icon-approve {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .modal-icon-reject {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+        }
+
+        /* Button Colors */
+        .btn-approve {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-approve:hover {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-reject {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-reject:hover {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { 
+                transform: scale(0.9) translateY(-20px);
+                opacity: 0;
+            }
+            to { 
+                transform: scale(1) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Focus styles for textarea */
+        .modal-container textarea:focus {
+            border-color: #10b981;
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+        }
+
+        /* Responsive modal */
+        @media (max-width: 640px) {
+            .modal-container {
+                margin: 1rem;
+                max-width: calc(100vw - 2rem);
+            }
+        }
     </style>
 </head>
 
@@ -725,27 +812,120 @@ function getStatusClass($status)
 
             // Funções para o modal de ação
             window.openActionModal = function(action, idMov) {
-                document.getElementById('actionModal').style.display = 'flex';
+                const modal = document.getElementById('actionModal');
+                const modalContainer = modal.querySelector('.modal-container');
+                const modalHeader = document.getElementById('modalHeader');
+                const modalIcon = document.getElementById('modalIcon');
+                const modalTitle = document.getElementById('modalTitle');
+                const modalSubtitle = document.getElementById('modalSubtitle');
+                const confirmButton = document.getElementById('confirmButton');
+                
+                // Mostrar modal
+                modal.style.display = 'flex';
+                
+                // Aplicar animação
+                setTimeout(() => {
+                    modalContainer.classList.add('show');
+                }, 10);
+                
+                // Configurar dados do modal
                 document.getElementById('actionType').value = action;
                 document.getElementById('idMov').value = idMov;
-                document.getElementById('modalTitle').textContent = action === 'aceitar' ? 'Aprovar Solicitação' : 'Recusar Solicitação';
-                document.getElementById('observacao').focus();
+                
+                if (action === 'aceitar') {
+                    // Configuração para aprovar
+                    modalHeader.className = 'px-6 py-4 rounded-t-2xl modal-header-approve';
+                    modalIcon.className = 'w-12 h-12 rounded-full flex items-center justify-center modal-icon-approve';
+                    modalIcon.innerHTML = `
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    `;
+                    modalTitle.textContent = 'Aprovar Solicitação';
+                    modalTitle.className = 'text-xl font-bold text-white';
+                    modalSubtitle.textContent = 'Confirme a aprovação desta solicitação';
+                    modalSubtitle.className = 'text-sm text-green-100';
+                    confirmButton.className = 'px-6 py-3 text-white rounded-xl transition-all duration-200 font-semibold flex items-center space-x-2 shadow-lg hover:shadow-xl transform hover:scale-105 btn-approve';
+                    confirmButton.innerHTML = `
+                        <svg class="icon icon-check w-4 h-4" viewBox="0 0 24 24">
+                            <polyline points="20,6 9,17 4,12"/>
+                        </svg>
+                        <span>Aprovar</span>
+                    `;
+                } else {
+                    // Configuração para recusar
+                    modalHeader.className = 'px-6 py-4 rounded-t-2xl modal-header-reject';
+                    modalIcon.className = 'w-12 h-12 rounded-full flex items-center justify-center modal-icon-reject';
+                    modalIcon.innerHTML = `
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    `;
+                    modalTitle.textContent = 'Recusar Solicitação';
+                    modalTitle.className = 'text-xl font-bold text-white';
+                    modalSubtitle.textContent = 'Confirme a recusa desta solicitação';
+                    modalSubtitle.className = 'text-sm text-red-100';
+                    confirmButton.className = 'px-6 py-3 text-white rounded-xl transition-all duration-200 font-semibold flex items-center space-x-2 shadow-lg hover:shadow-xl transform hover:scale-105 btn-reject';
+                    confirmButton.innerHTML = `
+                        <svg class="icon icon-x w-4 h-4" viewBox="0 0 24 24">
+                            <line x1="18" y1="6" x2="6" y2="18"/>
+                            <line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                        <span>Recusar</span>
+                    `;
+                }
+                
+                // Focar no textarea
+                setTimeout(() => {
+                    document.getElementById('observacao').focus();
+                }, 300);
             };
 
             window.closeActionModal = function() {
-                document.getElementById('actionModal').style.display = 'none';
-                document.getElementById('observacao').value = '';
+                const modal = document.getElementById('actionModal');
+                const modalContainer = modal.querySelector('.modal-container');
+                
+                // Aplicar animação de saída
+                modalContainer.classList.remove('show');
+                
+                // Esconder modal após animação
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                    document.getElementById('observacao').value = '';
+                }, 300);
             };
 
             window.submitAction = function() {
                 const form = document.getElementById('actionForm');
-                const observacao = document.getElementById('observacao').value.trim();
+                const observacao = document.getElementById('observacao');
+                const confirmButton = document.getElementById('confirmButton');
+                const observacaoValue = observacao.value.trim();
                 
-                if (observacao === '') {
-                    alert('Por favor, insira uma observação.');
+                if (observacaoValue === '') {
+                    // Adicionar efeito visual de erro
+                    observacao.classList.add('border-red-500', 'ring-4', 'ring-red-200');
+                    observacao.focus();
+                    
+                    // Remover efeito após 3 segundos
+                    setTimeout(() => {
+                        observacao.classList.remove('border-red-500', 'ring-4', 'ring-red-200');
+                    }, 3000);
+                    
                     return;
                 }
                 
+                // Desabilitar botão e mostrar loading
+                confirmButton.disabled = true;
+                const originalText = confirmButton.innerHTML;
+                confirmButton.innerHTML = `
+                    <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span>Processando...</span>
+                `;
+                
+                // Submeter formulário
                 form.submit();
             };
 
@@ -759,41 +939,71 @@ function getStatusClass($status)
     </script>
 
     <!-- Modal de Ação -->
-    <div id="actionModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" style="display: none;">
-        <div class="bg-white rounded-lg p-6 w-96 max-w-md mx-4">
-            <div class="flex justify-between items-center mb-4">
-                <h3 id="modalTitle" class="text-lg font-semibold text-gray-900"></h3>
-                <button onclick="closeActionModal()" class="text-gray-400 hover:text-gray-600">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
+    <div id="actionModal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 modal-overlay" style="display: none;">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 modal-container transform transition-all duration-300 scale-95 opacity-0">
+            <!-- Header do Modal -->
+            <div id="modalHeader" class="px-6 py-4 rounded-t-2xl">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div id="modalIcon" class="w-12 h-12 rounded-full flex items-center justify-center">
+                            <!-- Ícone será inserido dinamicamente -->
+                        </div>
+                        <div>
+                            <h3 id="modalTitle" class="text-xl font-bold text-gray-900"></h3>
+                            <p id="modalSubtitle" class="text-sm text-gray-600"></p>
+                        </div>
+                    </div>
+                    <button onclick="closeActionModal()" class="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-full">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
             </div>
             
-            <form id="actionForm" method="POST" action="../../control/solicitacoesController.php">
-                <input type="hidden" id="actionType" name="action" value="">
-                <input type="hidden" id="idMov" name="id_mov" value="">
-                
-                <div class="mb-4">
-                    <label for="observacao" class="block text-sm font-medium text-gray-700 mb-2">
-                        Observação *
-                    </label>
-                    <textarea id="observacao" name="observacao" rows="4" 
-                              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                              placeholder="Digite uma observação sobre esta ação..."></textarea>
-                </div>
-                
-                <div class="flex justify-end space-x-3">
-                    <button type="button" onclick="closeActionModal()" 
-                            class="px-4 py-2 text-gray-600 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors">
-                        Cancelar
-                    </button>
-                    <button type="button" onclick="submitAction()" 
-                            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-                        Confirmar
-                    </button>
-                </div>
-            </form>
+            <!-- Conteúdo do Modal -->
+            <div class="px-6 pb-6">
+                <form id="actionForm" method="POST" action="../../control/solicitacoesController.php">
+                    <input type="hidden" id="actionType" name="action" value="">
+                    <input type="hidden" id="idMov" name="id_mov" value="">
+                    
+                    <div class="mb-6">
+                        <label for="observacao" class="block text-sm font-semibold text-gray-800 mb-3">
+                            <div class="flex items-center">
+                                <svg class="icon icon-message-square mr-2 text-gray-600" viewBox="0 0 24 24">
+                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                                </svg>
+                                <span class="text-gray-800">Observação</span>
+                                <span class="text-red-500 ml-1 font-bold text-lg">*</span>
+                                <span class="text-xs text-gray-500 ml-2 font-normal">(obrigatório)</span>
+                            </div>
+                        </label>
+                        <textarea id="observacao" name="observacao" rows="4" 
+                                  class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-opacity-20 transition-all duration-200 resize-none"
+                                  placeholder="Digite uma observação sobre esta ação..."
+                                  style="min-height: 100px;"></textarea>
+                        <p class="text-xs text-gray-500 mt-2">Esta observação será registrada no histórico da solicitação.</p>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-3">
+                        <button type="button" onclick="closeActionModal()" 
+                                class="px-6 py-3 text-gray-600 bg-gray-100 rounded-xl hover:bg-gray-200 transition-all duration-200 font-semibold flex items-center space-x-2">
+                            <svg class="icon icon-x w-4 h-4" viewBox="0 0 24 24">
+                                <line x1="18" y1="6" x2="6" y2="18"/>
+                                <line x1="6" y1="6" x2="18" y2="18"/>
+                            </svg>
+                            <span>Cancelar</span>
+                        </button>
+                        <button type="button" onclick="submitAction()" id="confirmButton"
+                                class="px-6 py-3 text-white rounded-xl transition-all duration-200 font-semibold flex items-center space-x-2 shadow-lg hover:shadow-xl transform hover:scale-105">
+                            <svg class="icon icon-check w-4 h-4" viewBox="0 0 24 24">
+                                <polyline points="20,6 9,17 4,12"/>
+                            </svg>
+                            <span>Confirmar</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </body>
