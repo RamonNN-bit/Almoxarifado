@@ -49,19 +49,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             
             $id_solicitacao = intval($_POST['id_mov']);
+            $observacao = trim($_POST['observacao'] ?? '');
+            
             if (!$id_solicitacao) {
                 throw new Exception("ID da solicitação inválido");
             }
             
+            if (empty($observacao)) {
+                throw new Exception("Observação é obrigatória");
+            }
+            
             if ($action === 'aceitar') {
-                $sucesso = $solicitacoesModel->aprovarSolicitacao($id_solicitacao);
+                $sucesso = $solicitacoesModel->aprovarSolicitacao($id_solicitacao, $observacao);
                 if ($sucesso) {
                     $_SESSION['mensagem_sucesso'] = "Solicitação aprovada com sucesso!";
                 } else {
                     $_SESSION['erro'] = "Erro ao aprovar a solicitação";
                 }
             } elseif ($action === 'recusar') {
-                $sucesso = $solicitacoesModel->rejeitarSolicitacao($id_solicitacao);
+                $sucesso = $solicitacoesModel->rejeitarSolicitacao($id_solicitacao, $observacao);
                 if ($sucesso) {
                     $_SESSION['mensagem_sucesso'] = "Solicitação rejeitada com sucesso!";
                 } else {

@@ -94,7 +94,7 @@ class Solicitacoes {
 
 
     // Aprovar solicitação (atualizar estoque e status)
-    public function aprovarSolicitacao($id_solicitacao) {
+    public function aprovarSolicitacao($id_solicitacao, $observacao = '') {
         try {
             $this->pdo->beginTransaction();
             
@@ -126,10 +126,13 @@ class Solicitacoes {
                 ':id_item' => $solicitacao['id_item']
             ]);
             
-            // Atualizar status para 'aprovado' (alinhado com a tabela)
-            $sql_status = "UPDATE movimentacoes SET status = 'aprovado' WHERE id = :id";
+            // Atualizar status e observação
+            $sql_status = "UPDATE movimentacoes SET status = 'aprovado', observacao = :observacao WHERE id = :id";
             $stmt_status = $this->pdo->prepare($sql_status);
-            $resultado = $stmt_status->execute([':id' => $id_solicitacao]);
+            $resultado = $stmt_status->execute([
+                ':id' => $id_solicitacao,
+                ':observacao' => $observacao
+            ]);
             
             if ($resultado) {
                 $this->pdo->commit();
@@ -146,11 +149,14 @@ class Solicitacoes {
     }
 
     // Rejeitar solicitação (atualizar status)
-    public function rejeitarSolicitacao($id_solicitacao) {
+    public function rejeitarSolicitacao($id_solicitacao, $observacao = '') {
         try {
-            $sql = "UPDATE movimentacoes SET status = 'recusado' WHERE id = :id AND status = 'em espera'";
+            $sql = "UPDATE movimentacoes SET status = 'recusado', observacao = :observacao WHERE id = :id AND status = 'em espera'";
             $stmt = $this->pdo->prepare($sql);
-            $resultado = $stmt->execute([':id' => $id_solicitacao]);
+            $resultado = $stmt->execute([
+                ':id' => $id_solicitacao,
+                ':observacao' => $observacao
+            ]);
             
             if ($resultado && $stmt->rowCount() > 0) {
                 return true;

@@ -583,31 +583,19 @@ function getStatusClass($status)
                                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                 <div class="flex space-x-2">
                                                     <?php if ($_SESSION['admin'] && $solicitacao['status'] === 'em espera'): ?>
-                                                        <form method="POST" action="../../control/solicitacoesController.php"
-                                                            class="inline">
-                                                            <input type="hidden" name="id_mov"
-                                                                value="<?php echo $solicitacao['id']; ?>">
-                                                            <input type="hidden" name="action" value="aceitar">
-                                                            <button type="submit" class="text-green-600 hover:text-green-900"
-                                                                title="Aprovar">
-                                                                <svg class="icon icon-check" viewBox="0 0 24 24">
-                                                                    <polyline points="20,6 9,17 4,12"/>
-                                                                </svg>
-                                                            </button>
-                                                        </form>
-                                                        <form method="POST" action="../../control/solicitacoesController.php"
-                                                            class="inline">
-                                                            <input type="hidden" name="id_mov"
-                                                                value="<?php echo $solicitacao['id']; ?>">
-                                                            <input type="hidden" name="action" value="recusar">
-                                                            <button type="submit" class="text-red-600 hover:text-red-900"
-                                                                title="Rejeitar">
-                                                                <svg class="icon icon-times" viewBox="0 0 24 24">
-                                                                    <line x1="18" y1="6" x2="6" y2="18"/>
-                                                                    <line x1="6" y1="6" x2="18" y2="18"/>
-                                                                </svg>
-                                                            </button>
-                                                        </form>
+                                                        <button onclick="openActionModal('aceitar', <?php echo $solicitacao['id']; ?>)" 
+                                                                class="text-green-600 hover:text-green-900" title="Aprovar">
+                                                            <svg class="icon icon-check" viewBox="0 0 24 24">
+                                                                <polyline points="20,6 9,17 4,12"/>
+                                                            </svg>
+                                                        </button>
+                                                        <button onclick="openActionModal('recusar', <?php echo $solicitacao['id']; ?>)" 
+                                                                class="text-red-600 hover:text-red-900" title="Rejeitar">
+                                                            <svg class="icon icon-times" viewBox="0 0 24 24">
+                                                                <line x1="18" y1="6" x2="6" y2="18"/>
+                                                                <line x1="6" y1="6" x2="18" y2="18"/>
+                                                            </svg>
+                                                        </button>
                                                     <?php endif; ?>
                                                     <button class="text-blue-600 hover:text-blue-900" title="Ver detalhes">
                                                         <svg class="icon icon-eye" viewBox="0 0 24 24">
@@ -726,8 +714,80 @@ function getStatusClass($status)
                     quantidadeInput.max = '';
                 }
             });
+
+            // Funções para o modal de ação
+            window.openActionModal = function(action, idMov) {
+                document.getElementById('actionModal').style.display = 'flex';
+                document.getElementById('actionType').value = action;
+                document.getElementById('idMov').value = idMov;
+                document.getElementById('modalTitle').textContent = action === 'aceitar' ? 'Aprovar Solicitação' : 'Recusar Solicitação';
+                document.getElementById('observacao').focus();
+            };
+
+            window.closeActionModal = function() {
+                document.getElementById('actionModal').style.display = 'none';
+                document.getElementById('observacao').value = '';
+            };
+
+            window.submitAction = function() {
+                const form = document.getElementById('actionForm');
+                const observacao = document.getElementById('observacao').value.trim();
+                
+                if (observacao === '') {
+                    alert('Por favor, insira uma observação.');
+                    return;
+                }
+                
+                form.submit();
+            };
+
+            // Fechar modal ao clicar fora
+            document.getElementById('actionModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeActionModal();
+                }
+            });
         });
     </script>
+
+    <!-- Modal de Ação -->
+    <div id="actionModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" style="display: none;">
+        <div class="bg-white rounded-lg p-6 w-96 max-w-md mx-4">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="modalTitle" class="text-lg font-semibold text-gray-900"></h3>
+                <button onclick="closeActionModal()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <form id="actionForm" method="POST" action="../../control/solicitacoesController.php">
+                <input type="hidden" id="actionType" name="action" value="">
+                <input type="hidden" id="idMov" name="id_mov" value="">
+                
+                <div class="mb-4">
+                    <label for="observacao" class="block text-sm font-medium text-gray-700 mb-2">
+                        Observação *
+                    </label>
+                    <textarea id="observacao" name="observacao" rows="4" 
+                              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              placeholder="Digite uma observação sobre esta ação..."></textarea>
+                </div>
+                
+                <div class="flex justify-end space-x-3">
+                    <button type="button" onclick="closeActionModal()" 
+                            class="px-4 py-2 text-gray-600 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors">
+                        Cancelar
+                    </button>
+                    <button type="button" onclick="submitAction()" 
+                            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                        Confirmar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </body>
 
 </html>
