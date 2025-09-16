@@ -42,7 +42,7 @@ try {
 // Buscar dados do usuário logado
     $userData = $solicitacoesModel->buscarTodosUsuarios();
     $usuarios = $userData;
-
+ 
 } catch (Exception $e) {
     // Em caso de erro, usar valores padrão
     
@@ -559,7 +559,7 @@ function getStatusClass($status)
                             </div>
                             
                         </div>
-
+                                        <?php if($_SESSION['admin']){ ?>
                         <div>
                                 <label for="id_usuario"
                                     class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
@@ -579,7 +579,7 @@ function getStatusClass($status)
                                     <?php endforeach; ?>
                                 </select>
                             </div>
-
+                                        <?php } ?>
                         <div class="flex justify-end">
                             <button type="submit" name="action" value="criar"
                                 class="bg-green-primary hover:bg-green-secondary text-white px-6 py-3 rounded-lg font-semibold transition-colors flex items-center space-x-2">
@@ -684,7 +684,8 @@ function getStatusClass($status)
                                                             </svg>
                                                         </button>
                                                     <?php endif; ?>
-                                                    <button class="text-blue-600 hover:text-blue-900" title="Ver detalhes">
+                                                    <button onclick="openObservacaoModal(<?php echo $solicitacao['id']; ?>, '<?php echo htmlspecialchars($solicitacao['observacao'] ?? '', ENT_QUOTES); ?>')" 
+                                                            class="text-blue-600 hover:text-blue-900" title="Ver observações">
                                                         <svg class="icon icon-eye" viewBox="0 0 24 24">
                                                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
                                                             <circle cx="12" cy="12" r="3"/>
@@ -935,7 +936,52 @@ function getStatusClass($status)
                     closeActionModal();
                 }
             });
+
+            // Fechar modal de observação ao clicar fora
+            document.getElementById('observacaoModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeObservacaoModal();
+                }
+            });
         });
+
+        // Função para abrir modal de observações
+        function openObservacaoModal(id, observacao) {
+            const modal = document.getElementById('observacaoModal');
+            const content = document.getElementById('observacaoContent');
+            
+            // Definir conteúdo da observação
+            if (observacao && observacao.trim() !== '') {
+                content.innerHTML = observacao;
+            } else {
+                content.innerHTML = '<span class="text-gray-500 italic">Nenhuma observação registrada para esta solicitação.</span>';
+            }
+            
+            // Mostrar modal
+            modal.style.display = 'flex';
+            
+            // Animação de entrada
+            setTimeout(() => {
+                const container = modal.querySelector('.modal-container');
+                container.classList.remove('scale-95', 'opacity-0');
+                container.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        // Função para fechar modal de observações
+        function closeObservacaoModal() {
+            const modal = document.getElementById('observacaoModal');
+            const container = modal.querySelector('.modal-container');
+            
+            // Animação de saída
+            container.classList.remove('scale-100', 'opacity-100');
+            container.classList.add('scale-95', 'opacity-0');
+            
+            // Esconder modal após animação
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 300);
+        }
     </script>
 
     <!-- Modal de Ação -->
@@ -1003,6 +1049,60 @@ function getStatusClass($status)
                         </button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Observações -->
+    <div id="observacaoModal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 modal-overlay" style="display: none;">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 modal-container transform transition-all duration-300 scale-95 opacity-0">
+            <!-- Header do Modal -->
+            <div class="px-6 py-4 rounded-t-2xl bg-blue-500">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 rounded-full flex items-center justify-center bg-blue-600">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-white">Observações</h3>
+                            <p class="text-sm text-blue-100">Detalhes da solicitação</p>
+                        </div>
+                    </div>
+                    <button onclick="closeObservacaoModal()" class="text-white hover:text-blue-200 transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Conteúdo do Modal -->
+            <div class="p-6">
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        <svg class="icon icon-message-square mr-2 text-gray-600" viewBox="0 0 24 24" style="display: inline; width: 16px; height: 16px;">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                        </svg>
+                        Observação da Solicitação
+                    </label>
+                    <div id="observacaoContent" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 min-h-[100px] text-gray-700">
+                        <!-- Conteúdo será inserido dinamicamente -->
+                    </div>
+                </div>
+                
+                <div class="flex justify-end">
+                    <button type="button" onclick="closeObservacaoModal()" 
+                            class="px-6 py-3 text-white bg-blue-500 rounded-xl hover:bg-blue-600 transition-all duration-200 font-semibold flex items-center space-x-2">
+                        <svg class="icon icon-x w-4 h-4" viewBox="0 0 24 24">
+                            <line x1="18" y1="6" x2="6" y2="18"/>
+                            <line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                        <span>Fechar</span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
