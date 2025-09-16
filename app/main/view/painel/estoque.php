@@ -76,9 +76,9 @@ try {
 
 // Função para determinar o status do estoque
 function getStatusEstoque($quantidade) {
-    if ($quantidade <= 5) {
+    if ($quantidade < 5) {
         return ['status' => 'Crítico', 'class' => 'bg-red-100 text-red-800'];
-    } elseif ($quantidade <= 15) {
+    } elseif ($quantidade < 10) {
         return ['status' => 'Baixo', 'class' => 'bg-yellow-100 text-yellow-800'];
     } else {
         return ['status' => 'Normal', 'class' => 'bg-green-100 text-green-800'];
@@ -338,7 +338,7 @@ function getStatusEstoque($quantidade) {
                                 <p class="text-red-100 text-sm font-medium uppercase tracking-wide">Estoque Crítico</p>
                                 <p class="text-3xl font-bold mt-2">
                                     <?php 
-                                    $criticos = array_filter($itens, function($item) { return $item['quantidade'] <= 5; });
+                                    $criticos = array_filter($itens, function($item) { return $item['quantidade'] < 5; });
                                     echo count($criticos);
                                     ?>
                                 </p>
@@ -359,7 +359,7 @@ function getStatusEstoque($quantidade) {
                                 <p class="text-orange-100 text-sm font-medium uppercase tracking-wide">Estoque Baixo</p>
                                 <p class="text-3xl font-bold mt-2">
                                     <?php 
-                                    $baixos = array_filter($itens, function($item) { return $item['quantidade'] > 5 && $item['quantidade'] <= 15; });
+                                    $baixos = array_filter($itens, function($item) { return $item['quantidade'] >= 5 && $item['quantidade'] < 10; });
                                     echo count($baixos);
                                     ?>
                                 </p>
@@ -380,7 +380,7 @@ function getStatusEstoque($quantidade) {
                                 <p class="text-green-100 text-sm font-medium uppercase tracking-wide">Estoque Normal</p>
                                 <p class="text-3xl font-bold mt-2">
                                     <?php 
-                                    $normais = array_filter($itens, function($item) { return $item['quantidade'] > 15; });
+                                    $normais = array_filter($itens, function($item) { return $item['quantidade'] >= 10; });
                                     echo count($normais);
                                     ?>
                                 </p>

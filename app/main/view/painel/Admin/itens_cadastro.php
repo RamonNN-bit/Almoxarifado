@@ -376,10 +376,24 @@ try {
                                         <line x1="4.5" y1="11.5" x2="5.5" y2="12.5"/>
                                     </svg>Unidade
                                 </label>
-                                <input type="text" id="unidade" name="unidade" required
-                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-primary focus:border-transparent transition-colors"
-                                    placeholder="Ex: kg, litros, unidades"
-                                    value="<?php echo isset($_POST['unidade']) ? htmlspecialchars($_POST['unidade'], ENT_QUOTES, 'UTF-8') : ''; ?>">
+                                <select id="unidade" name="unidade" required
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-primary focus:border-transparent transition-colors bg-white">
+                                    <option value="">Selecione uma unidade</option>
+                                    <option value="unidades" <?php echo (isset($_POST['unidade']) && $_POST['unidade'] === 'unidades') ? 'selected' : ''; ?>>Unidades</option>
+                                    <option value="kg" <?php echo (isset($_POST['unidade']) && $_POST['unidade'] === 'kg') ? 'selected' : ''; ?>>Quilogramas (kg)</option>
+                                    <option value="g" <?php echo (isset($_POST['unidade']) && $_POST['unidade'] === 'g') ? 'selected' : ''; ?>>Gramas (g)</option>
+                                    <option value="litros" <?php echo (isset($_POST['unidade']) && $_POST['unidade'] === 'litros') ? 'selected' : ''; ?>>Litros</option>
+                                    <option value="ml" <?php echo (isset($_POST['unidade']) && $_POST['unidade'] === 'ml') ? 'selected' : ''; ?>>Mililitros (ml)</option>
+                                    <option value="metros" <?php echo (isset($_POST['unidade']) && $_POST['unidade'] === 'metros') ? 'selected' : ''; ?>>Metros (m)</option>
+                                    <option value="cm" <?php echo (isset($_POST['unidade']) && $_POST['unidade'] === 'cm') ? 'selected' : ''; ?>>Centímetros (cm)</option>
+                                    <option value="mm" <?php echo (isset($_POST['unidade']) && $_POST['unidade'] === 'mm') ? 'selected' : ''; ?>>Milímetros (mm)</option>
+                                    <option value="caixas" <?php echo (isset($_POST['unidade']) && $_POST['unidade'] === 'caixas') ? 'selected' : ''; ?>>Caixas</option>
+                                    <option value="pacotes" <?php echo (isset($_POST['unidade']) && $_POST['unidade'] === 'pacotes') ? 'selected' : ''; ?>>Pacotes</option>
+                                    <option value="frascos" <?php echo (isset($_POST['unidade']) && $_POST['unidade'] === 'frascos') ? 'selected' : ''; ?>>Frascos</option>
+                                    <option value="tubos" <?php echo (isset($_POST['unidade']) && $_POST['unidade'] === 'tubos') ? 'selected' : ''; ?>>Tubos</option>
+                                    <option value="pares" <?php echo (isset($_POST['unidade']) && $_POST['unidade'] === 'pares') ? 'selected' : ''; ?>>Pares</option>
+                                    <option value="conjuntos" <?php echo (isset($_POST['unidade']) && $_POST['unidade'] === 'conjuntos') ? 'selected' : ''; ?>>Conjuntos</option>
+                                </select>
                             </div>
 
                             <div>
