@@ -569,8 +569,8 @@ function getStatusClass($status)
                                                 </span>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                <?php echo htmlspecialchars($solicitacao['usuario_nome'], ENT_QUOTES, 'UTF-8'); ?>
-                                            </td>
+                                                <?php echo htmlspecialchars($solicitacao['solicitante_nome'] ?? 'N/A', ENT_QUOTES, 'UTF-8'); ?>
+                            </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                                 <?php echo date('d/m/Y', strtotime($solicitacao['data'])); ?>
                                             </td>
@@ -701,13 +701,21 @@ function getStatusClass($status)
             const selectItem = document.getElementById('id_item');
             const quantidadeInput = document.getElementById('quantidade_solicitada');
             const estoqueInfo = document.getElementById('estoque-info');
-
+            const isAdmin = <?php echo $_SESSION['admin'] ? 'true' : 'false'; ?>;
+            
             selectItem.addEventListener('change', function () {
                 const selectedOption = this.options[this.selectedIndex];
                 if (selectedOption.value) {
                     const quantidade = selectedOption.dataset.quantidade;
                     const unidade = selectedOption.dataset.unidade;
-                    estoqueInfo.textContent = `Estoque disponível: ${quantidade} ${unidade}`;
+                    
+                    // Mostrar informações de estoque apenas para administradores
+                    if (isAdmin) {
+                        estoqueInfo.textContent = `Estoque disponível: ${quantidade} ${unidade}`;
+                    } else {
+                        estoqueInfo.textContent = '';
+                    }
+                    
                     quantidadeInput.max = quantidade;
                 } else {
                     estoqueInfo.textContent = '';

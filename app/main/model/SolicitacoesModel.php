@@ -56,20 +56,22 @@ class Solicitacoes {
     // Buscar todas as solicitações com informações dos itens
     public function buscarTodasSolicitacoes($id_usuario = null) {
         if ($_SESSION['usuariologado']['TIPO'] == 'usuario') {
-            $sql = "SELECT m.*, i.nome as item_nome, i.unidade, u.nome as usuario_nome 
+            $sql = "SELECT m.*, i.nome as item_nome, i.unidade, u.nome as usuario_nome, us.nome as solicitante_nome 
                     FROM movimentacoes m 
                     INNER JOIN itens i ON m.id_item = i.id 
                     INNER JOIN usuario u ON m.id_usuario = u.id 
+                    LEFT JOIN usuario us ON m.id_solicitante = us.id
                     WHERE m.tipo = 'saida' AND m.id_usuario = :id_usuario
                     ORDER BY m.data DESC, m.id DESC";
             
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([':id_usuario' => $id_usuario]);
         } else {
-            $sql = "SELECT m.*, i.nome as item_nome, i.unidade, u.nome as usuario_nome 
+            $sql = "SELECT m.*, i.nome as item_nome, i.unidade, u.nome as usuario_nome, us.nome as solicitante_nome 
                     FROM movimentacoes m 
                     INNER JOIN itens i ON m.id_item = i.id 
                     INNER JOIN usuario u ON m.id_usuario = u.id 
+                    LEFT JOIN usuario us ON m.id_solicitante = us.id
                     WHERE m.tipo = 'saida'
                     ORDER BY m.data DESC, m.id DESC";
             
