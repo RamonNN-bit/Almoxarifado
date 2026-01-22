@@ -1,22 +1,24 @@
 <?php
-$pdo = new PDO('mysql:unix_socket=/Applications/XAMPP/xamppfiles/var/mysql/mysql.sock;dbname=almoxarifado;charset=utf8', 'root', '');
-$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-
+// Configuração para Windows (XAMPP)
 $host = 'localhost';
 $usuario = 'root';
 $senha = '';
 $nome_banco = 'almoxarifado';
 
-$link = mysqli_connect($host, $usuario, $senha, $nome_banco, 3306, '/Applications/XAMPP/xamppfiles/var/mysql/mysql.sock');
+// Conexão PDO
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$nome_banco;charset=utf8", $usuario, $senha);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Erro na conexão PDO: " . $e->getMessage());
+}
+
+// Conexão MySQLi (para compatibilidade)
+$link = mysqli_connect($host, $usuario, $senha, $nome_banco);
 mysqli_set_charset($link, 'utf8');
 if (!$link) {
-    die("A Conexão falhou:" . mysqli_connect_error());
+    die("A Conexão falhou: " . mysqli_connect_error());
 }
-mysqli_set_charset($link, 'utf8');
-
-
-
 
 date_default_timezone_set('America/Sao_Paulo');
 ?>

@@ -1,0 +1,61 @@
+========================================
+ATUALIZAÇÃO DO BANCO DE DADOS
+========================================
+
+PROBLEMA IDENTIFICADO:
+- O campo 'observacao' estava sendo usado no código mas não existia no banco de dados
+- Isso impedia que as funcionalidades de aprovar/recusar solicitações funcionassem
+
+CORREÇÕES APLICADAS:
+1. Campo 'observacao' adicionado na tabela movimentacoes
+2. Script de atualização automática criado
+3. Estrutura do banco.sql atualizada
+
+========================================
+COMO ATUALIZAR O BANCO DE DADOS
+========================================
+
+OPÇÃO 1 - Script Automático (RECOMENDADO):
+1. Acesse via navegador: http://localhost/GitHub/Almoxarifado/app/main/config/update_database.php
+2. O script verificará e adicionará os campos faltantes automaticamente
+3. Você verá mensagens de sucesso para cada campo adicionado
+
+OPÇÃO 2 - Via phpMyAdmin:
+1. Acesse o phpMyAdmin
+2. Selecione o banco 'almoxarifado'
+3. Vá em SQL e execute:
+   ALTER TABLE `movimentacoes` 
+   ADD COLUMN `observacao` TEXT DEFAULT NULL AFTER `id_usuario`;
+
+OPÇÃO 3 - Via linha de comando MySQL:
+mysql -u root -p almoxarifado < app/main/config/atualizar_banco.sql
+
+========================================
+CAMPOS ADICIONADOS
+========================================
+
+Tabela: movimentacoes
+- observacao (TEXT, NULL) - Armazena observações ao aprovar/recusar solicitações
+
+========================================
+VERIFICAÇÃO
+========================================
+
+Após executar a atualização, verifique se o campo foi adicionado:
+- No phpMyAdmin: Estrutura da tabela movimentacoes
+- Via SQL: DESCRIBE movimentacoes;
+
+Você deve ver o campo 'observacao' na lista de campos.
+
+========================================
+TESTE
+========================================
+
+Após a atualização:
+1. Acesse a página de solicitações
+2. Tente aprovar ou recusar uma solicitação
+3. Adicione uma observação
+4. A ação deve funcionar corretamente agora
+
+========================================
+

@@ -1,0 +1,65 @@
+========================================
+SOLUÇÃO RÁPIDA - ERRO: Campo 'observacao' não encontrado
+========================================
+
+ERRO:
+SQLSTATE[42S22]: Column not found: 1054 Unknown column 'observacao' in 'field list'
+
+SOLUÇÃO:
+Execute um dos métodos abaixo para adicionar o campo faltante:
+
+========================================
+MÉTODO 1 - Script Automático (MAIS FÁCIL)
+========================================
+1. Abra no navegador:
+   http://localhost/GitHub/Almoxarifado/app/main/config/adicionar_observacao.php
+
+2. O script adicionará o campo automaticamente
+3. Pronto! Tente aprovar/recusar novamente
+
+========================================
+MÉTODO 2 - Via phpMyAdmin (MANUAL)
+========================================
+1. Acesse o phpMyAdmin (http://localhost/phpmyadmin)
+2. Selecione o banco de dados "almoxarifado"
+3. Clique na aba "SQL"
+4. Cole e execute este comando:
+
+ALTER TABLE `movimentacoes` 
+ADD COLUMN `observacao` TEXT DEFAULT NULL AFTER `id_usuario`;
+
+5. Clique em "Executar"
+6. Pronto! Tente aprovar/recusar novamente
+
+========================================
+MÉTODO 3 - Via Linha de Comando MySQL
+========================================
+Abra o terminal/prompt de comando e execute:
+
+mysql -u root -p almoxarifado
+
+Depois execute:
+ALTER TABLE movimentacoes ADD COLUMN observacao TEXT DEFAULT NULL AFTER id_usuario;
+
+========================================
+VERIFICAÇÃO
+========================================
+Após executar, verifique se funcionou:
+
+No phpMyAdmin:
+- Vá em "Estrutura" da tabela "movimentacoes"
+- Procure pelo campo "observacao"
+- Deve aparecer como tipo "text"
+
+Ou execute no SQL:
+DESCRIBE movimentacoes;
+
+========================================
+OBSERVAÇÃO
+========================================
+O código foi atualizado para tentar adicionar o campo automaticamente,
+mas se o usuário do banco não tiver permissões ALTER TABLE, será
+necessário executar manualmente usando um dos métodos acima.
+
+========================================
+

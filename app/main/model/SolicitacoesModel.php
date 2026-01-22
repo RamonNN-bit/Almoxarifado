@@ -28,14 +28,15 @@ class Solicitacoes {
             }
             
             // Criar solicitação com status 'em espera'
-            $sql_solicitacao = "INSERT INTO movimentacoes (id_item, tipo, status, quantidade, data, id_usuario, id_solicitante) 
-                               VALUES (:id_item, 'saida', 'em espera', :quantidade, NOW(), :id_usuario, :id_usuario_s)";
+            // id_usuario é o usuário que está criando/aprovando (admin), id_usuario_s é o solicitante
+            // Como a tabela só tem id_usuario, vamos usar ele para o solicitante
+            $sql_solicitacao = "INSERT INTO movimentacoes (id_item, tipo, status, quantidade, data, id_usuario) 
+                               VALUES (:id_item, 'saida', 'em espera', :quantidade, CURDATE(), :id_usuario_s)";
             
             $stmt_solicitacao = $this->pdo->prepare($sql_solicitacao);
             $resultado = $stmt_solicitacao->execute([
                 ':id_item' => $id_item,
                 ':quantidade' => $quantidade_solicitada,
-                ':id_usuario' => $id_usuario,
                 ':id_usuario_s' => $id_usuario_s
             ]);
             
@@ -55,23 +56,26 @@ class Solicitacoes {
 
     // Buscar todas as solicitações com informações dos itens
     public function buscarTodasSolicitacoes($id_usuario = null) {
-        if ($_SESSION['usuariologado']['TIPO'] == 'usuario') {
-            $sql = "SELECT m.*, i.nome as item_nome, i.unidade, u.nome as usuario_nome, us.nome as solicitante_nome 
+        // Verificar se é usuário comum ou admin
+        $isUsuario = isset($_SESSION['usuariologado']['TIPO']) && $_SESSION['usuariologado']['TIPO'] == 'usuario';
+        
+        if ($isUsuario && $id_usuario !== null) {
+            // Usuário comum - buscar apenas suas solicitações
+            $sql = "SELECT m.*, i.nome as item_nome, i.unidade, u.nome as usuario_nome, u.nome as solicitante_nome 
                     FROM movimentacoes m 
                     INNER JOIN itens i ON m.id_item = i.id 
                     INNER JOIN usuario u ON m.id_usuario = u.id 
-                    LEFT JOIN usuario us ON m.id_solicitante = us.id
                     WHERE m.tipo = 'saida' AND m.id_usuario = :id_usuario
                     ORDER BY m.data DESC, m.id DESC";
             
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([':id_usuario' => $id_usuario]);
         } else {
-            $sql = "SELECT m.*, i.nome as item_nome, i.unidade, u.nome as usuario_nome, us.nome as solicitante_nome 
+            // Admin - buscar todas as solicitações
+            $sql = "SELECT m.*, i.nome as item_nome, i.unidade, u.nome as usuario_nome, u.nome as solicitante_nome 
                     FROM movimentacoes m 
                     INNER JOIN itens i ON m.id_item = i.id 
                     INNER JOIN usuario u ON m.id_usuario = u.id 
-                    LEFT JOIN usuario us ON m.id_solicitante = us.id
                     WHERE m.tipo = 'saida'
                     ORDER BY m.data DESC, m.id DESC";
             
@@ -97,6 +101,19 @@ class Solicitacoes {
 
     // Aprovar solicitação (atualizar estoque e status)
     public function aprovarSolicitacao($id_solicitacao, $observacao = '') {
+        // Verificar se o campo observacao existe ANTES de iniciar a transação
+        // ALTER TABLE faz commit automático e encerra transações
+        try {
+            $check_observacao = $this->pdo->query("SHOW COLUMNS FROM movimentacoes LIKE 'observacao'");
+            if ($check_observacao->rowCount() == 0) {
+                // Tentar adicionar o campo automaticamente (fora da transação)
+                $this->pdo->exec("ALTER TABLE movimentacoes ADD COLUMN observacao TEXT DEFAULT NULL AFTER id_usuario");
+            }
+        } catch (PDOException $e) {
+            // Se não conseguir adicionar, continuar (pode ser problema de permissões)
+            error_log("Aviso: Não foi possível verificar/adicionar campo observacao: " . $e->getMessage());
+        }
+        
         try {
             $this->pdo->beginTransaction();
             
@@ -107,6 +124,9 @@ class Solicitacoes {
             $solicitacao = $stmt_buscar->fetch(PDO::FETCH_ASSOC);
             
             if (!$solicitacao) {
+                if ($this->pdo->inTransaction()) {
+                    $this->pdo->rollback();
+                }
                 throw new Exception("Solicitação não encontrada ou já processada");
             }
             
@@ -117,6 +137,9 @@ class Solicitacoes {
             $item = $stmt_estoque->fetch(PDO::FETCH_ASSOC);
             
             if ($item['quantidade'] < $solicitacao['quantidade']) {
+                if ($this->pdo->inTransaction()) {
+                    $this->pdo->rollback();
+                }
                 throw new Exception("Estoque insuficiente para aprovar a solicitação");
             }
             
@@ -137,21 +160,40 @@ class Solicitacoes {
             ]);
             
             if ($resultado) {
-                $this->pdo->commit();
+                if ($this->pdo->inTransaction()) {
+                    $this->pdo->commit();
+                }
                 return true;
             } else {
-                $this->pdo->rollback();
+                if ($this->pdo->inTransaction()) {
+                    $this->pdo->rollback();
+                }
                 return false;
             }
             
         } catch (Exception $e) {
-            $this->pdo->rollback();
+            if ($this->pdo->inTransaction()) {
+                $this->pdo->rollback();
+            }
             throw $e;
         }
     }
 
     // Rejeitar solicitação (atualizar status)
     public function rejeitarSolicitacao($id_solicitacao, $observacao = '') {
+        // Verificar se o campo observacao existe ANTES de qualquer operação
+        // ALTER TABLE faz commit automático e encerra transações
+        try {
+            $check_observacao = $this->pdo->query("SHOW COLUMNS FROM movimentacoes LIKE 'observacao'");
+            if ($check_observacao->rowCount() == 0) {
+                // Tentar adicionar o campo automaticamente (fora da transação)
+                $this->pdo->exec("ALTER TABLE movimentacoes ADD COLUMN observacao TEXT DEFAULT NULL AFTER id_usuario");
+            }
+        } catch (PDOException $e) {
+            // Se não conseguir adicionar, continuar (pode ser problema de permissões)
+            error_log("Aviso: Não foi possível verificar/adicionar campo observacao: " . $e->getMessage());
+        }
+        
         try {
             $sql = "UPDATE movimentacoes SET status = 'recusado', observacao = :observacao WHERE id = :id AND status = 'em espera'";
             $stmt = $this->pdo->prepare($sql);

@@ -47,6 +47,11 @@ try {
     // Em caso de erro, usar valores padrão
     
 }
+// Inicializar variáveis
+$erros = [];
+$itens_disponiveis = [];
+$solicitacoes = [];
+
 // Buscar todos os itens disponíveis
 try {
     $itensModel = new Itens($pdo);
@@ -63,8 +68,12 @@ try {
 
 // Buscar todas as solicitações do usuário logado
 try {
-    $solicitacoesModel = new Solicitacoes($pdo);
-    $solicitacoes = $solicitacoesModel->buscarTodasSolicitacoes($id_usuario);
+    // Se for admin, buscar todas as solicitações; senão, apenas do usuário
+    if ($_SESSION['admin']) {
+        $solicitacoes = $solicitacoesModel->buscarTodasSolicitacoes(null);
+    } else {
+        $solicitacoes = $solicitacoesModel->buscarTodasSolicitacoes($id_usuario);
+    }
 } catch (Exception $e) {
     $erros[] = "Erro ao buscar solicitações: " . $e->getMessage();
     $solicitacoes = [];

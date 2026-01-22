@@ -17,38 +17,57 @@ $solicitacoesModel = new Solicitacoes($pdo);
 try {
     // Buscar todos os itens
     $itens = $itensModel->buscarTodosItens();
+    
+    // Inicializar variáveis
+    $total_itens_estoque = 0;
+    $itens_criticos = [];
+    $itens_em_falta = [];
+    
+    if (!empty($itens) && is_array($itens)) {
+        // Calcular estatísticas de itens
+        // Total de itens diferentes no estoque (não a soma das quantidades)
+        $total_itens_estoque = count($itens);
+        $itens_criticos = array_filter($itens, function ($item) {
+            return isset($item['quantidade']) && $item['quantidade'] <= 10; // Considerar crítico se <= 10
+        });
+        $itens_em_falta = array_filter($itens, function ($item) {
+            return isset($item['quantidade']) && $item['quantidade'] == 0;
+        });
+    }
 
-    // Calcular estatísticas de itens
-    $total_itens_estoque = array_sum(array_column($itens, 'quantidade'));
-    $itens_criticos = array_filter($itens, function ($item) {
-        return $item['quantidade'] <= 10; // Considerar crítico se <= 10
-    });
-    $itens_em_falta = array_filter($itens, function ($item) {
-        return $item['quantidade'] == 0;
-    });
+    // Buscar todas as solicitações (admin vê todas)
+    $solicitacoes = $solicitacoesModel->buscarTodasSolicitacoes(null);
+    
+    // Inicializar arrays de solicitações
+    $solicitacoes_hoje = [];
+    $solicitacoes_pendentes = [];
+    $solicitacoes_aprovadas = [];
+    $solicitacoes_recusadas = [];
+    $ultimas_solicitacoes = [];
+    
+    if (!empty($solicitacoes) && is_array($solicitacoes)) {
+        // Calcular estatísticas de solicitações
+        $solicitacoes_hoje = array_filter($solicitacoes, function ($s) {
+            if (!isset($s['data'])) return false;
+            $data_solicitacao = is_string($s['data']) ? strtotime($s['data']) : $s['data'];
+            return date('Y-m-d', $data_solicitacao) == date('Y-m-d');
+        });
 
-    // Buscar todas as solicitações
-    $solicitacoes = $solicitacoesModel->buscarTodasSolicitacoes();
+        $solicitacoes_pendentes = array_filter($solicitacoes, function ($s) {
+            return isset($s['status']) && $s['status'] === 'em espera';
+        });
 
-    // Calcular estatísticas de solicitações
-    $solicitacoes_hoje = array_filter($solicitacoes, function ($s) {
-        return date('Y-m-d', strtotime($s['data'])) == date('Y-m-d');
-    });
+        $solicitacoes_aprovadas = array_filter($solicitacoes, function ($s) {
+            return isset($s['status']) && $s['status'] === 'aprovado';
+        });
 
-    $solicitacoes_pendentes = array_filter($solicitacoes, function ($s) {
-        return $s['status'] === 'em espera';
-    });
+        $solicitacoes_recusadas = array_filter($solicitacoes, function ($s) {
+            return isset($s['status']) && $s['status'] === 'recusado';
+        });
 
-    $solicitacoes_aprovadas = array_filter($solicitacoes, function ($s) {
-        return $s['status'] === 'aprovado';
-    });
-
-    $solicitacoes_recusadas = array_filter($solicitacoes, function ($s) {
-        return $s['status'] === 'recusado';
-    });
-
-    // Buscar últimas solicitações (limitado a 5)
-    $ultimas_solicitacoes = array_slice($solicitacoes, 0, 5);
+        // Buscar últimas solicitações (limitado a 5)
+        $ultimas_solicitacoes = array_slice($solicitacoes, 0, 5);
+    }
 } catch (Exception $e) {
     // Em caso de erro, usar valores padrão
     $total_itens_estoque = 0;
@@ -60,6 +79,7 @@ try {
     $solicitacoes_recusadas = [];
     $ultimas_solicitacoes = [];
     $erro = $e->getMessage();
+    error_log("Erro no dashboard admin: " . $e->getMessage());
 }
 ?>
 <!DOCTYPE html>
@@ -555,7 +575,7 @@ try {
                                         <polyline points="3.27,6.96 12,12.01 20.73,6.96"/>
                                         <line x1="12" y1="22.08" x2="12" y2="12"/>
                                     </svg>
-                                    <span class="text-sm text-gray-600">Total em estoque</span>
+                                    <span class="text-sm text-gray-600">Itens cadastrados</span>
                                 </div>
                                 <span
                                     class="text-sm font-semibold text-gray-900"><?php echo number_format($total_itens_estoque); ?></span>
@@ -616,8 +636,28 @@ try {
                                                 <td class="px-6 py-4 text-sm text-gray-600">
                                                     <?php echo htmlspecialchars($item['marca'] ?? 'N/A'); ?>
                                                 </td>
-                                                <td class="px-6 py-4 text-sm text-gray-900"><?php echo $item['quantidade']; ?>
-                                                    <?php echo htmlspecialchars($item['unidade']); ?>
+                                                <td class="px-6 py-4 text-sm text-gray-900">
+                                                    <?php 
+                                                    $quantidade = $item['quantidade'];
+                                                    $unidade = $item['unidade'] ?? '';
+                                                    
+                                                    // Se unidade for numérico ou vazio, tratar adequadamente
+                                                    if (empty($unidade) || (is_numeric($unidade) && $unidade == 0)) {
+                                                        $unidade = 'unidades';
+                                                    } elseif (is_numeric($unidade)) {
+                                                        // Mapear números para unidades (se necessário)
+                                                        $unidades_map = [
+                                                            1 => 'unidades', 2 => 'kg', 3 => 'g', 4 => 'litros',
+                                                            5 => 'ml', 6 => 'metros', 7 => 'cm', 8 => 'mm',
+                                                            9 => 'caixas', 10 => 'pacotes', 11 => 'frascos',
+                                                            12 => 'tubos', 13 => 'pares', 14 => 'conjuntos'
+                                                        ];
+                                                        $unidade = $unidades_map[(int)$unidade] ?? 'unidades';
+                                                    }
+                                                    
+                                                    // Exibir quantidade e unidade com espaço entre eles
+                                                    echo number_format($quantidade, 0, ',', '.') . ' ' . htmlspecialchars($unidade);
+                                                    ?>
                                                 </td>
                                                 <td class="px-6 py-4">
                                                     <?php if ($item['quantidade'] == 0): ?>
